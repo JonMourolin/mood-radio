@@ -1,29 +1,15 @@
-import { StyleSheet, FlatList, Image, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, FlatList, Image, TouchableOpacity, Dimensions, ActivityIndicator, View } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
 import { StatusBar } from 'expo-status-bar';
-
-// Type pour les Long Mixs
-interface Tag {
-  id: string;
-  name: string;
-}
-
-interface LongMix {
-  id: string;
-  title: string;
-  artist: string;
-  description: string;
-  duration: number;
-  coverUrl: string;
-  cloudinaryPublicId: string;
-  tags: Tag[];
-}
+import { LongMix, fetchLongMixs, buildCloudinaryAudioUrl } from '@/services/cloudinaryService';
+import MiniPlayer from '@/components/MiniPlayer';
+import { MaterialIcons } from '@expo/vector-icons';
 
 // Composant pour afficher un mix
-const MixCard = ({ mix, onPress }: { mix: LongMix; onPress: () => void }) => {
+const MixCard = ({ mix, onPress, isPlaying }: { mix: LongMix; onPress: () => void; isPlaying: boolean }) => {
   // Formater la durée en format lisible
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -39,19 +25,26 @@ const MixCard = ({ mix, onPress }: { mix: LongMix; onPress: () => void }) => {
   };
 
   return (
-    <TouchableOpacity style={styles.mixCard} onPress={onPress}>
+    <TouchableOpacity 
+      style={[styles.mixCard, isPlaying && styles.playingCard]} 
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
       <Image 
         source={{ uri: mix.coverUrl }}
         style={styles.mixCover}
         resizeMode="cover"
       />
       <ThemedView style={styles.mixInfo}>
-        <ThemedText type="subtitle">{mix.title}</ThemedText>
-        <ThemedText>{mix.artist}</ThemedText>
+        <ThemedView>
+          <ThemedText type="subtitle">{mix.title}</ThemedText>
+          <ThemedText>{mix.artist}</ThemedText>
+          <ThemedText style={styles.folderName}>Dossier: {mix.folder}</ThemedText>
+        </ThemedView>
         <ThemedView style={styles.mixMeta}>
           <ThemedText style={styles.duration}>{formatDuration(mix.duration)}</ThemedText>
           <ThemedView style={styles.tagsContainer}>
-            {mix.tags.slice(0, 2).map(tag => (
+            {mix.tags.map(tag => (
               <ThemedView key={tag.id} style={styles.tag}>
                 <ThemedText style={styles.tagText}>{tag.name}</ThemedText>
               </ThemedView>
@@ -67,17 +60,24 @@ export default function LongMixsScreen() {
   const [mixs, setMixs] = useState<LongMix[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const [currentMixId, setCurrentMixId] = useState<string | null>(null);
+  const [currentMix, setCurrentMix] = useState<LongMix | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Configurer l'audio
   useEffect(() => {
     const configureAudio = async () => {
-      await Audio.setAudioModeAsync({
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: true,
-        interruptionModeIOS: InterruptionModeIOS.DuckOthers,
-        interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
-      });
+      try {
+        await Audio.setAudioModeAsync({
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: true,
+          interruptionModeIOS: InterruptionModeIOS.DuckOthers,
+          interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
+        });
+      } catch (error) {
+        console.error('Failed to configure audio:', error);
+        setError('Impossible de configurer l\'audio');
+      }
     };
 
     configureAudio();
@@ -90,68 +90,92 @@ export default function LongMixsScreen() {
     };
   }, []);
 
-  // Fonction pour construire l'URL Cloudinary pour l'audio
-  const buildCloudinaryUrl = (publicId: string) => {
-    // Remplacer avec votre cloud name Cloudinary
-    return `https://res.cloudinary.com/dyom5zfbh/video/upload/${publicId}`;
-  };
-
-  // Charger les mixs (simulation pour l'instant)
+  // Charger les mixs depuis notre service
   useEffect(() => {
-    // Simuler un chargement de données
-    setTimeout(() => {
-      setMixs([
-        {
-          id: '1',
-          title: 'Deep House Journey',
-          artist: 'DJ Ambient',
-          description: 'A deep house mix for your coding sessions',
-          duration: 5400, // 1h30
-          coverUrl: 'https://res.cloudinary.com/dyom5zfbh/image/upload/v1742502488/default-cover.jpg',
-          cloudinaryPublicId: 'sample-audio',
-          tags: [{ id: '1', name: 'Deep House' }, { id: '2', name: 'Chill' }]
-        },
-        {
-          id: '2',
-          title: 'Techno Dreams',
-          artist: 'TechMaster',
-          description: 'Hard-hitting techno for intense focus',
-          duration: 3600, // 1h
-          coverUrl: 'https://res.cloudinary.com/dyom5zfbh/image/upload/v1742502488/default-cover.jpg',
-          cloudinaryPublicId: 'sample-audio-2',
-          tags: [{ id: '3', name: 'Techno' }, { id: '4', name: 'Dark' }]
-        },
-        // Ajouter plus de mixs ici
-      ]);
-      setIsLoading(false);
-    }, 1000);
+    const loadMixs = async () => {
+      try {
+        setIsLoading(true);
+        const loadedMixs = await fetchLongMixs();
+        setMixs(loadedMixs);
+        setError(null);
+      } catch (error) {
+        console.error('Error loading mixes:', error);
+        setError('Impossible de charger les mixs');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMixs();
   }, []);
 
-  // Fonction pour jouer un mix
+  // Fonction pour jouer un mix avec plus de logs
   const playMix = async (mix: LongMix) => {
     try {
-      // Arrêter la lecture actuelle s'il y en a une
+      // Arrêter le mix en cours s'il y en a un
       if (sound) {
-        await sound.unloadAsync();
+        await sound.stopAsync();
+        sound.unloadAsync();
       }
-
+      
+      // Réinitialiser l'erreur précédente
+      setError(null);
+      
+      // Utiliser directement l'URL audio pré-construite
+      const audioUrl = mix.audioUrl;
+      
+      // Afficher les détails pour le débogage
+      console.log('=== INFORMATIONS DE DEBUG ===');
+      console.log(`URL audio: ${audioUrl}`);
+      console.log(`URL couverture: ${mix.coverUrl}`);
+      console.log(`Dossier: ${mix.folder}`);
+      console.log('============================');
+      
       // Créer une nouvelle instance de son
       const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: buildCloudinaryUrl(mix.cloudinaryPublicId) },
-        { shouldPlay: true }
+        { uri: audioUrl },
+        { shouldPlay: true },
+        (status) => {
+          if (status.isLoaded) {
+            if (status.didJustFinish) {
+              setIsPlaying(false);
+              setCurrentMix(null);
+              console.log(`Lecture terminée pour: ${mix.title}`);
+            } else {
+              setIsPlaying(!status.isPlaying);
+            }
+          }
+        }
       );
       
+      // Configurer le nouvel objet son
       setSound(newSound);
-      setCurrentMixId(mix.id);
+      setIsPlaying(true);
+      setCurrentMix(mix);
       
-      // Configurer les événements du son
-      newSound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          setCurrentMixId(null);
-        }
-      });
+      // Obtenir le statut initial pour vérifier la durée
+      const initialStatus = await newSound.getStatusAsync();
+      console.log(`Son chargé avec succès: ${mix.title}`);
+      if (initialStatus.isLoaded) {
+        console.log(`Durée: ${initialStatus.durationMillis ? initialStatus.durationMillis / 1000 : 'inconnue'} secondes`);
+      } else {
+        console.log('Statut non chargé, impossible d\'obtenir la durée');
+      }
+      
     } catch (error) {
-      console.error('Error playing mix:', error);
+      console.error("Erreur lors de la lecture du mix:", error);
+      setError(`Impossible de lire ${mix.title}. Vérifiez l'URL du fichier audio: ${mix.audioUrl}`);
+      setIsPlaying(false);
+      setCurrentMix(null);
+    }
+  };
+
+  // Fonction pour arrêter la lecture
+  const stopPlayback = async () => {
+    if (sound) {
+      await sound.unloadAsync();
+      setSound(null);
+      setCurrentMix(null);
     }
   };
 
@@ -160,12 +184,41 @@ export default function LongMixsScreen() {
       <StatusBar style="auto" />
       <ThemedView style={styles.header}>
         <ThemedText type="title">Long Mixs</ThemedText>
-        <ThemedText>Extended sessions for continuous listening</ThemedText>
+        <ThemedText>Mixs musicaux de longue durée</ThemedText>
       </ThemedView>
+
+      <ThemedView style={styles.infoContainer}>
+        <ThemedText style={styles.infoTitle}>Configuration Cloudinary</ThemedText>
+        <ThemedText style={styles.infoText}>
+          Structure sur Cloudinary:
+        </ThemedText>
+        <ThemedText style={styles.infoText}>
+          • Dossier principal: web-radio/longmixs/
+        </ThemedText>
+        <ThemedText style={styles.infoText}>
+          • Sous-dossiers: costa-arenbi, mamene-break, etc.
+        </ThemedText>
+        <ThemedText style={styles.infoText}>
+          • Dans chaque sous-dossier: un fichier MP3 et une image
+        </ThemedText>
+        <ThemedText style={styles.infoText}>
+          • Les noms des fichiers doivent être 'mix' et 'cover'
+        </ThemedText>
+        <ThemedText style={styles.infoText}>
+          En cas d'erreur, vérifiez les URLs dans la console de debug.
+        </ThemedText>
+      </ThemedView>
+
+      {error && (
+        <ThemedView style={styles.errorContainer}>
+          <ThemedText style={styles.errorText}>{error}</ThemedText>
+        </ThemedView>
+      )}
 
       {isLoading ? (
         <ThemedView style={styles.loadingContainer}>
-          <ThemedText>Loading mixes...</ThemedText>
+          <ActivityIndicator size="large" color="#3b82f6" />
+          <ThemedText style={styles.loadingText}>Chargement des mixs...</ThemedText>
         </ThemedView>
       ) : (
         <FlatList
@@ -174,30 +227,27 @@ export default function LongMixsScreen() {
           renderItem={({ item }) => (
             <MixCard 
               mix={item} 
-              onPress={() => playMix(item)} 
+              onPress={() => playMix(item)}
+              isPlaying={currentMix?.id === item.id}
             />
           )}
           contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={
+            <ThemedView style={styles.emptyContainer}>
+              <ThemedText>Aucun mix disponible pour le moment</ThemedText>
+            </ThemedView>
+          }
         />
       )}
 
-      {/* Mini Player (à développer davantage) */}
-      {currentMixId && (
-        <ThemedView style={styles.miniPlayer}>
-          <ThemedText>
-            Now Playing: {mixs.find(m => m.id === currentMixId)?.title}
-          </ThemedText>
-          <TouchableOpacity
-            onPress={async () => {
-              if (sound) {
-                await sound.unloadAsync();
-                setCurrentMixId(null);
-              }
-            }}
-          >
-            <ThemedText>Stop</ThemedText>
-          </TouchableOpacity>
-        </ThemedView>
+      {/* Mini Player */}
+      {currentMix && (
+        <MiniPlayer 
+          mix={currentMix}
+          sound={sound}
+          onClose={stopPlayback}
+        />
       )}
     </ThemedView>
   );
@@ -219,8 +269,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  loadingText: {
+    marginTop: 12,
+  },
+  errorContainer: {
+    backgroundColor: 'rgba(220, 38, 38, 0.1)',
+    padding: 12,
+    marginHorizontal: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  errorText: {
+    color: '#dc2626',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
   listContent: {
     padding: 16,
+    paddingBottom: 100, // Extra space for mini player
   },
   mixCard: {
     flexDirection: 'row',
@@ -232,6 +302,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
+  },
+  playingCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#3b82f6', // Blue color for currently playing
   },
   mixCover: {
     width: 120,
@@ -248,32 +322,53 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   duration: {
-    fontSize: 12,
+    fontSize: 14,
+    opacity: 0.7,
   },
   tagsContainer: {
     flexDirection: 'row',
   },
   tag: {
-    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-    borderRadius: 4,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 4,
+    borderRadius: 4,
     marginLeft: 4,
   },
   tagText: {
-    fontSize: 10,
+    fontSize: 12,
+    color: '#3b82f6',
   },
-  miniPlayer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(0, 0, 0, 0.1)',
-  }
+  folderName: {
+    fontSize: 12,
+    opacity: 0.6,
+    marginTop: 2,
+  },
+  infoContainer: {
+    margin: 16,
+    padding: 12,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  infoTitle: {
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  infoText: {
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  codePath: {
+    fontFamily: 'monospace',
+    fontSize: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    paddingHorizontal: 4,
+  },
+  codeText: {
+    fontFamily: 'monospace',
+    fontSize: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    paddingHorizontal: 4,
+  },
 }); 
