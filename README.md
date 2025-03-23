@@ -1,50 +1,42 @@
-# Welcome to your Expo app 👋
+# Web Radio Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Une application mobile et web pour écouter des mixs musicaux de longue durée.
 
-## Get started
+## Fonctionnalités
 
-1. Install dependencies
+- Écoute de mixs musicaux de longue durée
+- Interface utilisateur intuitive
+- Options de personnalisation via l'écran des paramètres
 
-   ```bash
-   npm install
-   ```
+## Technologies utilisées
 
-2. Start the app
+- React Native
+- Expo
+- Expo Router
+- Material Icons
 
-   ```bash
-    npx expo start
-   ```
+## Déploiement
 
-In the output, you'll find options to open the app in a
+L'application est déployée sur:
+- **Web**: [https://web-radio-mobile.expo.app](https://web-radio-mobile.expo.app)
+- **Mobile**: Bientôt disponible sur iOS et Android
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Installation pour développement
 
 ```bash
-npm run reset-project
+# Cloner le dépôt
+git clone https://github.com/votre-username/web-radio-mobile.git
+cd web-radio-mobile
+
+# Installer les dépendances
+npm install
+
+# Lancer l'application en mode développement
+npm run web  # Pour la version web
+npm run ios  # Pour iOS
+npm run android  # Pour Android
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Licence
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+MIT
