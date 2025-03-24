@@ -5,6 +5,13 @@ Toutes les modifications notables apportées à ce projet seront documentées da
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2025-03-24
+
+### Corrigé
+- Correction des URLs de streaming pour "Mamene Break 2" et "Web Radio Mixes"
+- Adaptation des points de montage aux noms réels sur le serveur Icecast (mamene2.mp3 et webradio.mp3)
+- Amélioration de la fiabilité des connexions aux flux de streaming
+
 ## [1.1.0] - 2024-07-16
 
 ### Ajouté

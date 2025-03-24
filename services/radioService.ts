@@ -44,7 +44,7 @@ export const AVAILABLE_STREAMS: Stream[] = [
     id: 'mamene-break-2',
     title: 'Mamene Break 2',
     artist: 'DJ Mamene',
-    url: `http://${SERVER_IP}:${SERVER_PORT}/mamene-break-2.mp3`,
+    url: `http://${SERVER_IP}:${SERVER_PORT}/mamene2.mp3`,
     genre: 'Breakbeat',
     description: 'Breakbeat mixes by DJ Mamene'
   },
@@ -52,7 +52,7 @@ export const AVAILABLE_STREAMS: Stream[] = [
     id: 'radio',
     title: 'Web Radio Mixes',
     artist: 'Various Artists',
-    url: `http://${SERVER_IP}:${SERVER_PORT}/radio.mp3`,
+    url: `http://${SERVER_IP}:${SERVER_PORT}/webradio.mp3`,
     genre: 'Mixed',
     description: 'Rotation of all DJ mixes'
   }
