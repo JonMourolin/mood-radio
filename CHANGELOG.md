@@ -1,3 +1,45 @@
+# Changelog - Web Radio Mobile App
+
+## [Unreleased] - Prochaine version
+
+### Prochaines étapes prévues
+- Augmenter davantage la taille du burst dans Icecast (tester 512K ou 1MB)
+- Explorer les options avec Liquidsoap pour une meilleure gestion des fichiers statiques
+- Convertir les MP3 en format HLS (m3u8) pour un streaming optimisé
+- Améliorer l'interface utilisateur pour afficher la progression du préchargement
+
+## [0.2.0] - Date : 2023-11-27
+
+### Ajouts
+- Implémentation d'un mécanisme de préchargement pour les DJ sets
+- Intégration de TrackPlayer pour une meilleure gestion de l'audio
+- Ajout d'une interface de progression pour le préchargement
+- Support avancé pour les plateformes web et mobile
+
+### Modifications
+- Optimisation des paramètres de buffer pour TrackPlayer
+- Configuration du serveur Icecast avec un burst-size augmenté (maintenant à 65535)
+- Mise en œuvre du cache-busting pour éviter les problèmes de mise en cache
+- Amélioration de la gestion des états audio (chargement, lecture, mise en tampon)
+
+### Corrections
+- Résolution partielle du problème de lecture depuis le début pour les DJ sets
+- Amélioration de la fiabilité du streaming sur différentes plateformes
+- Gestion améliorée des erreurs de lecture
+
+### Technique
+- Mise à jour des dépendances pour supporter les fonctionnalités avancées d'audio
+- Intégration de Shaka Player pour le web
+- Refactorisation du service audio pour une meilleure modularité
+
+## [0.1.0] - Version initiale
+
+### Fonctionnalités
+- Application React Native pour la lecture de flux radio web
+- Support pour différents streams (webradio et DJ sets)
+- Interface utilisateur de base pour la sélection et la lecture des flux
+- Support multiplateforme (web, iOS, Android)
+
 # Changelog
 
 Toutes les modifications notables apportées à ce projet seront documentées dans ce fichier.
