@@ -1,52 +1,39 @@
-import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-
-import { HapticTab } from '@/components/HapticTab';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { Tabs } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useThemeColor } from '../../hooks/useThemeColor';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+  const tintColor = useThemeColor({ light: '#3b82f6', dark: '#60a5fa' }, 'tint');
+  
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="longmixs"
-        options={{
-          title: 'Long Mixs',
-          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="queue-music" color={color} />,
-        }}
-      />
+        tabBarActiveTintColor: tintColor,
+        headerShown: true,
+      }}
+    >
       <Tabs.Screen
         name="radio"
         options={{
           title: 'Radio',
-          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="radio" color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="radio" size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="mixcloud"
+        options={{
+          title: 'DJ Sets',
+          tabBarIcon: ({ color }) => <Ionicons name="musical-notes" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
-          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="settings" color={color} />,
+          title: 'Paramètres',
+          tabBarIcon: ({ color }) => <Ionicons name="settings" size={24} color={color} />,
         }}
       />
     </Tabs>
   );
-}
+} 

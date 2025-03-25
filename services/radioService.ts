@@ -37,33 +37,6 @@ const SERVER_PORT = '8000';
 // Liste des flux disponibles
 export const AVAILABLE_STREAMS: Stream[] = [
   {
-    id: 'costa-arenbi',
-    title: 'Costa Arenbi Mix',
-    artist: 'Costa DJ',
-    url: `http://${SERVER_IP}:${SERVER_PORT}/costa-arenbi.mp3`,
-    genre: 'DJ Sets',
-    description: 'Long mixes by Costa DJ',
-    bitrate: 192
-  },
-  {
-    id: 'mamene-break',
-    title: 'Mamene Break',
-    artist: 'DJ Mamene',
-    url: `http://${SERVER_IP}:${SERVER_PORT}/mamene-break.mp3`,
-    genre: 'Tech House',
-    description: 'Tech house mixes by DJ Mamene',
-    bitrate: 256
-  },
-  {
-    id: 'mamene-break-2',
-    title: 'Mamene Break 2',
-    artist: 'DJ Mamene',
-    url: `http://${SERVER_IP}:${SERVER_PORT}/mamene2.mp3`,
-    genre: 'Breakbeat',
-    description: 'Breakbeat mixes by DJ Mamene',
-    bitrate: 128
-  },
-  {
     id: 'radio',
     title: 'Web Radio Mixes',
     artist: 'Various Artists',

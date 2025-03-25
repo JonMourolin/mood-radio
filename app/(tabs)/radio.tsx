@@ -1,17 +1,20 @@
+import { StyleSheet } from 'react-native';
 import React from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { ThemedView } from '@/components/ThemedView';
+import { StatusBar } from 'expo-status-bar';
 import RadioPlayer from '@/components/RadioPlayer';
 
 export default function RadioScreen() {
   return (
-    <SafeAreaView style={styles.container}>
+    <ThemedView style={styles.container}>
+      <StatusBar style="auto" />
       <RadioPlayer />
-    </SafeAreaView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
+  }
 }); 

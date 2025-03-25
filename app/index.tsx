@@ -1,6 +1,15 @@
-import { Redirect } from 'expo-router';
+import { Text, View } from "react-native";
 
 export default function Index() {
-  // Rediriger vers Long Mixs quand on ouvre l'application
-  return <Redirect href="/(tabs)/longmixs" />;
-} 
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Text>Edit app/index.tsx to edit this screen.</Text>
+    </View>
+  );
+}
