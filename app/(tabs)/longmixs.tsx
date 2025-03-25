@@ -4,12 +4,12 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
 import { StatusBar } from 'expo-status-bar';
-import { LongMix, fetchLongMixs, buildCloudinaryAudioUrl } from '@/services/cloudinaryService';
+import { SimplifiedMix, getMixes } from '@/services/mixcloudService';
 import MiniPlayer from '@/components/MiniPlayer';
 import { MaterialIcons } from '@expo/vector-icons';
 
 // Composant pour afficher un mix
-const MixCard = ({ mix, onPress, isPlaying }: { mix: LongMix; onPress: () => void; isPlaying: boolean }) => {
+const MixCard = ({ mix, onPress, isPlaying }: { mix: SimplifiedMix; onPress: () => void; isPlaying: boolean }) => {
   // Formater la durée en format lisible
   const formatDuration = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -38,15 +38,14 @@ const MixCard = ({ mix, onPress, isPlaying }: { mix: LongMix; onPress: () => voi
       <ThemedView style={styles.mixInfo}>
         <ThemedView>
           <ThemedText type="subtitle">{mix.title}</ThemedText>
-          <ThemedText>{mix.artist}</ThemedText>
-          <ThemedText style={styles.folderName}>Dossier: {mix.folder}</ThemedText>
+          <ThemedText>{mix.username}</ThemedText>
         </ThemedView>
         <ThemedView style={styles.mixMeta}>
-          <ThemedText style={styles.duration}>{formatDuration(mix.duration)}</ThemedText>
+          <ThemedText style={styles.duration}>{formatDuration(mix.durationInSeconds)}</ThemedText>
           <ThemedView style={styles.tagsContainer}>
-            {mix.tags.map(tag => (
-              <ThemedView key={tag.id} style={styles.tag}>
-                <ThemedText style={styles.tagText}>{tag.name}</ThemedText>
+            {mix.tags.map((tag, index) => (
+              <ThemedView key={index} style={styles.tag}>
+                <ThemedText style={styles.tagText}>{tag}</ThemedText>
               </ThemedView>
             ))}
           </ThemedView>
@@ -57,10 +56,10 @@ const MixCard = ({ mix, onPress, isPlaying }: { mix: LongMix; onPress: () => voi
 };
 
 export default function LongMixsScreen() {
-  const [mixs, setMixs] = useState<LongMix[]>([]);
+  const [mixs, setMixs] = useState<SimplifiedMix[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const [currentMix, setCurrentMix] = useState<LongMix | null>(null);
+  const [currentMix, setCurrentMix] = useState<SimplifiedMix | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -90,17 +89,17 @@ export default function LongMixsScreen() {
     };
   }, []);
 
-  // Charger les mixs depuis notre service
+  // Charger les mixs depuis Mixcloud
   useEffect(() => {
     const loadMixs = async () => {
       try {
         setIsLoading(true);
-        const loadedMixs = await fetchLongMixs();
+        const loadedMixs = await getMixes();
         setMixs(loadedMixs);
         setError(null);
       } catch (error) {
         console.error('Error loading mixes:', error);
-        setError('Impossible de charger les mixs');
+        setError('Impossible de charger les mixs depuis Mixcloud');
       } finally {
         setIsLoading(false);
       }
@@ -109,8 +108,8 @@ export default function LongMixsScreen() {
     loadMixs();
   }, []);
 
-  // Fonction pour jouer un mix avec plus de logs
-  const playMix = async (mix: LongMix) => {
+  // Fonction pour jouer un mix
+  const playMix = async (mix: SimplifiedMix) => {
     try {
       // Arrêter le mix en cours s'il y en a un
       if (sound) {
@@ -121,19 +120,15 @@ export default function LongMixsScreen() {
       // Réinitialiser l'erreur précédente
       setError(null);
       
-      // Utiliser directement l'URL audio pré-construite
-      const audioUrl = mix.audioUrl;
-      
       // Afficher les détails pour le débogage
       console.log('=== INFORMATIONS DE DEBUG ===');
-      console.log(`URL audio: ${audioUrl}`);
+      console.log(`URL audio: ${mix.url}`);
       console.log(`URL couverture: ${mix.coverUrl}`);
-      console.log(`Dossier: ${mix.folder}`);
       console.log('============================');
       
       // Créer une nouvelle instance de son
       const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: audioUrl },
+        { uri: mix.url },
         { shouldPlay: true },
         (status) => {
           if (status.isLoaded) {
@@ -164,7 +159,7 @@ export default function LongMixsScreen() {
       
     } catch (error) {
       console.error("Erreur lors de la lecture du mix:", error);
-      setError(`Impossible de lire ${mix.title}. Vérifiez l'URL du fichier audio: ${mix.audioUrl}`);
+      setError(`Impossible de lire ${mix.title}. Vérifiez l'URL du fichier audio: ${mix.url}`);
       setIsPlaying(false);
       setCurrentMix(null);
     }
@@ -185,28 +180,6 @@ export default function LongMixsScreen() {
       <ThemedView style={styles.header}>
         <ThemedText type="title">Long Mixs</ThemedText>
         <ThemedText>Mixs musicaux de longue durée</ThemedText>
-      </ThemedView>
-
-      <ThemedView style={styles.infoContainer}>
-        <ThemedText style={styles.infoTitle}>Configuration Cloudinary</ThemedText>
-        <ThemedText style={styles.infoText}>
-          Structure sur Cloudinary:
-        </ThemedText>
-        <ThemedText style={styles.infoText}>
-          • Dossier principal: web-radio/longmixs/
-        </ThemedText>
-        <ThemedText style={styles.infoText}>
-          • Sous-dossiers: costa-arenbi, mamene-break, etc.
-        </ThemedText>
-        <ThemedText style={styles.infoText}>
-          • Dans chaque sous-dossier: un fichier MP3 et une image
-        </ThemedText>
-        <ThemedText style={styles.infoText}>
-          • Les noms des fichiers doivent être 'mix' et 'cover'
-        </ThemedText>
-        <ThemedText style={styles.infoText}>
-          En cas d'erreur, vérifiez les URLs dans la console de debug.
-        </ThemedText>
       </ThemedView>
 
       {error && (
@@ -253,59 +226,28 @@ export default function LongMixsScreen() {
   );
 }
 
-const { width } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 60,
   },
   header: {
-    paddingHorizontal: 16,
-    marginBottom: 20,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 12,
-  },
-  errorContainer: {
-    backgroundColor: 'rgba(220, 38, 38, 0.1)',
-    padding: 12,
-    marginHorizontal: 16,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  errorText: {
-    color: '#dc2626',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 32,
+    padding: 15,
   },
   listContent: {
-    padding: 16,
-    paddingBottom: 100, // Extra space for mini player
+    padding: 15,
   },
   mixCard: {
     flexDirection: 'row',
-    marginBottom: 16,
-    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
     overflow: 'hidden',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   playingCard: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#3b82f6', // Blue color for currently playing
+    borderColor: '#3b82f6',
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
   },
   mixCover: {
     width: 120,
@@ -317,9 +259,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   mixMeta: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
+    marginTop: 8,
   },
   duration: {
     fontSize: 14,
@@ -327,48 +267,42 @@ const styles = StyleSheet.create({
   },
   tagsContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 8,
   },
   tag: {
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    backgroundColor: 'rgba(59, 130, 246, 0.2)',
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 4,
-    marginLeft: 4,
+    borderRadius: 16,
+    marginRight: 8,
+    marginBottom: 8,
   },
   tagText: {
     fontSize: 12,
     color: '#3b82f6',
   },
-  folderName: {
-    fontSize: 12,
-    opacity: 0.6,
-    marginTop: 2,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  infoContainer: {
-    margin: 16,
-    padding: 12,
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+  loadingText: {
+    marginTop: 10,
+  },
+  errorContainer: {
+    margin: 15,
+    padding: 15,
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
     borderRadius: 8,
-    marginBottom: 12,
   },
-  infoTitle: {
-    fontWeight: 'bold',
-    marginBottom: 4,
+  errorText: {
+    color: '#ef4444',
   },
-  infoText: {
-    fontSize: 12,
-    marginBottom: 4,
-  },
-  codePath: {
-    fontFamily: 'monospace',
-    fontSize: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    paddingHorizontal: 4,
-  },
-  codeText: {
-    fontFamily: 'monospace',
-    fontSize: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
-    paddingHorizontal: 4,
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
 }); 
