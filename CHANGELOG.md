@@ -3,6 +3,23 @@
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2024-03-26
+
+### Ajouté
+- Amélioration de l'intégration avec Mixcloud
+- Nouveau design des cartes de mix avec une meilleure présentation des informations
+- Affichage optimisé des tags et de la durée des mixes
+
+### Modifié
+- Refonte complète du composant MixCard pour une meilleure expérience utilisateur
+- Optimisation du chargement des mixes depuis Mixcloud
+- Amélioration de la gestion des erreurs lors du chargement des mixes
+
+### Corrigé
+- Correction des problèmes d'affichage des informations des mixes
+- Amélioration de la stabilité lors du chargement des mixes
+- Optimisation des performances de l'interface utilisateur
+
 ## [2.0.0] - 2024-03-25
 
 ### Ajouté
