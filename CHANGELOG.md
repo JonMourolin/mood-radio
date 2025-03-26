@@ -3,6 +3,27 @@
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+
+## [2.2.0] - 2024-03-26
+
+### Added
+- Configuration du serveur de streaming Icecast2
+- Implémentation de Liquidsoap pour la gestion des playlists
+- Nouveau point de montage pour le flux radio principal : `/stream.mp3`
+- Système de gestion des fichiers audio avec permissions dédiées (groupe `radiogroup`)
+
+### Technical
+- Icecast2 configuré sur le port `8000`
+- Liquidsoap configuré pour lire les fichiers depuis `/var/liquidsoap/playlists/main`
+- Permissions configurées pour permettre l'upload de fichiers via FTP
+- Optimisation de la gestion des fichiers avec création du `radiogroup`
+
+### Infrastructure
+- Serveur de streaming déployé sur `51.75.200.205`
+- Pare-feu configuré pour le port `8000`
+- Mise en place des logs pour Icecast2 et Liquidsoap
+
 ## [2.1.0] - 2024-03-26
 
 ### Ajouté
