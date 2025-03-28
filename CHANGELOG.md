@@ -120,4 +120,9 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Application React Native pour la lecture de flux radio web
 - Support pour différents streams (webradio et DJ sets)
 - Interface utilisateur de base pour la sélection et la lecture des flux
-- Support multiplateforme (web, iOS, Android) 
+- Support multiplateforme (web, iOS, Android)
+
+## [2.2.1] - 2024-03-26
+
+### Supprimé
+- Suppression de la page longmixs.tsx pour simplifier la navigation
