@@ -3,7 +3,20 @@
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2024-03-27
 
+### Added
+- Intégration du service de métadonnées Icecast
+- Nouveau hook personnalisé `useIcecastMetadata` pour la gestion des métadonnées
+- Service de métadonnées pour récupérer les informations des pistes en temps réel
+
+### Changed
+- Simplification de l'affichage des métadonnées (titre et artiste uniquement)
+- Amélioration de la gestion des états de chargement
+- Optimisation des performances avec mise en cache des métadonnées
+
+### Removed
+- Suppression de l'affichage du genre et du bitrate pour une meilleure expérience utilisateur
 
 ## [2.2.0] - 2024-03-29
 
