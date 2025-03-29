@@ -122,33 +122,14 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Interface utilisateur de base pour la sélection et la lecture des flux
 - Support multiplateforme (web, iOS, Android)
 
-## [2.2.1] - 2024-03-26
+## [1.1.0] - 2024-03-29
 
-### Supprimé
-- Suppression de la page longmixs.tsx pour simplifier la navigation
-
-## [2.3.0] - 2024-03-26
-
-### Ajouté
-- Nouvelle interface utilisateur pour la page radio avec :
-  - Visualisation des ondes audio en temps réel
-  - Grande pochette d'album avec overlay d'informations
-  - Contrôles de lecture améliorés (play/pause, volume)
-  - Support des thèmes clair/sombre
-  - Animations fluides
-
-### Technique
-- Intégration de expo-linear-gradient pour les effets visuels
-- Amélioration de la gestion du son avec expo-av
-- Optimisation des animations avec Animated API
-
-## [2.4.0] - 2024-03-28
+### Added
+- Admin tracks page for managing radio tracks
+- Track service for handling API calls
+- Configuration file for API endpoints
+- Integration with Liquidsoap telnet server
 
 ### Changed
-- Mise à jour du design de la navigation
-  - Nouveau format du titre "tangerine_radio" avec underscore orange
-  - Déplacement des liens Radio et Mixes à côté du titre
-- Amélioration du layout de la page Radio
-  - Centrage vertical du player
-  - Optimisation de l'espace d'affichage
-  - Correction des marges et du padding
+- Updated project structure with services directory
+- Improved error handling for API calls
