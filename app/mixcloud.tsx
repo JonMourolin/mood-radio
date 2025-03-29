@@ -88,6 +88,12 @@ export default function MixcloudScreen() {
 
   return (
     <ThemedView style={styles.container}>
+      <StatusBar style="auto" />
+      <ThemedView style={styles.header}>
+        <ThemedText type="title">Mixcloud DJ Sets</ThemedText>
+        <ThemedText>Découvrez mes mixes sur Mixcloud</ThemedText>
+      </ThemedView>
+      
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#3b82f6" />
@@ -132,6 +138,11 @@ export default function MixcloudScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 20,
+  },
+  header: {
+    padding: 16,
+    marginBottom: 8,
   },
   loadingContainer: {
     flex: 1,
