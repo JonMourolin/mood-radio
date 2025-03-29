@@ -5,13 +5,16 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 
 
-## [2.2.0] - 2024-03-26
+## [2.2.0] - 2024-03-29
 
 ### Added
 - Configuration du serveur de streaming Icecast2
 - Implémentation de Liquidsoap pour la gestion des playlists
 - Nouveau point de montage pour le flux radio principal : `/stream.mp3`
 - Système de gestion des fichiers audio avec permissions dédiées (groupe `radiogroup`)
+- Page d'administration des pistes (/admin/tracks)
+- Interface de gestion des pistes avec possibilité de suppression
+- Service de tracks amélioré avec communication Telnet vers Liquidsoap
 
 ### Technical
 - Icecast2 configuré sur le port `8000`
@@ -23,6 +26,10 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - Serveur de streaming déployé sur `51.75.200.205`
 - Pare-feu configuré pour le port `8000`
 - Mise en place des logs pour Icecast2 et Liquidsoap
+
+### Fixed
+- Correction des chemins d'importation dans les composants
+- Amélioration de la récupération des pistes via Telnet
 
 ## [2.1.0] - 2024-03-26
 
