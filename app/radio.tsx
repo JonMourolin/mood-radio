@@ -18,6 +18,14 @@ import { Feather } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ThemedView } from '@/components/ThemedView';
 
+// Type pour les métadonnées
+interface StreamMetadata {
+  title: string;
+  artist: string;
+  album: string;
+  song: string;
+}
+
 // Theme colors
 const colors = {
   light: {
@@ -58,7 +66,38 @@ export default function RadioScreen() {
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? colors.dark : colors.light;
 
-  // Initialize audio
+  const [currentTrack, setCurrentTrack] = useState<StreamMetadata>({
+    title: '',
+    artist: '',
+    album: '',
+    song: ''
+  });
+
+  // Fonction pour mettre à jour les métadonnées
+  const updateMetadata = async () => {
+    try {
+      const response = await fetch('http://51.75.200.205:8000/status-json.xsl');
+      const data = await response.json();
+      
+      if (data.icestats && data.icestats.source) {
+        const source = data.icestats.source;
+        
+        setCurrentTrack({
+          title: source.title || '',
+          artist: source.artist || '',
+          album: source.album || 'Unknown Album',  // Utilisation de l'album fourni par Liquidsoap
+          song: source.song || source.title || 'Web Radio'  // Utilisation du champ song fourni par Liquidsoap
+        });
+
+        // Log pour debug
+        console.log('Metadata from Liquidsoap:', source);
+      }
+    } catch (error) {
+      console.error('Error fetching metadata:', error);
+    }
+  };
+
+  // Initialize audio and metadata polling
   useEffect(() => {
     async function setupAudio() {
       try {
@@ -78,6 +117,16 @@ export default function RadioScreen() {
         );
         
         soundRef.current = sound;
+
+        // Initial metadata fetch
+        updateMetadata();
+
+        // Set up metadata polling
+        const metadataInterval = setInterval(updateMetadata, 5000);
+
+        return () => {
+          clearInterval(metadataInterval);
+        };
       } catch (error) {
         console.error("Error setting up audio:", error);
       }
@@ -230,19 +279,19 @@ export default function RadioScreen() {
                 </Text>
               </View>
               <Text style={[styles.trackTitle, { color: theme.foreground }]}>
-                Web Radio Mixes
+                {currentTrack.song || 'Web Radio Mixes'}
               </Text>
               <View style={styles.trackMetaContainer}>
                 <View style={styles.trackMetaItem}>
                   <Feather name="user" size={12} color={theme.primary} style={styles.trackMetaIcon} />
                   <Text style={[styles.trackMetaText, { color: theme.foreground }]}>
-                    Various Artists
+                    {currentTrack.artist || 'Various Artists'}
                   </Text>
                 </View>
                 <View style={styles.trackMetaItem}>
-                  <Feather name="radio" size={12} color={theme.primary} style={styles.trackMetaIcon} />
+                  <Feather name="disc" size={12} color={theme.primary} style={styles.trackMetaIcon} />
                   <Text style={[styles.trackMetaText, { color: theme.foreground }]}>
-                    Live Stream
+                    {currentTrack.album || 'Unknown Album'}
                   </Text>
                 </View>
               </View>

@@ -153,3 +153,12 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Changed
 - Updated project structure with services directory
 - Improved error handling for API calls
+
+## [2.4.0] - 2024-03-30
+
+### Removed
+- Removed Discogs integration and all related components
+- Cleaned up environment variables and type definitions related to Discogs
+
+### Changed
+- Simplified metadata handling to use only Icecast/Liquidsoap metadata
