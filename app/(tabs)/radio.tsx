@@ -17,6 +17,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ThemedView } from '@/components/ThemedView';
+import { useMetadata } from '@/app/hooks/useMetadata';
 
 // Theme colors
 const colors = {
@@ -48,21 +49,15 @@ const colors = {
   }
 };
 
-interface TrackMetadata {
-  title: string;
-  artist: string;
-  album: string;
-  song: string;
-}
-
 export default function RadioScreen() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(80);
   const soundRef = useRef<Audio.Sound | null>(null);
   const waveformAnimation = useRef(new Animated.Value(0)).current;
-  const [currentTrack, setCurrentTrack] = useState<TrackMetadata | null>(null);
-  const [currentTrackTitle, setCurrentTrackTitle] = useState<string | null>(null);
+  
+  // Utiliser notre nouveau hook pour les métadonnées
+  const metadata = useMetadata();
   
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? colors.dark : colors.light;
@@ -134,28 +129,6 @@ export default function RadioScreen() {
     };
   }, [isPlaying]);
 
-  // Fonction pour extraire le titre et l'artiste du titre Icecast
-  const parseIcecastTitle = (title: string) => {
-    const parts = title.split(' - ');
-    return {
-      title: parts[1] || title,
-      artist: parts[0] || 'Various Artists'
-    };
-  };
-
-  // Mettre à jour la piste courante quand le titre Icecast change
-  useEffect(() => {
-    if (currentTrackTitle) {
-      const parsed = parseIcecastTitle(currentTrackTitle);
-      setCurrentTrack({
-        title: parsed.title,
-        artist: parsed.artist,
-        album: 'Unknown Album',
-        song: currentTrackTitle
-      });
-    }
-  }, [currentTrackTitle]);
-
   const togglePlay = async () => {
     if (!soundRef.current) return;
     
@@ -200,58 +173,26 @@ export default function RadioScreen() {
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+    <ThemedView style={styles.container}>
       <StatusBar barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'} />
-      
-      <ScrollView 
-        style={styles.content}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Current track with large cover */}
-        <View style={styles.currentTrackContainer}>
-          <View style={[styles.coverArtContainer, { borderBottomColor: theme.border }]}>
-            <Image
-              source={{ 
-                uri: 'https://via.placeholder.com/300x300.png?text=WEB+RADIO'
-              }}
-              style={styles.coverArt}
-              resizeMode="cover"
-            />
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.playerContainer}>
+            {/* Album artwork or radio logo */}
+            <View style={styles.artworkContainer}>
+              <Image
+                source={metadata?.artwork ? { uri: metadata.artwork } : { uri: 'https://via.placeholder.com/300x300.png?text=Web+Radio' }}
+                style={styles.artwork}
+              />
+              
+              {/* Waveform overlay */}
+              <Animated.View style={[
+                styles.waveformOverlay,
+                { opacity: waveformAnimation }
+              ]} />
+            </View>
             
-            {/* Visualization overlay */}
-            <LinearGradient
-              colors={[
-                'transparent', 
-                `${colorScheme === 'dark' ? '#121418' : '#f7f8fa'}30`, 
-                `${colorScheme === 'dark' ? '#121418' : '#f7f8fa'}90`
-              ]}
-              style={styles.coverGradient}
-            >
-              {/* Waveform visualization */}
-              <View style={styles.waveformContainer}>
-                {Array.from({ length: 8 }).map((_, index) => (
-                  <Animated.View 
-                    key={index}
-                    style={[
-                      styles.waveformBar,
-                      { 
-                        backgroundColor: theme.primary,
-                        height: Animated.multiply(
-                          waveformAnimation.interpolate({
-                            inputRange: [0, 1],
-                            outputRange: [10, 40]
-                          }),
-                          Math.random() * 0.8 + 0.6
-                        ),
-                        opacity: isPlaying ? 0.7 : 0.3
-                      }
-                    ]}
-                  />
-                ))}
-              </View>
-            </LinearGradient>
-            
+            {/* Track info */}
             <View style={styles.trackInfoOverlay}>
               <View style={styles.nowPlayingIndicator}>
                 <View style={[styles.pulsingDot, { backgroundColor: theme.primary }]} />
@@ -260,20 +201,20 @@ export default function RadioScreen() {
                 </Text>
               </View>
               <Text style={[styles.trackTitle, { color: theme.foreground }]}>
-                {currentTrack?.title || currentTrackTitle}
+                {metadata?.title || 'Web Radio'}
               </Text>
               <View style={styles.trackMetaContainer}>
                 <View style={styles.trackMetaItem}>
                   <Feather name="user" size={12} color={theme.primary} style={styles.trackMetaIcon} />
                   <Text style={[styles.trackMetaText, { color: theme.foreground }]}>
-                    {currentTrack?.artist || parseIcecastTitle(currentTrackTitle || '').artist}
+                    {metadata?.artist || 'Various Artists'}
                   </Text>
                 </View>
-                {currentTrack?.album && (
+                {metadata?.album && (
                   <View style={styles.trackMetaItem}>
-                    <Feather name="music" size={12} color={theme.primary} style={styles.trackMetaIcon} />
+                    <Feather name="disc" size={12} color={theme.primary} style={styles.trackMetaIcon} />
                     <Text style={[styles.trackMetaText, { color: theme.foreground }]}>
-                      {currentTrack.album}
+                      {metadata.album}
                     </Text>
                   </View>
                 )}
@@ -324,9 +265,9 @@ export default function RadioScreen() {
               />
             </View>
           </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </ThemedView>
   );
 }
 
@@ -334,46 +275,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  content: {
+  safeArea: {
     flex: 1,
   },
-  contentContainer: {
+  scrollContent: {
     paddingBottom: 16,
   },
-  currentTrackContainer: {
+  playerContainer: {
     marginBottom: 16,
   },
-  coverArtContainer: {
+  artworkContainer: {
     width: '100%',
     aspectRatio: 1,
     position: 'relative',
     borderBottomWidth: 1,
   },
-  coverArt: {
+  artwork: {
     width: '100%',
     height: '100%',
   },
-  coverGradient: {
+  waveformOverlay: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-  },
-  waveformContainer: {
-    position: 'absolute',
-    bottom: 80,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'flex-end',
-    height: 40,
-    paddingHorizontal: 40,
-  },
-  waveformBar: {
-    width: 4,
-    borderRadius: 2,
   },
   trackInfoOverlay: {
     position: 'absolute',

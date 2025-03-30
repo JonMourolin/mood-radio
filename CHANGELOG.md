@@ -3,6 +3,24 @@
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.6.0] - 2024-03-31
+
+### Added
+- Nouveau service de métadonnées avec WebSocket pour les mises à jour en temps réel
+- Hook personnalisé useMetadata pour la gestion des métadonnées
+- Intégration du serveur Node.js pour la gestion des métadonnées
+- Support des métadonnées étendues via Liquidsoap (titre, artiste, album)
+
+### Changed
+- Amélioration de la gestion des métadonnées avec mise à jour en temps réel
+- Optimisation de la configuration Liquidsoap pour une meilleure gestion des métadonnées
+- Refactoring du composant Radio pour utiliser le nouveau service de métadonnées
+
+### Technical
+- Configuration du serveur WebSocket sur le port 3001
+- Intégration directe entre Liquidsoap et le serveur de métadonnées
+- Amélioration de la stabilité du streaming et des mises à jour de métadonnées
+
 ## [2.5.0] - 2024-03-31
 
 ### Changed
