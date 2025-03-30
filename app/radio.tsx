@@ -85,12 +85,9 @@ export default function RadioScreen() {
         setCurrentTrack({
           title: source.title || '',
           artist: source.artist || '',
-          album: source.album || 'Unknown Album',  // Utilisation de l'album fourni par Liquidsoap
-          song: source.song || source.title || 'Web Radio'  // Utilisation du champ song fourni par Liquidsoap
+          album: source.album || 'Unknown Album',
+          song: source.song || source.title || 'Web Radio'
         });
-
-        // Log pour debug
-        console.log('Metadata from Liquidsoap:', source);
       }
     } catch (error) {
       console.error('Error fetching metadata:', error);

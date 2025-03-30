@@ -17,8 +17,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather, Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ThemedView } from '@/components/ThemedView';
-import { getTracks, Track } from '../../services/trackService';
-import { API_URL } from '../../config';
 
 // Theme colors
 const colors = {
@@ -51,9 +49,10 @@ const colors = {
 };
 
 interface TrackMetadata {
-  id: string;
   title: string;
   artist: string;
+  album: string;
+  song: string;
 }
 
 export default function RadioScreen() {
@@ -64,7 +63,6 @@ export default function RadioScreen() {
   const waveformAnimation = useRef(new Animated.Value(0)).current;
   const [currentTrack, setCurrentTrack] = useState<TrackMetadata | null>(null);
   const [currentTrackTitle, setCurrentTrackTitle] = useState<string | null>(null);
-  const [coverArt, setCoverArt] = useState<string | null>(null);
   
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? colors.dark : colors.light;
@@ -145,59 +143,18 @@ export default function RadioScreen() {
     };
   };
 
-  // Fonction pour trouver la piste enrichie correspondante
-  const findEnrichedTrack = async (icecastTitle: string): Promise<Track | null> => {
-    try {
-      const tracks = await getTracks();
-      const { title, artist } = parseIcecastTitle(icecastTitle);
-      
-      // Chercher une correspondance exacte
-      const exactMatch = tracks.find(t => 
-        t.title.toLowerCase() === title.toLowerCase() && 
-        t.discogsData?.artist.toLowerCase() === artist.toLowerCase()
-      );
-
-      // Si pas de correspondance exacte, chercher une correspondance partielle
-      if (!exactMatch) {
-        return tracks.find(t => 
-          t.title.toLowerCase().includes(title.toLowerCase()) || 
-          t.discogsData?.artist.toLowerCase().includes(artist.toLowerCase())
-        ) || null;
-      }
-
-      return exactMatch;
-    } catch (error) {
-      console.error('Error finding enriched track:', error);
-      return null;
-    }
-  };
-
   // Mettre à jour la piste courante quand le titre Icecast change
   useEffect(() => {
     if (currentTrackTitle) {
-      findEnrichedTrack(currentTrackTitle).then(setCurrentTrack);
+      const parsed = parseIcecastTitle(currentTrackTitle);
+      setCurrentTrack({
+        title: parsed.title,
+        artist: parsed.artist,
+        album: 'Unknown Album',
+        song: currentTrackTitle
+      });
     }
   }, [currentTrackTitle]);
-
-  const fetchCoverArt = async (trackId: string) => {
-    try {
-      const response = await fetch(`${API_URL}/tracks/${trackId}/cover?size=medium`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.data) {
-          setCoverArt(`data:${data.mime};base64,${data.data}`);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching cover art:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (currentTrack?.id) {
-      fetchCoverArt(currentTrack.id);
-    }
-  }, [currentTrack]);
 
   const togglePlay = async () => {
     if (!soundRef.current) return;
@@ -256,7 +213,7 @@ export default function RadioScreen() {
           <View style={[styles.coverArtContainer, { borderBottomColor: theme.border }]}>
             <Image
               source={{ 
-                uri: coverArt || 'https://via.placeholder.com/300x300.png?text=WEB+RADIO'
+                uri: 'https://via.placeholder.com/300x300.png?text=WEB+RADIO'
               }}
               style={styles.coverArt}
               resizeMode="cover"
