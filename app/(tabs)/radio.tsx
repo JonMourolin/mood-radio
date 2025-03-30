@@ -17,6 +17,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ThemedView } from '@/components/ThemedView';
+import { getTracks, Track } from '../../services/trackService';
 
 // Theme colors
 const colors = {
@@ -54,6 +55,8 @@ export default function RadioScreen() {
   const [volume, setVolume] = useState(80);
   const soundRef = useRef<Audio.Sound | null>(null);
   const waveformAnimation = useRef(new Animated.Value(0)).current;
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [currentTrackTitle, setCurrentTrackTitle] = useState<string | null>(null);
   
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? colors.dark : colors.light;
@@ -125,6 +128,49 @@ export default function RadioScreen() {
     };
   }, [isPlaying]);
 
+  // Fonction pour extraire le titre et l'artiste du titre Icecast
+  const parseIcecastTitle = (title: string) => {
+    const parts = title.split(' - ');
+    return {
+      title: parts[1] || title,
+      artist: parts[0] || 'Various Artists'
+    };
+  };
+
+  // Fonction pour trouver la piste enrichie correspondante
+  const findEnrichedTrack = async (icecastTitle: string): Promise<Track | null> => {
+    try {
+      const tracks = await getTracks();
+      const { title, artist } = parseIcecastTitle(icecastTitle);
+      
+      // Chercher une correspondance exacte
+      const exactMatch = tracks.find(t => 
+        t.title.toLowerCase() === title.toLowerCase() && 
+        t.discogsData?.artist.toLowerCase() === artist.toLowerCase()
+      );
+
+      // Si pas de correspondance exacte, chercher une correspondance partielle
+      if (!exactMatch) {
+        return tracks.find(t => 
+          t.title.toLowerCase().includes(title.toLowerCase()) || 
+          t.discogsData?.artist.toLowerCase().includes(artist.toLowerCase())
+        ) || null;
+      }
+
+      return exactMatch;
+    } catch (error) {
+      console.error('Error finding enriched track:', error);
+      return null;
+    }
+  };
+
+  // Mettre à jour la piste courante quand le titre Icecast change
+  useEffect(() => {
+    if (currentTrackTitle) {
+      findEnrichedTrack(currentTrackTitle).then(setCurrentTrack);
+    }
+  }, [currentTrackTitle]);
+
   const togglePlay = async () => {
     if (!soundRef.current) return;
     
@@ -181,7 +227,9 @@ export default function RadioScreen() {
         <View style={styles.currentTrackContainer}>
           <View style={[styles.coverArtContainer, { borderBottomColor: theme.border }]}>
             <Image
-              source={{ uri: 'https://via.placeholder.com/300x300.png?text=WEB+RADIO' }}
+              source={{ 
+                uri: currentTrack?.discogsData?.coverUrl || 'https://via.placeholder.com/300x300.png?text=WEB+RADIO'
+              }}
               style={styles.coverArt}
               resizeMode="cover"
             />
@@ -227,21 +275,23 @@ export default function RadioScreen() {
                 </Text>
               </View>
               <Text style={[styles.trackTitle, { color: theme.foreground }]}>
-                Web Radio Mixes
+                {currentTrack?.discogsData?.title || currentTrackTitle}
               </Text>
               <View style={styles.trackMetaContainer}>
                 <View style={styles.trackMetaItem}>
                   <Feather name="user" size={12} color={theme.primary} style={styles.trackMetaIcon} />
                   <Text style={[styles.trackMetaText, { color: theme.foreground }]}>
-                    Various Artists
+                    {currentTrack?.discogsData?.artist || parseIcecastTitle(currentTrackTitle || '').artist}
                   </Text>
                 </View>
-                <View style={styles.trackMetaItem}>
-                  <Feather name="radio" size={12} color={theme.primary} style={styles.trackMetaIcon} />
-                  <Text style={[styles.trackMetaText, { color: theme.foreground }]}>
-                    Live Stream
-                  </Text>
-                </View>
+                {currentTrack?.discogsData?.album && (
+                  <View style={styles.trackMetaItem}>
+                    <Feather name="music" size={12} color={theme.primary} style={styles.trackMetaIcon} />
+                    <Text style={[styles.trackMetaText, { color: theme.foreground }]}>
+                      {currentTrack.discogsData.album}
+                    </Text>
+                  </View>
+                )}
               </View>
             </View>
           </View>

@@ -6,6 +6,19 @@ export interface Track {
   duration: number;
   addedAt: string;
   path?: string;
+  discogsData?: {
+    title: string;
+    artist: string;
+    album: string;
+    year: string;
+  };
+}
+
+export interface DiscogsSearchResult {
+  title: string;
+  artist: string;
+  album: string;
+  year: string;
 }
 
 export async function getTracks(): Promise<Track[]> {
@@ -36,6 +49,31 @@ export async function deleteTrack(id: string): Promise<void> {
     }
   } catch (error) {
     console.error('Error deleting track:', error);
+    throw error;
+  }
+}
+
+export async function updateTrackMetadata(trackId: string, metadata: {
+  path: string;
+  title: string;
+  artist: string;
+  album: string;
+  year: string;
+}): Promise<void> {
+  try {
+    const response = await fetch(`${config.API_URL}/tracks/${trackId}/metadata`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(metadata),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  } catch (error) {
+    console.error('Error updating metadata:', error);
     throw error;
   }
 }
