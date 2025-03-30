@@ -3,6 +3,18 @@
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2024-03-31
+
+### Changed
+- Simplification majeure de l'architecture de l'application
+- Optimisation du service de gestion des pistes
+- Focus sur les fonctionnalités essentielles de streaming radio
+
+### Removed
+- Suppression complète de l'intégration Discogs
+- Nettoyage des composants et services non utilisés
+- Retrait des fonctionnalités de gestion des métadonnées externes
+
 ## [2.4.1] - 2024-03-30
 
 ### Fixed
