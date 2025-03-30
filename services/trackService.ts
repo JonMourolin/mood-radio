@@ -1,4 +1,4 @@
-import config from '../app/config';
+import { API_URL } from '../config';
 
 const DISCOGS_TOKEN = 'TJmLXAOganjkyfpLYSDwPdgxqFjcjglPlHrUaNjt';
 
@@ -76,8 +76,8 @@ export async function searchDiscogsReleases(query: string): Promise<DiscogsSearc
 
 export async function getTracks(): Promise<Track[]> {
   try {
-    console.log('Fetching tracks from:', `${config.API_URL}/tracks`);
-    const response = await fetch(`${config.API_URL}/tracks`);
+    console.log('Fetching tracks from:', `${API_URL}/tracks`);
+    const response = await fetch(`${API_URL}/tracks`);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -109,7 +109,7 @@ export async function getTracks(): Promise<Track[]> {
 export async function enrichTrack(track: Track, discogsData: DiscogsSearchResult): Promise<void> {
   try {
     // Envoyer les métadonnées au serveur
-    const response = await fetch(`${config.API_URL}/tracks/${track.id}/metadata`, {
+    const response = await fetch(`${API_URL}/tracks/${track.id}/metadata`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ export async function enrichTrack(track: Track, discogsData: DiscogsSearchResult
 
 export async function deleteTrack(id: string): Promise<void> {
   try {
-    const response = await fetch(`${config.API_URL}/tracks/${id}`, {
+    const response = await fetch(`${API_URL}/tracks/${id}`, {
       method: 'DELETE',
     });
     if (!response.ok) {

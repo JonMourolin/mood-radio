@@ -14,10 +14,11 @@ import {
 import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ThemedView } from '@/components/ThemedView';
 import { getTracks, Track } from '../../services/trackService';
+import { API_URL } from '../../config';
 
 // Theme colors
 const colors = {
@@ -49,14 +50,21 @@ const colors = {
   }
 };
 
+interface TrackMetadata {
+  id: string;
+  title: string;
+  artist: string;
+}
+
 export default function RadioScreen() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(80);
   const soundRef = useRef<Audio.Sound | null>(null);
   const waveformAnimation = useRef(new Animated.Value(0)).current;
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [currentTrack, setCurrentTrack] = useState<TrackMetadata | null>(null);
   const [currentTrackTitle, setCurrentTrackTitle] = useState<string | null>(null);
+  const [coverArt, setCoverArt] = useState<string | null>(null);
   
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? colors.dark : colors.light;
@@ -171,6 +179,26 @@ export default function RadioScreen() {
     }
   }, [currentTrackTitle]);
 
+  const fetchCoverArt = async (trackId: string) => {
+    try {
+      const response = await fetch(`${API_URL}/tracks/${trackId}/cover?size=medium`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.data) {
+          setCoverArt(`data:${data.mime};base64,${data.data}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching cover art:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (currentTrack?.id) {
+      fetchCoverArt(currentTrack.id);
+    }
+  }, [currentTrack]);
+
   const togglePlay = async () => {
     if (!soundRef.current) return;
     
@@ -228,7 +256,7 @@ export default function RadioScreen() {
           <View style={[styles.coverArtContainer, { borderBottomColor: theme.border }]}>
             <Image
               source={{ 
-                uri: currentTrack?.discogsData?.coverUrl || 'https://via.placeholder.com/300x300.png?text=WEB+RADIO'
+                uri: coverArt || 'https://via.placeholder.com/300x300.png?text=WEB+RADIO'
               }}
               style={styles.coverArt}
               resizeMode="cover"
@@ -275,20 +303,20 @@ export default function RadioScreen() {
                 </Text>
               </View>
               <Text style={[styles.trackTitle, { color: theme.foreground }]}>
-                {currentTrack?.discogsData?.title || currentTrackTitle}
+                {currentTrack?.title || currentTrackTitle}
               </Text>
               <View style={styles.trackMetaContainer}>
                 <View style={styles.trackMetaItem}>
                   <Feather name="user" size={12} color={theme.primary} style={styles.trackMetaIcon} />
                   <Text style={[styles.trackMetaText, { color: theme.foreground }]}>
-                    {currentTrack?.discogsData?.artist || parseIcecastTitle(currentTrackTitle || '').artist}
+                    {currentTrack?.artist || parseIcecastTitle(currentTrackTitle || '').artist}
                   </Text>
                 </View>
-                {currentTrack?.discogsData?.album && (
+                {currentTrack?.album && (
                   <View style={styles.trackMetaItem}>
                     <Feather name="music" size={12} color={theme.primary} style={styles.trackMetaIcon} />
                     <Text style={[styles.trackMetaText, { color: theme.foreground }]}>
-                      {currentTrack.discogsData.album}
+                      {currentTrack.album}
                     </Text>
                   </View>
                 )}

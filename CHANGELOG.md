@@ -3,6 +3,17 @@
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.1] - 2024-03-30
+
+### Fixed
+- Correction de l'architecture des fichiers pour maintenir la cohérence entre les versions web et mobile
+- Restauration des fichiers de base essentiels dans le dossier /app
+- Amélioration de la stabilité de l'application
+
+### Technical
+- Clarification de la structure du projet avec les composants de base dans /app
+- Versions spécifiques dans /app/(tabs) pour mobile et /app/web pour la version web
+
 ## [2.3.0] - 2024-03-27
 
 ### Added
@@ -162,20 +173,3 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ### Changed
 - Simplified metadata handling to use only Icecast/Liquidsoap metadata
-
-## [2.5.0] - 2024-03-30
-
-### Added
-- Nouvelle API pour la gestion des métadonnées des pistes
-- Support complet des tags ID3 (titre, artiste, album, année)
-- Logs détaillés pour le débogage des métadonnées
-
-### Changed
-- Amélioration de la structure des données pour les métadonnées
-- Optimisation de la communication entre le frontend et le backend
-- Refonte du système d'enrichissement des métadonnées
-
-### Technical
-- Mise à jour du serveur Python pour une meilleure gestion des métadonnées
-- Amélioration de la gestion des erreurs côté serveur
-- Support de la création automatique des tags ID3 si manquants
