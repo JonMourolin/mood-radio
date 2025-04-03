@@ -3,6 +3,13 @@
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Roadmap
+
+### [2.7.0] - Planned
+- Récupération des métadonnées d'album depuis Liquidsoap
+- Transmission des métadonnées d'album via l'endpoint /metadata
+- Amélioration de l'affichage des informations d'album dans l'interface
+
 ## [2.6.0] - 2024-03-31
 
 ### Added

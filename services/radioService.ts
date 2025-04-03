@@ -30,10 +30,10 @@ export const AVAILABLE_STREAMS: Stream[] = [
     id: 'radio',
     title: 'Web Radio Mixes',
     artist: 'Various Artists',
-    url: `http://${SERVER_IP}:${SERVER_PORT}/webradio.mp3`,
+    url: `http://${SERVER_IP}:${SERVER_PORT}/stream.mp3`,
     genre: 'Mixed',
     description: 'Rotation of all DJ mixes',
-    bitrate: 320
+    bitrate: 192
   }
 ];
 
@@ -50,6 +50,7 @@ let isPlaybackInProgress = false;
 class RadioService {
   private sound: Audio.Sound | null = null;
   private currentStream: Stream | null = null;
+  private onPlaybackStatusUpdateCallback?: (status: PlaybackStatus) => void;
   
   constructor() {
     // Configuration de l'audio pour le mode arrière-plan
@@ -107,6 +108,7 @@ class RadioService {
     stream: Stream, 
     onPlaybackStatusUpdate?: (status: PlaybackStatus) => void
   ): Promise<void> {
+    this.onPlaybackStatusUpdateCallback = onPlaybackStatusUpdate;
     try {
       // Protection contre les appels multiples
       if (isPlaybackInProgress) {
@@ -147,17 +149,18 @@ class RadioService {
         
         // Configurer les événements
         audioElement.onloadedmetadata = () => {
-          console.log('Audio metadata loaded');
+          console.log('Web: Audio metadata loaded');
         };
         
         audioElement.oncanplay = () => {
-          console.log('Audio can play, starting playback');
+          console.log('Web: Audio can play, attempting playback');
+          // Démarrage automatique de la lecture
           const playPromise = audioElement.play();
           if (playPromise !== undefined) {
             playPromise.catch(error => {
-              console.error('Playback error:', error);
-              if (onPlaybackStatusUpdate) {
-                onPlaybackStatusUpdate({
+              console.error('Web: Autoplay error:', error);
+              if (this.onPlaybackStatusUpdateCallback) {
+                this.onPlaybackStatusUpdateCallback({
                   isLoaded: false,
                   isPlaying: false,
                   isBuffering: false,
@@ -169,9 +172,9 @@ class RadioService {
         };
         
         audioElement.onplaying = () => {
-          console.log('Audio is now playing');
-          if (onPlaybackStatusUpdate) {
-            onPlaybackStatusUpdate({
+          console.log('Web: Audio is now playing');
+           if (this.onPlaybackStatusUpdateCallback) {
+            this.onPlaybackStatusUpdateCallback({
               isLoaded: true,
               isPlaying: true,
               isBuffering: false
@@ -180,9 +183,9 @@ class RadioService {
         };
         
         audioElement.onwaiting = () => {
-          console.log('Audio is buffering');
-          if (onPlaybackStatusUpdate) {
-            onPlaybackStatusUpdate({
+          console.log('Web: Audio is buffering');
+           if (this.onPlaybackStatusUpdateCallback) {
+            this.onPlaybackStatusUpdateCallback({
               isLoaded: true,
               isPlaying: false,
               isBuffering: true
@@ -190,16 +193,28 @@ class RadioService {
           }
         };
         
+        audioElement.onpause = () => {
+           console.log('Web: Audio paused');
+           if (this.onPlaybackStatusUpdateCallback) {
+             this.onPlaybackStatusUpdateCallback({
+               isLoaded: true,
+               isPlaying: false,
+               isBuffering: false
+             });
+           }
+        };
+        
         audioElement.onerror = (e) => {
-          console.error('Audio error:', e);
-          if (onPlaybackStatusUpdate) {
-            onPlaybackStatusUpdate({
+          console.error('Web: Audio error:', e);
+           if (this.onPlaybackStatusUpdateCallback) {
+            this.onPlaybackStatusUpdateCallback({
               isLoaded: false,
               isPlaying: false,
               isBuffering: false,
-              error: 'Error loading audio'
+              error: 'Error loading or playing audio'
             });
           }
+          this.stopPlayback();
         };
         
         // Définir la source et charger le fichier
@@ -227,6 +242,15 @@ class RadioService {
     } catch (error) {
       isPlaybackInProgress = false;
       console.error('Error playing stream:', error);
+      if (this.onPlaybackStatusUpdateCallback) {
+         this.onPlaybackStatusUpdateCallback({
+            isLoaded: false,
+            isPlaying: false,
+            isBuffering: false,
+            error: error instanceof Error ? error.message : 'Unknown error during playStream'
+         });
+      }
+      await this.stopPlayback();
       throw error;
     }
   }
@@ -236,60 +260,110 @@ class RadioService {
     callback?: (status: PlaybackStatus) => void
   ) {
     return (status: any) => {
+      if (!this.sound) return;
+
+      let playbackStatus: PlaybackStatus = {
+        isLoaded: false,
+        isPlaying: false,
+        isBuffering: false,
+      };
+
       if (status.isLoaded) {
-        const playbackStatus: PlaybackStatus = {
+        playbackStatus = {
           isLoaded: status.isLoaded,
           isPlaying: status.isPlaying,
           isBuffering: status.isBuffering
         };
-        
-        if (callback) {
-          callback(playbackStatus);
-        }
-      } else if (status.error) {
-        console.error(`Playback error: ${status.error}`);
-        const errorStatus: PlaybackStatus = {
-          isLoaded: false,
-          isPlaying: false,
-          isBuffering: false,
-          error: status.error
-        };
-        
-        if (callback) {
-          callback(errorStatus);
-        }
+      } 
+      
+      if (status.error) {
+        console.error(`Mobile Playback error: ${status.error}`);
+        playbackStatus.error = status.error;
+      }
+
+      if (this.onPlaybackStatusUpdateCallback) {
+        this.onPlaybackStatusUpdateCallback(playbackStatus);
       }
     };
   }
 
   // Mettre en pause ou reprendre la lecture
   async togglePlayback(): Promise<boolean> {
-    if (Platform.OS === 'web' && webAudioElement) {
-      if (webAudioElement.paused) {
-        webAudioElement.play();
-        return true;
+    if (Platform.OS === 'web') {
+      if (webAudioElement) {
+        if (webAudioElement.paused) {
+          console.log('Web: Attempting to play...');
+          try {
+            await webAudioElement.play();
+            return true;
+          } catch (error) {
+            console.error('Web: Error playing audio:', error);
+            // Notifier l'UI de l'erreur
+            if (this.onPlaybackStatusUpdateCallback) {
+               this.onPlaybackStatusUpdateCallback({ isLoaded: false, isPlaying: false, isBuffering: false, error: error instanceof Error ? error.message : 'Error playing' });
+            }
+            return false;
+          }
+        } else {
+          console.log('Web: Attempting to pause...');
+          webAudioElement.pause();
+          return false;
+        }
       } else {
-        webAudioElement.pause();
+        console.warn('Web: togglePlayback called but no audio element exists.');
         return false;
       }
-    } else if (this.sound) {
-      try {
-        const status = await this.sound.getStatusAsync();
-        
-        if (status.isLoaded) {
-          if (status.isPlaying) {
-            await this.sound.pauseAsync();
+    } else {
+      // --- Logique Mobile SIMPLE --- 
+      console.log('Mobile: togglePlayback called.');
+      if (this.sound) {
+         console.log('Mobile: this.sound object exists.'); 
+         try {
+           console.log('Mobile: Attempting getStatusAsync...'); 
+           const status = await this.sound.getStatusAsync();
+           console.log('Mobile: getStatusAsync successful.');
+
+           // @ts-ignore - Vérification directe 
+           if (status.isLoaded) {
+              console.log('Mobile: Sound is loaded.'); 
+              // @ts-ignore - Vérification directe
+              if (status.isPlaying) {
+                 console.log('Mobile: Sound is playing, attempting pauseAsync...'); 
+                 await this.sound.pauseAsync();
+                 console.log('Mobile: pauseAsync successful.');
+                 return false; // Devrait être en pause
+              } else {
+                 console.log('Mobile: Sound is paused or stopped, attempting playAsync...'); 
+                 await this.sound.playAsync();
+                 console.log('Mobile: playAsync successful.');
+                 return true; // Devrait être en lecture
+              }
+           } else {
+              console.warn('Mobile: togglePlayback - Sound is NOT loaded (status.isLoaded is false).'); 
+              // Notifier l'UI
+              if (this.onPlaybackStatusUpdateCallback) {
+                 this.onPlaybackStatusUpdateCallback({ isLoaded: false, isPlaying: false, isBuffering: false, error: 'Sound not loaded' });
+              }
+              return false;
+           }
+         } catch (error) {
+            console.error('Mobile: Error during togglePlayback:', error);
+            // Notifier l'UI
+            if (this.onPlaybackStatusUpdateCallback) {
+               this.onPlaybackStatusUpdateCallback({
+                  isLoaded: false, 
+                  isPlaying: false,
+                  isBuffering: false,
+                  error: error instanceof Error ? error.message : 'Error toggling playback'
+               });
+            }
             return false;
-          } else {
-            await this.sound.playAsync();
-            return true;
-          }
-        }
-      } catch (error) {
-        console.error('Error toggling playback:', error);
+         }
+      } else {
+        console.warn('Mobile: togglePlayback called but no sound object exists.');
+        return false;
       }
     }
-    return false;
   }
 
   // Régler le volume (0 à 1)
@@ -310,28 +384,40 @@ class RadioService {
 
   // Arrêter la lecture
   async stopPlayback(): Promise<void> {
+    console.log('Stopping playback (simple version)...');
     // Arrêter l'audio web si actif
     if (Platform.OS === 'web' && webAudioElement) {
+      console.log('Web: Stopping and cleaning up audio element...');
       webAudioElement.pause();
-      webAudioElement.src = '';
-      webAudioElement.load();
-      if (webAudioElement.parentNode) {
-        webAudioElement.parentNode.removeChild(webAudioElement);
-      }
-      webAudioElement = null;
+      webAudioElement.src = ''; // Vider la source
+      webAudioElement.load(); // Annuler le chargement
+      // Optionnel: Retirer du DOM si vous le recréez à chaque fois
+      // if (webAudioElement.parentNode) {
+      //   webAudioElement.parentNode.removeChild(webAudioElement);
+      // }
+      // webAudioElement = null;
     }
-    
+
     // Arrêter l'audio Expo si actif
     if (this.sound) {
+      console.log('Mobile: Stopping and unloading sound...');
       try {
+        await this.sound.stopAsync();
         await this.sound.unloadAsync();
         this.sound = null;
+        console.log('Mobile: Sound unloaded.');
       } catch (error) {
-        console.error('Error stopping playback:', error);
+        console.error('Mobile: Error stopping/unloading playback:', error);
+        this.sound = null; // S'assurer qu'il est nul même en cas d'erreur
       }
     }
-    
+
     this.currentStream = null;
+    isPlaybackInProgress = false;
+    // Mettre à jour l'interface utilisateur pour refléter l'arrêt
+    if (this.onPlaybackStatusUpdateCallback) {
+      this.onPlaybackStatusUpdateCallback({ isLoaded: false, isPlaying: false, isBuffering: false });
+    }
   }
 
   // Obtenir le flux actuel
