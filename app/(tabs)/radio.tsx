@@ -14,10 +14,18 @@ import {
 import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Feather, Ionicons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ThemedView } from '@/components/ThemedView';
-import { useMetadata } from '@/app/hooks/useMetadata';
+
+// Type pour les métadonnées
+interface StreamMetadata {
+  title: string;
+  artist: string;
+  album: string;
+  song: string;
+  artUrl?: string;
+}
 
 // Theme colors
 const colors = {
@@ -56,13 +64,38 @@ export default function RadioScreen() {
   const soundRef = useRef<Audio.Sound | null>(null);
   const waveformAnimation = useRef(new Animated.Value(0)).current;
   
-  // Utiliser notre nouveau hook pour les métadonnées
-  const metadata = useMetadata();
-  
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? colors.dark : colors.light;
 
-  // Initialize audio
+  const [currentTrack, setCurrentTrack] = useState<StreamMetadata>({
+    title: '',
+    artist: '',
+    album: '',
+    song: ''
+  });
+
+  // Fonction pour mettre à jour les métadonnées
+  const updateMetadata = async () => {
+    try {
+      const response = await fetch('http://51.75.200.205/api/nowplaying/tangerine_radio');
+      const data = await response.json();
+      
+      if (data.now_playing) {
+        const track = data.now_playing;
+        setCurrentTrack({
+          title: track.song.title || '',
+          artist: track.song.artist || '',
+          album: track.song.album || 'Unknown Album',
+          song: track.song.title || 'Web Radio',
+          artUrl: track.song.art || null
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching metadata:', error);
+    }
+  };
+
+  // Initialize audio and metadata polling
   useEffect(() => {
     async function setupAudio() {
       try {
@@ -77,11 +110,21 @@ export default function RadioScreen() {
         });
         
         const { sound } = await Audio.Sound.createAsync(
-          { uri: 'http://51.75.200.205:8000/stream.mp3' },
+          { uri: 'http://51.75.200.205/listen/tangerine_radio/radio.mp3' },
           { shouldPlay: false, volume: volume / 100 }
         );
         
         soundRef.current = sound;
+
+        // Initial metadata fetch
+        updateMetadata();
+
+        // Set up metadata polling
+        const metadataInterval = setInterval(updateMetadata, 5000);
+
+        return () => {
+          clearInterval(metadataInterval);
+        };
       } catch (error) {
         console.error("Error setting up audio:", error);
       }
@@ -173,26 +216,61 @@ export default function RadioScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <StatusBar barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'} />
-      <SafeAreaView style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.playerContainer}>
-            {/* Album artwork or radio logo */}
-            <View style={styles.artworkContainer}>
-              <Image
-                source={metadata?.artwork ? { uri: metadata.artwork } : { uri: 'https://via.placeholder.com/300x300.png?text=Web+Radio' }}
-                style={styles.artwork}
-              />
-              
-              {/* Waveform overlay */}
-              <Animated.View style={[
-                styles.waveformOverlay,
-                { opacity: waveformAnimation }
-              ]} />
-            </View>
+      
+      <ScrollView 
+        style={styles.content}
+        contentContainerStyle={[
+          styles.contentContainer,
+          { minHeight: '100%', justifyContent: 'center' }
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Current track with large cover */}
+        <View style={styles.currentTrackContainer}>
+          <View style={[styles.coverArtContainer, { borderBottomColor: theme.border }]}>
+            <Image
+              source={{ 
+                uri: currentTrack.artUrl || 'https://via.placeholder.com/300x300.png?text=WEB+RADIO'
+              }}
+              style={styles.coverArt}
+              resizeMode="cover"
+            />
             
-            {/* Track info */}
+            {/* Visualization overlay */}
+            <LinearGradient
+              colors={[
+                'transparent', 
+                `${colorScheme === 'dark' ? '#121418' : '#f7f8fa'}30`, 
+                `${colorScheme === 'dark' ? '#121418' : '#f7f8fa'}90`
+              ]}
+              style={styles.coverGradient}
+            >
+              {/* Waveform visualization */}
+              <View style={styles.waveformContainer}>
+                {Array.from({ length: 8 }).map((_, index) => (
+                  <Animated.View 
+                    key={index}
+                    style={[
+                      styles.waveformBar,
+                      { 
+                        backgroundColor: theme.primary,
+                        height: Animated.multiply(
+                          waveformAnimation.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [10, 40]
+                          }),
+                          Math.random() * 0.8 + 0.6
+                        ),
+                        opacity: isPlaying ? 0.7 : 0.3
+                      }
+                    ]}
+                  />
+                ))}
+              </View>
+            </LinearGradient>
+            
             <View style={styles.trackInfoOverlay}>
               <View style={styles.nowPlayingIndicator}>
                 <View style={[styles.pulsingDot, { backgroundColor: theme.primary }]} />
@@ -201,20 +279,20 @@ export default function RadioScreen() {
                 </Text>
               </View>
               <Text style={[styles.trackTitle, { color: theme.foreground }]}>
-                {metadata?.title || 'Web Radio'}
+                {currentTrack.song || 'Web Radio'}
               </Text>
               <View style={styles.trackMetaContainer}>
                 <View style={styles.trackMetaItem}>
                   <Feather name="user" size={12} color={theme.primary} style={styles.trackMetaIcon} />
                   <Text style={[styles.trackMetaText, { color: theme.foreground }]}>
-                    {metadata?.artist || 'Various Artists'}
+                    {currentTrack.artist || 'Various Artists'}
                   </Text>
                 </View>
-                {metadata?.album && (
+                {currentTrack.album && (
                   <View style={styles.trackMetaItem}>
                     <Feather name="disc" size={12} color={theme.primary} style={styles.trackMetaIcon} />
                     <Text style={[styles.trackMetaText, { color: theme.foreground }]}>
-                      {metadata.album}
+                      {currentTrack.album}
                     </Text>
                   </View>
                 )}
@@ -251,91 +329,127 @@ export default function RadioScreen() {
                   color={theme.mutedForeground} 
                 />
               </TouchableOpacity>
-              
               <Slider
                 style={styles.volumeSlider}
-                value={volume}
                 minimumValue={0}
                 maximumValue={100}
-                step={1}
+                value={isMuted ? 0 : volume}
                 onValueChange={handleVolumeChange}
+                step={1}
                 minimumTrackTintColor={theme.primary}
                 maximumTrackTintColor={theme.muted}
                 thumbTintColor={theme.primary}
               />
             </View>
           </View>
-        </ScrollView>
-      </SafeAreaView>
-    </ThemedView>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  safeArea: {
+  content: {
     flex: 1,
   },
-  scrollContent: {
-    paddingBottom: 16,
+  contentContainer: {
+    paddingVertical: Platform.OS === 'ios' ? 40 : 60, // Adjust padding for different platforms
+    paddingHorizontal: 20,
   },
-  playerContainer: {
-    marginBottom: 16,
-  },
-  artworkContainer: {
-    width: '100%',
-    aspectRatio: 1,
+  currentTrackContainer: {
+    alignItems: 'center',
+    marginBottom: 40, // Increased spacing
     position: 'relative',
-    borderBottomWidth: 1,
   },
-  artwork: {
+  coverArtContainer: {
+    width: '100%',
+    aspectRatio: 1, // Maintain square aspect ratio
+    borderRadius: 20, // Rounded corners
+    overflow: 'hidden',
+    marginBottom: 20,
+    position: 'relative', // For absolute positioning of overlay
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    borderBottomWidth: 1, // Add subtle border
+  },
+  coverArt: {
     width: '100%',
     height: '100%',
   },
-  waveformOverlay: {
+  coverGradient: {
     position: 'absolute',
-    top: 0,
     left: 0,
     right: 0,
     bottom: 0,
+    height: '60%',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingBottom: 20,
+  },
+  waveformContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    height: 40, // Fixed height for waveform
+  },
+  waveformBar: {
+    width: 6, // Width of each bar
+    marginHorizontal: 3, // Spacing between bars
+    borderRadius: 3, // Rounded corners for bars
+    height: 10, // Minimum height
   },
   trackInfoOverlay: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
+    bottom: 20, // Positioned slightly above the bottom edge
+    left: 20,
+    right: 20,
+    alignItems: 'center', // Center align track info
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', // Semi-transparent background
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 12, // Rounded corners for the overlay
   },
   nowPlayingIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 8,
+    alignSelf: 'center',
   },
   pulsingDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginRight: 4,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 6,
+    // TODO: Add pulsing animation if desired
   },
   nowPlayingText: {
-    fontSize: 12,
-    textTransform: 'uppercase',
+    fontSize: 10,
+    fontWeight: 'bold',
+    letterSpacing: 1.5,
   },
   trackTitle: {
-    fontSize: 16,
+    fontSize: 20, // Larger font size
     fontWeight: 'bold',
-    marginBottom: 4,
+    textAlign: 'center',
+    marginBottom: 8, // Increased spacing
   },
   trackMetaContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     alignItems: 'center',
   },
   trackMetaItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 12, // Spacing between meta items
+    marginBottom: 4, // Spacing for wrap
   },
   trackMetaIcon: {
     marginRight: 4,
@@ -344,35 +458,29 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   controlsContainer: {
-    padding: 16,
+    alignItems: 'center',
   },
   transportControls: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 30, // Spacing below play button
   },
   playButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     borderWidth: 2,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
   },
   volumeControls: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 8,
+    width: '80%', // Take up most of the width
   },
   muteButton: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginRight: 10,
+    padding: 5,
   },
   volumeSlider: {
     flex: 1,
-    height: 40,
   },
 }); 
