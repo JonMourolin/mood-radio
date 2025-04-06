@@ -1,8 +1,7 @@
-// Configuration de l'API
-export const API_URL = 'http://51.75.200.205:8000';
+// API_URL Supprimée car pointait vers l'ancien serveur Icecast/API de gestion des pistes
+// export const API_URL = 'http://51.75.200.205:8000';
 
-// Configuration du serveur radio
-export const RADIO_URL = 'http://51.75.200.205:8000/stream.mp3';
+// Configuration du serveur radio - Supprimée car obsolète
 
 // Configuration de Mixcloud
 export const MIXCLOUD_USERNAME = 'jonprod18';
