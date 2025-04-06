@@ -3,6 +3,12 @@
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.0] - 2024-04-06
+
+### Changed
+- Interface utilisateur : Masquage du header redondant sur l'écran Radio (mobile).
+- Interface utilisateur : Masquage de la barre d'onglets sur la plateforme Web (remplacée par `<Slot />` pour afficher le contenu).
+
 ## [2.7.0] - 2024-04-06
 
 ### Changed
