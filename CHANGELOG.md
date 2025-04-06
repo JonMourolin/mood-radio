@@ -3,6 +3,26 @@
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.0] - 2024-04-06
+
+### Changed
+- Refactoring majeur de la gestion du lecteur radio.
+- Consolidation de la logique de lecture et d'affichage des métadonnées AzuraCast pour les plateformes mobile et web (`app/(tabs)/radio.tsx` et `app/web/radio.tsx`).
+- Mise à jour de la documentation technique pour refléter l'architecture AzuraCast.
+
+### Removed
+- Suppression du code obsolète lié à l'ancienne infrastructure Icecast/Liquidsoap.
+- Suppression de l'ancien service `radioService.ts`.
+- Suppression de l'ancien service `metadataService.ts` (WebSocket).
+- Suppression de l'ancien service `trackService.ts`.
+- Suppression de l'ancien composant `RadioPlayer.tsx`.
+- Suppression de l'ancien serveur Node.js (`server/`).
+- Suppression des constantes de configuration API et stream obsolètes.
+- Suppression du hook `useMetadata`.
+
+### Fixed
+- Correction de l'incohérence de la logique radio entre les plateformes web et mobile.
+
 ## Roadmap
 
 ### [2.7.0] - Planned
