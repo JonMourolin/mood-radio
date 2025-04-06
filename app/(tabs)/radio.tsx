@@ -77,7 +77,7 @@ export default function RadioScreen() {
         });
         
         const { sound } = await Audio.Sound.createAsync(
-          { uri: 'http://51.75.200.205:8000/stream.mp3' },
+          { uri: 'http://51.75.200.205/listen/tangerine_radio/radio.mp3' },
           { shouldPlay: false, volume: volume / 100 }
         );
         
