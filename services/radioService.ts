@@ -20,21 +20,12 @@ export interface PlaybackStatus {
   error?: string;
 }
 
-// Configuration du serveur
-const SERVER_IP = '51.75.200.205';
-const SERVER_PORT = '8000';
+// Configuration du serveur - Supprimé car obsolète après migration AzuraCast
 
-// Liste des flux disponibles
+// Liste des flux disponibles - Mise à jour pour AzuraCast
 export const AVAILABLE_STREAMS: Stream[] = [
-  {
-    id: 'radio',
-    title: 'Web Radio Mixes',
-    artist: 'Various Artists',
-    url: `http://${SERVER_IP}:${SERVER_PORT}/stream.mp3`,
-    genre: 'Mixed',
-    description: 'Rotation of all DJ mixes',
-    bitrate: 192
-  }
+  // Le stream AzuraCast est géré directement dans app/radio.tsx pour le moment
+  // Ce tableau peut être utilisé si d'autres streams sont ajoutés plus tard.
 ];
 
 // Clé pour le stockage
