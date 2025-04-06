@@ -21,18 +21,19 @@ export interface PlaybackStatus {
 }
 
 // Configuration du serveur
-const SERVER_IP = '51.75.200.205';
-const SERVER_PORT = '8000';
+// Supprimé car nous utilisons maintenant AzuraCast
+// const SERVER_IP = '51.75.200.205';
+// const SERVER_PORT = '8000';
 
 // Liste des flux disponibles
 export const AVAILABLE_STREAMS: Stream[] = [
   {
-    id: 'radio',
-    title: 'Web Radio Mixes',
-    artist: 'Various Artists',
-    url: `http://${SERVER_IP}:${SERVER_PORT}/stream.mp3`,
+    id: 'tangerine_radio',
+    title: 'Tangerine Radio',
+    artist: 'AzuraCast AutoDJ',
+    url: 'http://51.75.200.205/listen/tangerine_radio/radio.mp3',
     genre: 'Mixed',
-    description: 'Rotation of all DJ mixes',
+    description: 'Live stream from AzuraCast',
     bitrate: 192
   }
 ];

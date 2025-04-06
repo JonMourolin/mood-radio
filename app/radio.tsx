@@ -24,6 +24,7 @@ interface StreamMetadata {
   artist: string;
   album: string;
   song: string;
+  artUrl?: string; // URL de la pochette d'album
 }
 
 // Theme colors
@@ -76,17 +77,17 @@ export default function RadioScreen() {
   // Fonction pour mettre à jour les métadonnées
   const updateMetadata = async () => {
     try {
-      const response = await fetch('http://51.75.200.205:8000/status-json.xsl');
+      const response = await fetch('http://51.75.200.205/api/nowplaying/tangerine_radio');
       const data = await response.json();
       
-      if (data.icestats && data.icestats.source) {
-        const source = data.icestats.source;
-        
+      if (data && data.now_playing && data.now_playing.song) {
+        const song = data.now_playing.song;
         setCurrentTrack({
-          title: source.title || '',
-          artist: source.artist || '',
-          album: source.album || 'Unknown Album',
-          song: source.song || source.title || 'Web Radio'
+          title: song.title || '',
+          artist: song.artist || '',
+          album: song.album || 'Unknown Album',
+          song: song.text || `${song.artist} - ${song.title}`,
+          artUrl: song.art || undefined
         });
       }
     } catch (error) {
@@ -109,7 +110,7 @@ export default function RadioScreen() {
         });
         
         const { sound } = await Audio.Sound.createAsync(
-          { uri: 'http://51.75.200.205:8000/stream.mp3' },
+          { uri: 'http://51.75.200.205/listen/tangerine_radio/radio.mp3' },
           { shouldPlay: false, volume: volume / 100 }
         );
         
@@ -230,7 +231,7 @@ export default function RadioScreen() {
         <View style={styles.currentTrackContainer}>
           <View style={[styles.coverArtContainer, { borderBottomColor: theme.border }]}>
             <Image
-              source={{ uri: 'https://via.placeholder.com/300x300.png?text=WEB+RADIO' }}
+              source={{ uri: currentTrack.artUrl || 'https://via.placeholder.com/300x300.png?text=WEB+RADIO' }}
               style={styles.coverArt}
               resizeMode="cover"
             />
