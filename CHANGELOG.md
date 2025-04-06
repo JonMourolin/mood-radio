@@ -13,20 +13,21 @@ et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [2.6.0] - 2024-03-31
 
 ### Added
-- Nouveau service de métadonnées avec WebSocket pour les mises à jour en temps réel
-- Hook personnalisé useMetadata pour la gestion des métadonnées
-- Intégration du serveur Node.js pour la gestion des métadonnées
-- Support des métadonnées étendues via Liquidsoap (titre, artiste, album)
+- Migration complète vers AzuraCast comme service de streaming
+- Support des pochettes d'albums via l'API AzuraCast
+- Intégration de l'endpoint nowplaying d'AzuraCast pour les métadonnées en temps réel
+- Nouveau flux audio haute qualité via AzuraCast
 
 ### Changed
-- Amélioration de la gestion des métadonnées avec mise à jour en temps réel
-- Optimisation de la configuration Liquidsoap pour une meilleure gestion des métadonnées
-- Refactoring du composant Radio pour utiliser le nouveau service de métadonnées
+- Mise à jour de l'interface StreamMetadata pour inclure les pochettes d'albums
+- Modification du composant Radio pour afficher les pochettes d'albums
+- Optimisation de la récupération des métadonnées avec l'API AzuraCast
+- Migration de l'URL du flux audio vers AzuraCast
 
 ### Technical
-- Configuration du serveur WebSocket sur le port 3001
-- Intégration directe entre Liquidsoap et le serveur de métadonnées
-- Amélioration de la stabilité du streaming et des mises à jour de métadonnées
+- Configuration de l'endpoint AzuraCast : http://51.75.200.205/api/nowplaying/tangerine_radio
+- Mise à jour de l'URL du flux : http://51.75.200.205/listen/tangerine_radio/radio.mp3
+- Amélioration de la gestion des métadonnées avec support des pochettes
 
 ## [2.5.0] - 2024-03-31
 
