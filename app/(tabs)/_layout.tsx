@@ -1,10 +1,15 @@
 import React from 'react';
-import { Tabs } from 'expo-router';
+import { Tabs, Slot } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeColor } from '../../hooks/useThemeColor';
+import { Platform, View } from 'react-native';
 
 export default function TabLayout() {
   const tintColor = useThemeColor({ light: '#3b82f6', dark: '#60a5fa' }, 'tint');
+  
+  if (Platform.OS === 'web') {
+    return <Slot />;
+  }
   
   return (
     <Tabs
@@ -18,6 +23,7 @@ export default function TabLayout() {
         options={{
           title: 'Radio',
           tabBarIcon: ({ color }) => <Ionicons name="radio" size={24} color={color} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
