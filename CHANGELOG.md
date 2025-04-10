@@ -1,7 +1,31 @@
-# Changelog - Web Radio Mobile App
+# Changelog
 
-Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/),
-et ce projet adhère au [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [3.0.0] - 2024-04-10
+
+### Changed (Modifié)
+- Refonte complète de l'interface utilisateur avec des principes de design brutaliste.
+- Changement de nom de "tangerine_radio" à "SONIC DRIFT RADIO".
+- Interface du lecteur simplifiée pour une meilleure expérience utilisateur.
+- Conception responsive améliorée pour les petits écrans.
+- Nouveau schéma de couleurs en noir et blanc.
+- Mise à jour du design de la barre de navigation et des icônes.
+
+### Removed (Supprimé)
+- Curseur de contrôle du volume.
+- Visualisation de forme d'onde.
+- Superpositions de dégradés complexes.
+- Éléments d'interface utilisateur superflus pour une interface plus propre.
+
+### Fixed (Corrigé)
+- Détection de l'état actif de la navigation pour les routes à onglets.
+- Gestion de l'état de chargement et des messages d'erreur.
+- Gestion des images de remplacement (placeholder).
+- Configuration de la lecture audio en arrière-plan.
 
 ## [2.8.0] - 2024-04-06
 

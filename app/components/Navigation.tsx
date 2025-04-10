@@ -10,9 +10,9 @@ export default function Navigation() {
     <View style={styles.container}>
       <View style={styles.leftSection}>
         <View style={styles.logoContainer}>
-          <Feather name="radio" size={24} color="#ff8000" style={styles.logoIcon} />
+          <Feather name="activity" size={24} color="#ffffff" style={styles.logoIcon} />
           <Text style={styles.logoText}>
-            tangerine<Text style={styles.logoUnderscore}>_</Text>radio
+            SONIC DRIFT RADIO
           </Text>
         </View>
         
@@ -21,7 +21,7 @@ export default function Navigation() {
             <TouchableOpacity style={styles.navItem}>
               <Text style={[
                 styles.navText,
-                pathname === '/radio' && styles.navTextActive
+                (pathname === '/radio' || pathname.startsWith('/(tabs)/radio')) && styles.navTextActive
               ]}>
                 Radio
               </Text>
@@ -33,12 +33,12 @@ export default function Navigation() {
               <Feather 
                 name="disc" 
                 size={16} 
-                color={pathname === '/mixcloud' ? '#ff8000' : '#646b7a'} 
+                color={(pathname === '/mixcloud' || pathname.startsWith('/(tabs)/mixcloud')) ? '#ffffff' : '#888888'}
                 style={styles.mixesIcon}
               />
               <Text style={[
                 styles.navText,
-                pathname === '/mixcloud' && styles.navTextActive
+                (pathname === '/mixcloud' || pathname.startsWith('/(tabs)/mixcloud')) && styles.navTextActive
               ]}>
                 Mixes
               </Text>
@@ -54,36 +54,38 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#121418',
+    backgroundColor: '#000000',
     borderBottomWidth: 1,
-    borderBottomColor: '#1e2126',
+    borderBottomColor: '#333333',
   },
   leftSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 32,
+    gap: 16,
+    flexShrink: 1,
   },
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   logoIcon: {
-    marginRight: 8,
-  },
-  logoText: {
-    fontSize: 20,
-    fontWeight: '600',
+    marginRight: 10,
     color: '#ffffff',
   },
-  logoUnderscore: {
-    color: '#ff8000',
+  logoText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
   nav: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 24,
+    gap: 16,
   },
   navItem: {
     flexDirection: 'row',
@@ -91,11 +93,12 @@ const styles = StyleSheet.create({
   },
   navText: {
     fontSize: 16,
-    color: '#646b7a',
+    color: '#888888',
     fontWeight: '500',
   },
   navTextActive: {
-    color: '#ff8000',
+    color: '#ffffff',
+    fontWeight: 'bold',
   },
   mixesIcon: {
     marginRight: 6,
