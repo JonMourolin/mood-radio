@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Text,
   Image,
+  ImageBackground,
   StyleSheet,
   TouchableOpacity,
   Platform,
   StatusBar,
   SafeAreaView,
-  Dimensions,
+  useWindowDimensions,
   ActivityIndicator,
 } from 'react-native';
 import { Audio } from 'expo-av';
@@ -34,17 +35,27 @@ const theme = {
   mutedForeground: '#A0A0A0', // Grayish for less important text like album
 };
 
-// --- Responsive Threshold --- START
-const { width } = Dimensions.get('window');
-const isSmallScreen = width < 400; // Target screens narrower than 400px
-// --- Responsive Threshold --- END
+// Define breakpoints
+const BREAKPOINTS = {
+  sm: 400, // Small screens (phones portrait)
+  md: 768, // Medium screens (tablets portrait / large phones)
+  // Add lg, xl etc. as needed
+};
 
 export default function RadioScreen() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [showPlayButton, setShowPlayButton] = useState(false);
   const soundRef = useRef<Audio.Sound | null>(null);
   const navigation = useNavigation();
+  const { width } = useWindowDimensions(); // Get dynamic width
+
+  // Determine current breakpoint category (optional helper)
+  const getBreakpoint = (currentWidth: number) => {
+    if (currentWidth < BREAKPOINTS.sm) return 'sm';
+    if (currentWidth < BREAKPOINTS.md) return 'md';
+    return 'lg'; // Default to largest category if not smaller
+  };
+  const breakpoint = getBreakpoint(width);
 
   const [currentTrack, setCurrentTrack] = useState<StreamMetadata>({
     title: 'Loading...',
@@ -168,76 +179,120 @@ export default function RadioScreen() {
     }
   };
 
+  // Calculate dynamic style values based on width/breakpoint
+  const { 
+    albumArtMarginBottom,
+    albumArtMaxWidth,
+    playButtonPadding,
+    playIconSize,
+    infoBlockPaddingVertical,
+    nowPlayingFontSize,
+    nowPlayingMarginBottom,
+    titleFontSize,
+    titleMarginBottom,
+    artistFontSize,
+    artistMarginBottom,
+    albumFontSize,
+    infoBlockMaxWidth
+  } = useMemo(() => {
+    const isSmall = breakpoint === 'sm';
+    const isMediumOrLarger = breakpoint === 'md' || breakpoint === 'lg';
+
+    return {
+      albumArtMarginBottom: isSmall ? 6 : 15,
+      albumArtMaxWidth: isMediumOrLarger ? 500 : undefined,
+      playButtonPadding: isSmall ? 10 : 15,
+      playIconSize: isSmall ? 30 : 40,
+      infoBlockPaddingVertical: isSmall ? 8 : 15,
+      nowPlayingFontSize: isSmall ? 10 : 12,
+      nowPlayingMarginBottom: isSmall ? 4 : 8,
+      titleFontSize: isSmall ? 20 : 26,
+      titleMarginBottom: isSmall ? 2 : 4,
+      artistFontSize: isSmall ? 14 : 17,
+      artistMarginBottom: isSmall ? 2 : 4,
+      albumFontSize: isSmall ? 12 : 15,
+      infoBlockMaxWidth: isMediumOrLarger ? 500 : undefined,
+    };
+  }, [breakpoint]); // Recompute only when breakpoint changes
+
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle={'light-content'} />
-       <View style={styles.centeredContent}>
-
-            <View style={styles.albumArtContainer}>
-              <Image
-                source={{ uri: currentTrack.artUrl || 'https://via.placeholder.com/600/000000/111111/?text=+' }}
-                style={styles.albumArt}
-                resizeMode="cover"
-              />
-              {isLoading ? (
-                <View style={styles.loadingOverlay}>
-                  <ActivityIndicator size="large" color={theme.primary} />
-                </View>
-              ) : (
-                <TouchableOpacity
-                  style={styles.playButtonOverlay}
-                  onPress={togglePlay}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.playButtonBackground}>
-                    <Feather name={isPlaying ? 'pause' : 'play'} size={isSmallScreen ? 30 : 40} color={theme.background} />
-                  </View>
-                </TouchableOpacity>
-              )}
-            </View>
-
-            <View style={styles.infoBlockContainer}>
-              <View style={styles.infoBlock}>
-                <Text style={styles.nowPlayingText}>NOW PLAYING:</Text>
-                <Text style={styles.titleText} numberOfLines={1}>{isLoading ? ' ' : currentTrack.title}</Text>
-                <Text style={styles.artistText} numberOfLines={1}>{isLoading ? ' ' : currentTrack.artist}</Text>
-                {!isLoading && currentTrack.album ? (
-                  <Text style={styles.albumText} numberOfLines={1}>{currentTrack.album}</Text>
-                ) : null}
+      <ImageBackground 
+        source={require('../../assets/images/background-swirl.png')}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      >
+        <StatusBar barStyle={'light-content'} />
+        <View style={styles.centeredContent}>
+          <View style={[
+            styles.albumArtContainer, 
+            { 
+              marginBottom: albumArtMarginBottom, 
+              maxWidth: albumArtMaxWidth
+            }
+          ]}>
+            <Image
+              source={{ uri: currentTrack.artUrl || 'https://via.placeholder.com/600/000000/111111/?text=+' }}
+              style={styles.albumArt}
+              resizeMode="cover"
+            />
+            {isLoading ? (
+              <View style={styles.loadingOverlay}>
+                <ActivityIndicator size="large" color={theme.primary} />
               </View>
-            </View>
+            ) : (
+              <TouchableOpacity
+                style={styles.playButtonOverlay}
+                onPress={togglePlay}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.playButtonBackground, { padding: playButtonPadding }]}>
+                  <Feather name={isPlaying ? 'pause' : 'play'} size={playIconSize} color={theme.background} />
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
 
+          <View style={[styles.infoBlockContainer, { maxWidth: infoBlockMaxWidth }]}>
+            <View style={[styles.infoBlock, { paddingVertical: infoBlockPaddingVertical }]}>
+              <Text style={[styles.nowPlayingText, { fontSize: nowPlayingFontSize, marginBottom: nowPlayingMarginBottom }]}>NOW PLAYING:</Text>
+              <Text style={[styles.titleText, { fontSize: titleFontSize, marginBottom: titleMarginBottom }]} numberOfLines={1}>{isLoading ? ' ' : currentTrack.title}</Text>
+              <Text style={[styles.artistText, { fontSize: artistFontSize, marginBottom: artistMarginBottom }]} numberOfLines={1}>{isLoading ? ' ' : currentTrack.artist}</Text>
+              {!isLoading && currentTrack.album ? (
+                <Text style={[styles.albumText, { fontSize: albumFontSize }]} numberOfLines={1}>{currentTrack.album}</Text>
+              ) : null}
+            </View>
+          </View>
         </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 }
 
-// Styles with more aggressive conditional values for small screens
+// Define static styles outside the component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.background,
+    overflowX: 'hidden',
+  },
+  backgroundImage: {
+    flex: 1,
   },
   centeredContent: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: 30,
-      backgroundColor: theme.background,
   },
   albumArtContainer: {
     width: '100%',
     aspectRatio: 1,
     position: 'relative',
-    justifyContent: 'center',
-    alignItems: 'center',
     overflow: 'hidden',
-    marginBottom: isSmallScreen ? 6 : 15, // Final reduction (was 8:15)
   },
   albumArt: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#111',
   },
   playButtonOverlay: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
@@ -247,7 +302,6 @@ const styles = StyleSheet.create({
   playButtonBackground: {
     backgroundColor: 'rgba(255, 255, 255, 0.85)',
     borderRadius: 50,
-    padding: isSmallScreen ? 10 : 15, // More reduced padding for small screens
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 3.84, elevation: 5,
@@ -259,34 +313,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)',
   },
   infoBlockContainer: {
-    width: '100%', // Takes width from parent padding
+    width: '100%',
   },
   infoBlock: {
     backgroundColor: theme.cardBackground,
-    paddingVertical: isSmallScreen ? 8 : 15, // Final reduction (was 10:15)
-    paddingHorizontal: 20,
+    paddingHorizontal: 20, // Keep horizontal padding consistent
   },
   nowPlayingText: {
     color: theme.cardForeground,
-    fontSize: isSmallScreen ? 10 : 12,
     fontWeight: 'bold',
-    marginBottom: isSmallScreen ? 4 : 8, // Final reduction (was 5:8)
     letterSpacing: 0.5,
     textTransform: 'uppercase',
   },
   titleText: {
     color: theme.cardForeground,
-    fontSize: isSmallScreen ? 20 : 26,
     fontWeight: 'bold',
-    marginBottom: isSmallScreen ? 2 : 4, // Final reduction (was 3:4)
   },
   artistText: {
     color: theme.cardForeground,
-    fontSize: isSmallScreen ? 14 : 17,
-    marginBottom: isSmallScreen ? 2 : 4, // Final reduction (was 3:4)
   },
   albumText: {
     color: theme.mutedForeground,
-    fontSize: isSmallScreen ? 12 : 15,
   },
 }); 
