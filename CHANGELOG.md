@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2024-06-01
+
+### Added
+- Implemented hover effect on mixtape tiles on the web version (`app/infinite.tsx`), showing description on hover.
+
+### Changed
+- Refactored the mixtape grid layout (`app/infinite.tsx`) to use a standard `View` with `flexWrap` instead of `FlatList` for better web compatibility and layout consistency.
+- Adjusted hover effect logic to keep the play button visible and clickable at all times.
+
+### Fixed
+- Resolved issue where mixtape grid items were cut off on larger screen sizes (web).
+- Corrected TypeScript errors related to web-specific hover event props.
+
 ## [3.1.0] - 2025-04-15
 
 ### Added
