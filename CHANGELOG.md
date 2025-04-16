@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Constrained maximum width of album art and metadata block on larger screens.
 - Prevented horizontal scrolling on web view.
 
+### Fixed
+- Updated background image path to use `.jpg` extension.
+- Corrected background image positioning to fill entire viewport.
+
 ## [3.0.0] - 2024-04-10
 
 ### Changed (Modifié)
