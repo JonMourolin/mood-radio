@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2025-04-15
+
+### Added
+- Background image added to the main radio screen.
+
+### Changed
+- Refactored layout logic to use `useWindowDimensions` for dynamic responsiveness.
+- Implemented multiple breakpoints (`sm`, `md`) for more granular control.
+- Constrained maximum width of album art and metadata block on larger screens.
+- Prevented horizontal scrolling on web view.
+
 ## [3.0.0] - 2024-04-10
 
 ### Changed (Modifié)
