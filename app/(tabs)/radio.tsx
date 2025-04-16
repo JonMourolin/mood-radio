@@ -217,54 +217,55 @@ export default function RadioScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Absolutely positioned background */}
       <ImageBackground 
-        source={require('../../assets/images/background-swirl.png')}
-        style={styles.backgroundImage}
+        source={require('../../assets/images/background-swirl.jpg')}
+        style={styles.backgroundImage} // New style for absolute positioning
         resizeMode="cover"
-      >
-        <StatusBar barStyle={'light-content'} />
-        <View style={styles.centeredContent}>
-          <View style={[
-            styles.albumArtContainer, 
-            { 
-              marginBottom: albumArtMarginBottom, 
-              maxWidth: albumArtMaxWidth
-            }
-          ]}>
-            <Image
-              source={{ uri: currentTrack.artUrl || 'https://via.placeholder.com/600/000000/111111/?text=+' }}
-              style={styles.albumArt}
-              resizeMode="cover"
-            />
-            {isLoading ? (
-              <View style={styles.loadingOverlay}>
-                <ActivityIndicator size="large" color={theme.primary} />
-              </View>
-            ) : (
-              <TouchableOpacity
-                style={styles.playButtonOverlay}
-                onPress={togglePlay}
-                activeOpacity={0.7}
-              >
-                <View style={[styles.playButtonBackground, { padding: playButtonPadding }]}>
-                  <Feather name={isPlaying ? 'pause' : 'play'} size={playIconSize} color={theme.background} />
-                </View>
-              </TouchableOpacity>
-            )}
-          </View>
-
-          <View style={[styles.infoBlockContainer, { maxWidth: infoBlockMaxWidth }]}>
-            <View style={[styles.infoBlock, { paddingVertical: infoBlockPaddingVertical }]}>
-              <Text style={[styles.nowPlayingText, { fontSize: nowPlayingFontSize, marginBottom: nowPlayingMarginBottom }]}>NOW PLAYING:</Text>
-              <Text style={[styles.titleText, { fontSize: titleFontSize, marginBottom: titleMarginBottom }]} numberOfLines={1}>{isLoading ? ' ' : currentTrack.title}</Text>
-              <Text style={[styles.artistText, { fontSize: artistFontSize, marginBottom: artistMarginBottom }]} numberOfLines={1}>{isLoading ? ' ' : currentTrack.artist}</Text>
-              {!isLoading && currentTrack.album ? (
-                <Text style={[styles.albumText, { fontSize: albumFontSize }]} numberOfLines={1}>{currentTrack.album}</Text>
-              ) : null}
+      />
+      <StatusBar barStyle={'light-content'} />
+      {/* Transparent View to center content on top of background */}
+      <View style={styles.centeredContent}>
+        <View style={[
+          styles.albumArtContainer, 
+          { 
+            marginBottom: albumArtMarginBottom, 
+            maxWidth: albumArtMaxWidth
+          }
+        ]}>
+          <Image
+            source={{ uri: currentTrack.artUrl || 'https://via.placeholder.com/600/000000/111111/?text=+' }}
+            style={styles.albumArt}
+            resizeMode="cover"
+          />
+          {isLoading ? (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size="large" color={theme.primary} />
             </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.playButtonOverlay}
+              onPress={togglePlay}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.playButtonBackground, { padding: playButtonPadding }]}>
+                <Feather name={isPlaying ? 'pause' : 'play'} size={playIconSize} color={theme.background} />
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <View style={[styles.infoBlockContainer, { maxWidth: infoBlockMaxWidth }]}>
+          <View style={[styles.infoBlock, { paddingVertical: infoBlockPaddingVertical }]}>
+            <Text style={[styles.nowPlayingText, { fontSize: nowPlayingFontSize, marginBottom: nowPlayingMarginBottom }]}>NOW PLAYING:</Text>
+            <Text style={[styles.titleText, { fontSize: titleFontSize, marginBottom: titleMarginBottom }]} numberOfLines={1}>{isLoading ? ' ' : currentTrack.title}</Text>
+            <Text style={[styles.artistText, { fontSize: artistFontSize, marginBottom: artistMarginBottom }]} numberOfLines={1}>{isLoading ? ' ' : currentTrack.artist}</Text>
+            {!isLoading && currentTrack.album ? (
+              <Text style={[styles.albumText, { fontSize: albumFontSize }]} numberOfLines={1}>{currentTrack.album}</Text>
+            ) : null}
           </View>
         </View>
-      </ImageBackground>
+      </View> { /* End centeredContent View */}
     </SafeAreaView>
   );
 }
@@ -273,16 +274,23 @@ export default function RadioScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    overflowX: 'hidden',
+    overflowX: 'hidden', // Prevent ONLY horizontal scrolling
   },
   backgroundImage: {
-    flex: 1,
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
   },
   centeredContent: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: 30,
+      backgroundColor: 'transparent', // Ensure content container is transparent
   },
   albumArtContainer: {
     width: '100%',
