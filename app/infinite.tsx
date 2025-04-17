@@ -89,21 +89,21 @@ const STREAM_DATA: StreamData[] = [
     metadataUrl: 'http://51.75.200.205/api/nowplaying/rage',
   },
   {
-    id: 'memory-lane',
-    title: 'COSMICS TRIP',
-    emoji: '📼',
-    description: 'Futuristic, experimental and cosmic',
-    imageUrl: require('../assets/images/moods/memory-lane.png'),
-    streamUrl: 'http://51.75.200.205/listen/cosmics_trip/radio.mp3',
-  },
-  {
-    id: 'memory-lane',
+    id: 'melancholia',
     title: 'MELANCHOLIA',
     emoji: '🌙',
     description: 'Dark, moody and melancholic',
     imageUrl: require('../assets/images/moods/melancholia.png'),
     streamUrl: 'http://51.75.200.205/listen/melancholia/radio.mp3',
     metadataUrl: 'http://51.75.200.205/api/nowplaying/melancholia',
+  },
+  {
+    id: 'memory-lane',
+    title: 'COSMICS TRIP',
+    emoji: '📼',
+    description: 'Futuristic, experimental and cosmic',
+    imageUrl: require('../assets/images/moods/memory-lane.png'),
+    streamUrl: 'http://51.75.200.205/listen/cosmics_trip/radio.mp3',
   },
 ];
 
@@ -213,12 +213,21 @@ export default function InfiniteScreen() {
   const { width } = useWindowDimensions();
   const isDarkMode = colorScheme === 'dark';
 
-  let numColumns = 2; 
-  if (width > 1200) { 
+  // Updated column calculation logic
+  let numColumns = 1; // Default to 1 column for smallest screens
+  if (width > 1200) { // Very large screens
     numColumns = 4;
-  } else if (width > 768) { 
+  } else if (width > 768) { // Large screens
     numColumns = 3;
+  } else if (width > 480) { // Small/Medium screens
+     numColumns = 2;
   }
+  // If width <= 480, numColumns remains 1
+
+  // --- Debugging Log --- 
+  console.log(`Screen Width: ${width}, Calculated Columns: ${numColumns}`);
+  // ---------------------
+
   const styles = getStyles(isDarkMode, numColumns);
 
   const [activeStream, setActiveStream] = useState<StreamData | null>(null);
@@ -358,10 +367,11 @@ export default function InfiniteScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Main content container */}
       <View style={styles.container}>
-        <ThemedText type="title" style={styles.pageTitle}>INFINITE MIXTAPES</ThemedText>
+        <ThemedText type="title" style={styles.pageTitle}>INFINITE RADIO</ThemedText>
         <ThemedText style={styles.pageSubtitle}>
-          Music-only themed radio streams, made from NTS resident and guest shows (placeholder text)
+          Listen to your ❤️
         </ThemedText>
         <View style={styles.listWrapper}>
           {STREAM_DATA.map((item) => (
@@ -374,13 +384,16 @@ export default function InfiniteScreen() {
             />
           ))}
         </View>
-        <MiniPlayer 
-            activeStream={activeStream}
-            metadata={currentMetadata}
-            isPlaying={isPlaying}
-            onPlayPausePress={handleMiniPlayerPlayPause}
-        />
+        {/* MiniPlayer removed from here */}
       </View>
+
+      {/* Sticky MiniPlayer at the bottom */}
+      <MiniPlayer 
+          activeStream={activeStream}
+          metadata={currentMetadata}
+          isPlaying={isPlaying}
+          onPlayPausePress={handleMiniPlayerPlayPause}
+      />
     </SafeAreaView>
   );
 }
@@ -392,7 +405,9 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.cr
     backgroundColor: '#000000',
   },
   container: {
+    flex: 1,
     padding: 10,
+    paddingBottom: 75, // Add padding for sticky MiniPlayer (65 height + 10 margin)
   },
   pageTitle: {
     color: '#FFFFFF',
@@ -406,23 +421,26 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.cr
     fontSize: 14,
   },
   listWrapper: {
-    flex: 1,
-    flexDirection: 'row',
+    flexDirection: numColumns === 1 ? 'column' : 'row',
     flexWrap: 'wrap',
-    width: '100%', 
-    maxWidth: 1200, 
-    alignSelf: 'center', 
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
   },
   itemOuterContainer: {
     width: `${100 / numColumns}%`,
-    padding: 3, 
-    height: 120, 
+    ...(numColumns === 1 ? {
+      paddingHorizontal: 0,
+      marginVertical: 3,
+    } : {
+      padding: 3,
+    }),
+    height: 150,
     overflow: 'hidden',
   },
   itemImageBackground: {
-    flex: 1,
-    justifyContent: 'center', // Center content vertically by default
-    alignItems: 'center',    // Center content horizontally by default
+    height: '100%',
+    width: '100%',
     position: 'relative',
     overflow: 'hidden',
   },
@@ -487,13 +505,12 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.cr
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 10, 
-    paddingTop: 50, // Add padding to push text below the centered play button
   },
   hoverTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 5, // Space between title and description
+    marginBottom: 5,
+    paddingHorizontal: 5,
   },
   hoverTitle: { // Title style for hover state
     color: '#FFFFFF',
@@ -501,15 +518,20 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.cr
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  hoverDescription: { // Description style for hover state
+  hoverDescription: {
     color: '#E0E0E0',
     fontSize: 12, 
     textAlign: 'center',
+    paddingHorizontal: 5,
   },
   miniPlayerContainer: {
+    position: 'absolute', // Make it absolute
+    bottom: 0,            // Stick to bottom
+    left: 0,              // Stick to left
+    right: 0,             // Stick to right
     flexDirection: 'row',
     height: 65,
-    backgroundColor: '#111111', 
+    backgroundColor: '#111111',
     borderTopWidth: 1,
     borderTopColor: '#333',
     alignItems: 'center',
