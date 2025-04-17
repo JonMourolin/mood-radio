@@ -53,22 +53,6 @@ interface MiniPlayerProps {
 // --- Sample Data --- 
 const STREAM_DATA: StreamData[] = [
   {
-    id: 'slow-focus',
-    title: 'THE BIG CALM',
-    emoji: '🧘',
-    description: 'Meditation, relax and focus',
-    imageUrl: require('../assets/images/moods/slow-focus.png'),
-    streamUrl: 'placeholder',
-  },
-  {
-    id: 'low-key',
-    title: 'RAW EDGES',
-    emoji: '🔑',
-    description: 'Raw, gritty and unfiltered',
-    imageUrl: require('../assets/images/moods/low-key.png'),
-    streamUrl: 'placeholder',
-  },
-  {
     id: 'sonic-drift',
     title: 'SONIC DRIFT RADIO',
     emoji: '📡',
@@ -78,12 +62,28 @@ const STREAM_DATA: StreamData[] = [
     metadataUrl: 'http://51.75.200.205/api/nowplaying/tangerine_radio',
   },
   {
+    id: 'slow-focus',
+    title: 'THE BIG CALM',
+    emoji: '🧘',
+    description: 'Meditation, relax and focus',
+    imageUrl: require('../assets/images/moods/slow-focus.png'),
+    streamUrl: 'placeholder',
+},
+{
     id: 'poolside',
     title: 'HIGH ENERGY',
     emoji: '☀️',
     description: 'Uplifting, energetic and fun',
     imageUrl: require('../assets/images/moods/poolside.png'),
     streamUrl: 'placeholder', 
+  },
+  {
+    id: 'low-key',
+    title: 'RAGE',
+    emoji: '🔑',
+    description: 'Angry, aggressive and intense',
+    imageUrl: require('../assets/images/moods/low-key.png'),
+    streamUrl: 'placeholder',
   },
   {
     id: 'memory-lane',
