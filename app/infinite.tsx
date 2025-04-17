@@ -11,11 +11,11 @@ import {
   SafeAreaView,
   ImageSourcePropType,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; 
 import { Audio } from 'expo-av';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText'; 
+import { Ionicons } from '@expo/vector-icons';
 
 // --- Interfaces --- 
 interface StreamData {
@@ -128,30 +128,36 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
     // @ts-ignore - Spread web-specific props
     <View 
       style={styles.itemOuterContainer}
-      {...webHoverProps} // Spread the conditional props
+      {...webHoverProps} 
     >
       <ImageBackground source={item.imageUrl} style={styles.itemImageBackground} resizeMode="cover">
-        {/* Always render play button, positioned absolutely */}
+        {/* Always render play button */}
         <TouchableOpacity onPress={handlePress} style={styles.playButton}>
-          <Ionicons 
-            name={isActive && isPlaying ? "pause" : "play"} 
-            size={24} 
-            color="#000000"
-          />
+           {/* Restore Ionicons */}
+           <Ionicons 
+             name={isActive && isPlaying ? "pause" : "play"} 
+             size={24} 
+             color="#000000"
+           />
         </TouchableOpacity>
 
-        {/* Conditionally render hover overlay OR non-hover text */}
+        {/* Conditionally render hover effects OR non-hover text */}
         {canHover && isHovered ? (
-          <View style={styles.hoverOverlay}>
-            <View style={styles.hoverTitleContainer}> 
-              <Text style={styles.itemEmoji}>{item.emoji}</Text> 
-              <Text style={styles.hoverTitle}>{item.title}</Text>
+          <>
+            {/* Web-only blend layer for negative effect */}
+            <View style={styles.blendLayer as any} /> 
+            {/* Existing hover text overlay */}
+            <View style={styles.hoverOverlay}>
+              <View style={styles.hoverTitleContainer}> 
+                <Text style={styles.itemEmoji}>{item.emoji}</Text> 
+                <Text style={styles.hoverTitle}>{item.title}</Text>
+              </View>
+              <Text style={styles.hoverDescription}>{item.description}</Text>
             </View>
-            <Text style={styles.hoverDescription}>{item.description}</Text>
-          </View>
+          </>
         ) : (
+          /* Non-hover text overlay */
           <View style={styles.itemOverlay}> 
-            {/* Play button removed from here */}
             <View style={styles.itemTitleContainer}>
                 <Text style={styles.itemEmoji}>{item.emoji}</Text>
                 <Text style={styles.itemTitle} numberOfLines={1}>{item.title}</Text> 
@@ -196,11 +202,12 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
         <Text style={styles.miniPlayerTrackInfo} numberOfLines={1}>{trackInfo}</Text>
       </View>
       <TouchableOpacity onPress={onPlayPausePress} style={styles.miniPlayerPlayButton}>
-        <Ionicons 
-          name={isPlaying ? "pause" : "play"} 
-          size={24} 
-          color="#FFFFFF" 
-        />
+         {/* Restore Ionicons */}
+         <Ionicons 
+           name={isPlaying ? "pause" : "play"} 
+           size={24} 
+           color="#FFFFFF" 
+         />
       </TouchableOpacity>
     </View>
   );
@@ -369,9 +376,9 @@ export default function InfiniteScreen() {
     <SafeAreaView style={styles.safeArea}>
       {/* Main content container */}
       <View style={styles.container}>
-        <ThemedText type="title" style={styles.pageTitle}>INFINITE RADIO</ThemedText>
+        <ThemedText type="title" style={styles.pageTitle}>LISTEN TO YOUR ❤️ </ThemedText>
         <ThemedText style={styles.pageSubtitle}>
-          Listen to your ❤️
+          Ear music close to your feelings
         </ThemedText>
         <View style={styles.listWrapper}>
           {STREAM_DATA.map((item) => (
@@ -439,10 +446,11 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.cr
     overflow: 'hidden',
   },
   itemImageBackground: {
-    height: '100%',
+    height: '100%', 
     width: '100%',
     position: 'relative',
     overflow: 'hidden',
+    backgroundColor: '#000', // Add a fallback background for image loading
   },
   itemOverlay: { // Style for non-hover state text
     flexDirection: 'row',
@@ -457,19 +465,17 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.cr
     borderRadius: 4, 
   },
   playButton: {
-    position: 'absolute', // Position absolutely
-    // Center the button - adjust as needed
+    position: 'absolute', 
     top: '50%',
     left: '50%',
-    transform: [{ translateX: -15 }, { translateY: -15 }], // Offset by half size
-    zIndex: 1, // Ensure it's above the overlay
-    backgroundColor: '#FFFFFF',
+    transform: [{ translateX: -15 }, { translateY: -15 }], 
+    zIndex: 3,
+    backgroundColor: '#FFFFFF', 
     borderRadius: 15, 
     width: 30, 
     height: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    // marginRight: 8, // Removed
   },
   itemTitleContainer: {
     flexDirection: 'row',
@@ -496,33 +502,35 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.cr
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
-  hoverOverlay: { 
+  hoverOverlay: { // Text overlay
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-start',
+    padding: 10, 
+    zIndex: 2, // Keep zIndex (below play button)
   },
   hoverTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 5,
-    paddingHorizontal: 5,
+    paddingHorizontal: 0,
   },
-  hoverTitle: { // Title style for hover state
+  hoverTitle: {
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: 'bold',
-    textAlign: 'center',
+    textAlign: 'left',
   },
   hoverDescription: {
     color: '#E0E0E0',
     fontSize: 12, 
-    textAlign: 'center',
-    paddingHorizontal: 5,
+    textAlign: 'left',
+    paddingHorizontal: 0,
   },
   miniPlayerContainer: {
     position: 'absolute', // Make it absolute
@@ -570,5 +578,21 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.cr
   miniPlayerPlayButton: {
     padding: 10,
     marginLeft: 10,
+    // Revert size/alignment changes
+    // width: 44, 
+    // height: 44,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+  },
+  blendLayer: { // Blend effect layer
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#ffffff', 
+    // @ts-ignore - mixBlendMode is web-only
+    mixBlendMode: 'difference',
+    zIndex: 0, // Keep zIndex (behind text and button)
   },
 });
