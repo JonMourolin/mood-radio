@@ -67,7 +67,8 @@ const STREAM_DATA: StreamData[] = [
     emoji: '🧘',
     description: 'Meditation, relax and focus',
     imageUrl: require('../assets/images/moods/slow-focus.png'),
-    streamUrl: 'placeholder',
+    streamUrl: 'http://51.75.200.205/listen/the_big_calm/radio.mp3',
+    metadataUrl: 'http://51.75.200.205/api/nowplaying/the_big_calm',
 },
 {
     id: 'poolside',
@@ -75,7 +76,8 @@ const STREAM_DATA: StreamData[] = [
     emoji: '☀️',
     description: 'Uplifting, energetic and fun',
     imageUrl: require('../assets/images/moods/poolside.png'),
-    streamUrl: 'placeholder', 
+    streamUrl: 'http://51.75.200.205/listen/high_energy/radio.mp3', 
+    metadataUrl: 'http://51.75.200.205/api/nowplaying/high_energy',
   },
   {
     id: 'low-key',
@@ -83,7 +85,8 @@ const STREAM_DATA: StreamData[] = [
     emoji: '🔑',
     description: 'Angry, aggressive and intense',
     imageUrl: require('../assets/images/moods/low-key.png'),
-    streamUrl: 'placeholder',
+    streamUrl: 'http://51.75.200.205/listen/rage/radio.mp3',
+    metadataUrl: 'http://51.75.200.205/api/nowplaying/rage',
   },
   {
     id: 'memory-lane',
@@ -91,7 +94,7 @@ const STREAM_DATA: StreamData[] = [
     emoji: '📼',
     description: 'Futuristic, experimental and cosmic',
     imageUrl: require('../assets/images/moods/memory-lane.png'),
-    streamUrl: 'placeholder',
+    streamUrl: 'http://51.75.200.205/listen/cosmics_trip/radio.mp3',
   },
   {
     id: 'memory-lane',
@@ -99,7 +102,8 @@ const STREAM_DATA: StreamData[] = [
     emoji: '🌙',
     description: 'Dark, moody and melancholic',
     imageUrl: require('../assets/images/moods/melancholia.png'),
-    streamUrl: 'placeholder',
+    streamUrl: 'http://51.75.200.205/listen/melancholia/radio.mp3',
+    metadataUrl: 'http://51.75.200.205/api/nowplaying/melancholia',
   },
 ];
 
