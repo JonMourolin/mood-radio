@@ -54,19 +54,19 @@ interface MiniPlayerProps {
 const STREAM_DATA: StreamData[] = [
   {
     id: 'sonic-drift',
-    title: 'SONIC DRIFT RADIO',
+    title: 'M00D RADIO',
     emoji: '📡',
     description: 'The main station feed.',
-    imageUrl: require('../assets/images/moods/sonic-drift.png'),
+    imageUrl: require('../assets/images/moods/sonic-drift.jpg'),
     streamUrl: 'http://51.75.200.205/listen/tangerine_radio/radio.mp3', 
     metadataUrl: 'http://51.75.200.205/api/nowplaying/tangerine_radio',
   },
   {
     id: 'slow-focus',
-    title: 'THE BIG CALM',
+    title: 'FOCUS',
     emoji: '🧘',
     description: 'Meditation, relax and focus',
-    imageUrl: require('../assets/images/moods/slow-focus.png'),
+    imageUrl: require('../assets/images/moods/slow-focus.jpg'),
     streamUrl: 'http://51.75.200.205/listen/the_big_calm/radio.mp3',
     metadataUrl: 'http://51.75.200.205/api/nowplaying/the_big_calm',
 },
@@ -75,16 +75,16 @@ const STREAM_DATA: StreamData[] = [
     title: 'HIGH ENERGY',
     emoji: '☀️',
     description: 'Uplifting, energetic and fun',
-    imageUrl: require('../assets/images/moods/poolside.png'),
+    imageUrl: require('../assets/images/moods/poolside.jpg'),
     streamUrl: 'http://51.75.200.205/listen/high_energy/radio.mp3', 
     metadataUrl: 'http://51.75.200.205/api/nowplaying/high_energy',
   },
   {
     id: 'low-key',
-    title: 'RAGE',
+    title: 'RAGE / RAVE',
     emoji: '🔑',
     description: 'Angry, aggressive and intense',
-    imageUrl: require('../assets/images/moods/low-key.png'),
+    imageUrl: require('../assets/images/moods/low-key.jpg'),
     streamUrl: 'http://51.75.200.205/listen/rage/radio.mp3',
     metadataUrl: 'http://51.75.200.205/api/nowplaying/rage',
   },
@@ -93,16 +93,16 @@ const STREAM_DATA: StreamData[] = [
     title: 'MELANCHOLIA',
     emoji: '🌙',
     description: 'Dark, moody and melancholic',
-    imageUrl: require('../assets/images/moods/melancholia.png'),
+    imageUrl: require('../assets/images/moods/melancholia.jpg'),
     streamUrl: 'http://51.75.200.205/listen/melancholia/radio.mp3',
     metadataUrl: 'http://51.75.200.205/api/nowplaying/melancholia',
   },
   {
     id: 'memory-lane',
-    title: 'COSMICS TRIP',
+    title: 'EXPLORE',
     emoji: '📼',
     description: 'Futuristic, experimental and cosmic',
-    imageUrl: require('../assets/images/moods/memory-lane.png'),
+    imageUrl: require('../assets/images/moods/memory-lane.jpg'),
     streamUrl: 'http://51.75.200.205/listen/cosmics_trip/radio.mp3',
   },
 ];
@@ -126,13 +126,15 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
 
   return (
     // @ts-ignore - Spread web-specific props
-    <View 
+    <TouchableOpacity 
       style={styles.itemOuterContainer}
       {...webHoverProps} 
+      onPress={handlePress}
+      activeOpacity={0.8}
     >
       <ImageBackground source={item.imageUrl} style={styles.itemImageBackground} resizeMode="cover">
         {/* Always render play button */}
-        <TouchableOpacity onPress={handlePress} style={styles.playButton}>
+        <TouchableOpacity style={styles.playButton}>
            {/* Restore Ionicons */}
            <Ionicons 
              name={isActive && isPlaying ? "pause" : "play"} 
@@ -165,7 +167,7 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
           </View>
         )}
       </ImageBackground>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -214,8 +216,8 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
 }
 
 
-// --- Main Screen Component --- <<<<< ENSURE THIS IS EXPORTED AS DEFAULT >>>>>
-export default function InfiniteScreen() { 
+// --- Main Screen Component ---
+export function InfiniteScreen() { 
   const colorScheme = useColorScheme();
   const { width } = useWindowDimensions();
   const isDarkMode = colorScheme === 'dark';
@@ -373,48 +375,54 @@ export default function InfiniteScreen() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      {/* Main content container */}
-      <View style={styles.container}>
-        <ThemedText type="title" style={styles.pageTitle}>LISTEN TO YOUR ❤️ </ThemedText>
-        <ThemedText style={styles.pageSubtitle}>
-          Ear music close to your feelings
-        </ThemedText>
-        <View style={styles.listWrapper}>
-          {STREAM_DATA.map((item) => (
-            <StreamItem 
-              key={item.id}
-              item={item}
-              onPlayPress={handlePlayPress} 
-              isActive={activeStream?.id === item.id}
-              isPlaying={activeStream?.id === item.id && isPlaying}
-            />
-          ))}
+    <ImageBackground 
+      source={require('../assets/images/global/global1.jpg')} 
+      style={styles.pageBackground} 
+      resizeMode="cover"
+    >
+      <SafeAreaView style={styles.safeArea}>
+        {/* Main content container */}
+        <View style={styles.container}>
+          <View style={styles.listWrapper}>
+            {STREAM_DATA.map((item) => (
+              <StreamItem 
+                key={item.id}
+                item={item}
+                onPlayPress={handlePlayPress} 
+                isActive={activeStream?.id === item.id}
+                isPlaying={activeStream?.id === item.id && isPlaying}
+              />
+            ))}
+          </View>
+          {/* MiniPlayer removed from here */}
         </View>
-        {/* MiniPlayer removed from here */}
-      </View>
 
-      {/* Sticky MiniPlayer at the bottom */}
-      <MiniPlayer 
-          activeStream={activeStream}
-          metadata={currentMetadata}
-          isPlaying={isPlaying}
-          onPlayPausePress={handleMiniPlayerPlayPause}
-      />
-    </SafeAreaView>
+        {/* Sticky MiniPlayer at the bottom */}
+        <MiniPlayer 
+            activeStream={activeStream}
+            metadata={currentMetadata}
+            isPlaying={isPlaying}
+            onPlayPausePress={handleMiniPlayerPlayPause}
+        />
+      </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 // --- Styles ---
 const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.create({
+  pageBackground: {
+    flex: 1,
+  },
   safeArea: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: 'transparent',
   },
   container: {
     flex: 1,
     padding: 10,
     paddingBottom: 75, // Add padding for sticky MiniPlayer (65 height + 10 margin)
+    backgroundColor: 'transparent',
   },
   pageTitle: {
     color: '#FFFFFF',
@@ -442,7 +450,7 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.cr
     } : {
       padding: 3,
     }),
-    height: 150,
+    height: 220,
     overflow: 'hidden',
   },
   itemImageBackground: {
