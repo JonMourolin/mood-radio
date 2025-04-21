@@ -375,54 +375,44 @@ export function InfiniteScreen() {
   }, []);
 
   return (
-    <ImageBackground 
-      source={require('../assets/images/global/global1.jpg')} 
-      style={styles.pageBackground} 
-      resizeMode="cover"
-    >
-      <SafeAreaView style={styles.safeArea}>
-        {/* Main content container */}
-        <View style={styles.container}>
-          <View style={styles.listWrapper}>
-            {STREAM_DATA.map((item) => (
-              <StreamItem 
-                key={item.id}
-                item={item}
-                onPlayPress={handlePlayPress} 
-                isActive={activeStream?.id === item.id}
-                isPlaying={activeStream?.id === item.id && isPlaying}
-              />
-            ))}
-          </View>
-          {/* MiniPlayer removed from here */}
+    <SafeAreaView style={styles.safeArea}>
+      {/* Main content container */}
+      <View style={styles.container}>
+        <View style={styles.listWrapper}>
+          {STREAM_DATA.map((item) => (
+            <StreamItem 
+              key={item.id}
+              item={item}
+              onPlayPress={handlePlayPress} 
+              isActive={activeStream?.id === item.id}
+              isPlaying={activeStream?.id === item.id && isPlaying}
+            />
+          ))}
         </View>
+        {/* MiniPlayer removed from here */}
+      </View>
 
-        {/* Sticky MiniPlayer at the bottom */}
-        <MiniPlayer 
-            activeStream={activeStream}
-            metadata={currentMetadata}
-            isPlaying={isPlaying}
-            onPlayPausePress={handleMiniPlayerPlayPause}
-        />
-      </SafeAreaView>
-    </ImageBackground>
+      {/* Sticky MiniPlayer at the bottom */}
+      <MiniPlayer 
+          activeStream={activeStream}
+          metadata={currentMetadata}
+          isPlaying={isPlaying}
+          onPlayPausePress={handleMiniPlayerPlayPause}
+      />
+    </SafeAreaView>
   );
 }
 
 // --- Styles ---
 const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.create({
-  pageBackground: {
-    flex: 1,
-  },
   safeArea: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: '#000000', // Restore background color
   },
   container: {
     flex: 1,
     padding: 10,
     paddingBottom: 75, // Add padding for sticky MiniPlayer (65 height + 10 margin)
-    backgroundColor: 'transparent',
   },
   pageTitle: {
     color: '#FFFFFF',
