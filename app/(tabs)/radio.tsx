@@ -67,7 +67,13 @@ export default function RadioScreen() {
 
   useEffect(() => {
     navigation.setOptions({
-      headerTitle: 'SONIC DRIFT RADIO',
+      headerTitle: () => (
+        <Image
+          source={require('../../assets/images/logo/logo1.png')}
+          style={{ height: 30, width: 150, resizeMode: 'contain' }}
+        />
+      ),
+      headerTitleAlign: 'center',
     });
   }, [navigation]);
 

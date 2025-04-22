@@ -27,6 +27,14 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="infinite"
+        options={{
+          title: 'Infinite',
+          tabBarIcon: ({ color }) => <Ionicons name="infinite-outline" size={24} color={color} />,
+          headerShown: true,
+        }}
+      />
+      <Tabs.Screen
         name="mixcloud"
         options={{
           title: 'DJ Sets',

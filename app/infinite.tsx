@@ -11,11 +11,11 @@ import {
   SafeAreaView,
   ImageSourcePropType,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; 
 import { Audio } from 'expo-av';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText'; 
+import { Ionicons } from '@expo/vector-icons';
 
 // --- Interfaces --- 
 interface StreamData {
@@ -54,19 +54,19 @@ interface MiniPlayerProps {
 const STREAM_DATA: StreamData[] = [
   {
     id: 'sonic-drift',
-    title: 'SONIC DRIFT RADIO',
+    title: 'M00D RADIO',
     emoji: '📡',
     description: 'The main station feed.',
-    imageUrl: require('../assets/images/moods/sonic-drift.png'),
+    imageUrl: require('../assets/images/moods/sonic-drift.jpg'),
     streamUrl: 'http://51.75.200.205/listen/tangerine_radio/radio.mp3', 
     metadataUrl: 'http://51.75.200.205/api/nowplaying/tangerine_radio',
   },
   {
     id: 'slow-focus',
-    title: 'THE BIG CALM',
+    title: 'FOCUS',
     emoji: '🧘',
     description: 'Meditation, relax and focus',
-    imageUrl: require('../assets/images/moods/slow-focus.png'),
+    imageUrl: require('../assets/images/moods/slow-focus.jpg'),
     streamUrl: 'http://51.75.200.205/listen/the_big_calm/radio.mp3',
     metadataUrl: 'http://51.75.200.205/api/nowplaying/the_big_calm',
 },
@@ -75,35 +75,35 @@ const STREAM_DATA: StreamData[] = [
     title: 'HIGH ENERGY',
     emoji: '☀️',
     description: 'Uplifting, energetic and fun',
-    imageUrl: require('../assets/images/moods/poolside.png'),
+    imageUrl: require('../assets/images/moods/poolside.jpg'),
     streamUrl: 'http://51.75.200.205/listen/high_energy/radio.mp3', 
     metadataUrl: 'http://51.75.200.205/api/nowplaying/high_energy',
   },
   {
     id: 'low-key',
-    title: 'RAGE',
+    title: 'RAGE / RAVE',
     emoji: '🔑',
     description: 'Angry, aggressive and intense',
-    imageUrl: require('../assets/images/moods/low-key.png'),
+    imageUrl: require('../assets/images/moods/low-key.jpg'),
     streamUrl: 'http://51.75.200.205/listen/rage/radio.mp3',
     metadataUrl: 'http://51.75.200.205/api/nowplaying/rage',
   },
   {
-    id: 'memory-lane',
-    title: 'COSMICS TRIP',
-    emoji: '📼',
-    description: 'Futuristic, experimental and cosmic',
-    imageUrl: require('../assets/images/moods/memory-lane.png'),
-    streamUrl: 'http://51.75.200.205/listen/cosmics_trip/radio.mp3',
-  },
-  {
-    id: 'memory-lane',
+    id: 'melancholia',
     title: 'MELANCHOLIA',
     emoji: '🌙',
     description: 'Dark, moody and melancholic',
-    imageUrl: require('../assets/images/moods/melancholia.png'),
+    imageUrl: require('../assets/images/moods/melancholia.jpg'),
     streamUrl: 'http://51.75.200.205/listen/melancholia/radio.mp3',
     metadataUrl: 'http://51.75.200.205/api/nowplaying/melancholia',
+  },
+  {
+    id: 'memory-lane',
+    title: 'EXPLORE',
+    emoji: '📼',
+    description: 'Futuristic, experimental and cosmic',
+    imageUrl: require('../assets/images/moods/memory-lane.jpg'),
+    streamUrl: 'http://51.75.200.205/listen/cosmics_trip/radio.mp3',
   },
 ];
 
@@ -126,32 +126,40 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
 
   return (
     // @ts-ignore - Spread web-specific props
-    <View 
+    <TouchableOpacity 
       style={styles.itemOuterContainer}
-      {...webHoverProps} // Spread the conditional props
+      {...webHoverProps} 
+      onPress={handlePress}
+      activeOpacity={0.8}
     >
       <ImageBackground source={item.imageUrl} style={styles.itemImageBackground} resizeMode="cover">
-        {/* Always render play button, positioned absolutely */}
-        <TouchableOpacity onPress={handlePress} style={styles.playButton}>
-          <Ionicons 
-            name={isActive && isPlaying ? "pause" : "play"} 
-            size={24} 
-            color="#000000"
-          />
+        {/* Always render play button */}
+        <TouchableOpacity style={styles.playButton}>
+           {/* Restore Ionicons */}
+           <Ionicons 
+             name={isActive && isPlaying ? "pause" : "play"} 
+             size={24} 
+             color="#000000"
+           />
         </TouchableOpacity>
 
-        {/* Conditionally render hover overlay OR non-hover text */}
+        {/* Conditionally render hover effects OR non-hover text */}
         {canHover && isHovered ? (
-          <View style={styles.hoverOverlay}>
-            <View style={styles.hoverTitleContainer}> 
-              <Text style={styles.itemEmoji}>{item.emoji}</Text> 
-              <Text style={styles.hoverTitle}>{item.title}</Text>
+          <>
+            {/* Web-only blend layer for negative effect */}
+            <View style={styles.blendLayer as any} /> 
+            {/* Existing hover text overlay */}
+            <View style={styles.hoverOverlay}>
+              <View style={styles.hoverTitleContainer}> 
+                <Text style={styles.itemEmoji}>{item.emoji}</Text> 
+                <Text style={styles.hoverTitle}>{item.title}</Text>
+              </View>
+              <Text style={styles.hoverDescription}>{item.description}</Text>
             </View>
-            <Text style={styles.hoverDescription}>{item.description}</Text>
-          </View>
+          </>
         ) : (
+          /* Non-hover text overlay */
           <View style={styles.itemOverlay}> 
-            {/* Play button removed from here */}
             <View style={styles.itemTitleContainer}>
                 <Text style={styles.itemEmoji}>{item.emoji}</Text>
                 <Text style={styles.itemTitle} numberOfLines={1}>{item.title}</Text> 
@@ -159,7 +167,7 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
           </View>
         )}
       </ImageBackground>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -196,29 +204,39 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
         <Text style={styles.miniPlayerTrackInfo} numberOfLines={1}>{trackInfo}</Text>
       </View>
       <TouchableOpacity onPress={onPlayPausePress} style={styles.miniPlayerPlayButton}>
-        <Ionicons 
-          name={isPlaying ? "pause" : "play"} 
-          size={24} 
-          color="#FFFFFF" 
-        />
+         {/* Restore Ionicons */}
+         <Ionicons 
+           name={isPlaying ? "pause" : "play"} 
+           size={24} 
+           color="#FFFFFF" 
+         />
       </TouchableOpacity>
     </View>
   );
 }
 
 
-// --- Main Screen Component --- <<<<< ENSURE THIS IS EXPORTED AS DEFAULT >>>>>
-export default function InfiniteScreen() { 
+// --- Main Screen Component ---
+export function InfiniteScreen() { 
   const colorScheme = useColorScheme();
   const { width } = useWindowDimensions();
   const isDarkMode = colorScheme === 'dark';
 
-  let numColumns = 2; 
-  if (width > 1200) { 
+  // Updated column calculation logic
+  let numColumns = 1; // Default to 1 column for smallest screens
+  if (width > 1200) { // Very large screens
     numColumns = 4;
-  } else if (width > 768) { 
+  } else if (width > 768) { // Large screens
     numColumns = 3;
+  } else if (width > 480) { // Small/Medium screens
+     numColumns = 2;
   }
+  // If width <= 480, numColumns remains 1
+
+  // --- Debugging Log --- 
+  console.log(`Screen Width: ${width}, Calculated Columns: ${numColumns}`);
+  // ---------------------
+
   const styles = getStyles(isDarkMode, numColumns);
 
   const [activeStream, setActiveStream] = useState<StreamData | null>(null);
@@ -358,11 +376,8 @@ export default function InfiniteScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Main content container */}
       <View style={styles.container}>
-        <ThemedText type="title" style={styles.pageTitle}>INFINITE MIXTAPES</ThemedText>
-        <ThemedText style={styles.pageSubtitle}>
-          Music-only themed radio streams, made from NTS resident and guest shows (placeholder text)
-        </ThemedText>
         <View style={styles.listWrapper}>
           {STREAM_DATA.map((item) => (
             <StreamItem 
@@ -374,13 +389,16 @@ export default function InfiniteScreen() {
             />
           ))}
         </View>
-        <MiniPlayer 
-            activeStream={activeStream}
-            metadata={currentMetadata}
-            isPlaying={isPlaying}
-            onPlayPausePress={handleMiniPlayerPlayPause}
-        />
+        {/* MiniPlayer removed from here */}
       </View>
+
+      {/* Sticky MiniPlayer at the bottom */}
+      <MiniPlayer 
+          activeStream={activeStream}
+          metadata={currentMetadata}
+          isPlaying={isPlaying}
+          onPlayPausePress={handleMiniPlayerPlayPause}
+      />
     </SafeAreaView>
   );
 }
@@ -389,10 +407,12 @@ export default function InfiniteScreen() {
 const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: '#000000', // Restore background color
   },
   container: {
+    flex: 1,
     padding: 10,
+    paddingBottom: 75, // Add padding for sticky MiniPlayer (65 height + 10 margin)
   },
   pageTitle: {
     color: '#FFFFFF',
@@ -406,25 +426,29 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.cr
     fontSize: 14,
   },
   listWrapper: {
-    flex: 1,
-    flexDirection: 'row',
+    flexDirection: numColumns === 1 ? 'column' : 'row',
     flexWrap: 'wrap',
-    width: '100%', 
-    maxWidth: 1200, 
-    alignSelf: 'center', 
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
   },
   itemOuterContainer: {
     width: `${100 / numColumns}%`,
-    padding: 3, 
-    height: 120, 
+    ...(numColumns === 1 ? {
+      paddingHorizontal: 0,
+      marginVertical: 3,
+    } : {
+      padding: 3,
+    }),
+    height: 220,
     overflow: 'hidden',
   },
   itemImageBackground: {
-    flex: 1,
-    justifyContent: 'center', // Center content vertically by default
-    alignItems: 'center',    // Center content horizontally by default
+    height: '100%', 
+    width: '100%',
     position: 'relative',
     overflow: 'hidden',
+    backgroundColor: '#000', // Add a fallback background for image loading
   },
   itemOverlay: { // Style for non-hover state text
     flexDirection: 'row',
@@ -439,19 +463,17 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.cr
     borderRadius: 4, 
   },
   playButton: {
-    position: 'absolute', // Position absolutely
-    // Center the button - adjust as needed
+    position: 'absolute', 
     top: '50%',
     left: '50%',
-    transform: [{ translateX: -15 }, { translateY: -15 }], // Offset by half size
-    zIndex: 1, // Ensure it's above the overlay
-    backgroundColor: '#FFFFFF',
+    transform: [{ translateX: -15 }, { translateY: -15 }], 
+    zIndex: 3,
+    backgroundColor: '#FFFFFF', 
     borderRadius: 15, 
     width: 30, 
     height: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    // marginRight: 8, // Removed
   },
   itemTitleContainer: {
     flexDirection: 'row',
@@ -478,38 +500,44 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.cr
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
-  hoverOverlay: { 
+  hoverOverlay: { // Text overlay
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-start',
     padding: 10, 
-    paddingTop: 50, // Add padding to push text below the centered play button
+    zIndex: 2, // Keep zIndex (below play button)
   },
   hoverTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 5, // Space between title and description
+    marginBottom: 5,
+    paddingHorizontal: 0,
   },
-  hoverTitle: { // Title style for hover state
+  hoverTitle: {
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: 'bold',
-    textAlign: 'center',
+    textAlign: 'left',
   },
-  hoverDescription: { // Description style for hover state
+  hoverDescription: {
     color: '#E0E0E0',
     fontSize: 12, 
-    textAlign: 'center',
+    textAlign: 'left',
+    paddingHorizontal: 0,
   },
   miniPlayerContainer: {
+    position: 'absolute', // Make it absolute
+    bottom: 0,            // Stick to bottom
+    left: 0,              // Stick to left
+    right: 0,             // Stick to right
     flexDirection: 'row',
     height: 65,
-    backgroundColor: '#111111', 
+    backgroundColor: '#111111',
     borderTopWidth: 1,
     borderTopColor: '#333',
     alignItems: 'center',
@@ -548,5 +576,21 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.cr
   miniPlayerPlayButton: {
     padding: 10,
     marginLeft: 10,
+    // Revert size/alignment changes
+    // width: 44, 
+    // height: 44,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+  },
+  blendLayer: { // Blend effect layer
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#ffffff', 
+    // @ts-ignore - mixBlendMode is web-only
+    mixBlendMode: 'difference',
+    zIndex: 0, // Keep zIndex (behind text and button)
   },
 });

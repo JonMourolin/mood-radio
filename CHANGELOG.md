@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.0] - 2024-07-27
+
+### Added
+- Background image added to the infinite mixtapes screen (`app/infinite.tsx`).
+
+### Changed
+- Made entire stream tile tappable on the infinite mixtapes screen (`app/infinite.tsx`).
+- Refined responsive layout for infinite mixtapes grid (`app/infinite.tsx`).
+
+### Fixed
+- Ensured unique keys for streams and implemented single-column layout for small screens (`app/infinite.tsx`).
+- Resolved background image path error (`app/infinite.tsx`).
+
+### Removed
+- Header title and subtitle from the infinite mixtapes screen (`app/infinite.tsx`).
+- Global background image from infinite mixtapes screen (reverted in d58e2f6).
+
+### Technical
+- Added various image assets for mixtape moods.
+
 ## [3.3.0] - 2024-04-16
 
 ### Added

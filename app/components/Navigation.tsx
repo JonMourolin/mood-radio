@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Link, usePathname } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 
@@ -10,10 +10,11 @@ export default function Navigation() {
     <View style={styles.container}>
       <View style={styles.leftSection}>
         <View style={styles.logoContainer}>
-          <Feather name="activity" size={24} color="#ffffff" style={styles.logoIcon} />
-          <Text style={styles.logoText}>
-            SONIC DRIFT RADIO
-          </Text>
+          <Image 
+            source={require('../../assets/images/logo/logo1.png')}
+            style={styles.logoImage} 
+            resizeMode="contain"
+          />
         </View>
         
         <View style={styles.nav}>
@@ -70,17 +71,11 @@ const styles = StyleSheet.create({
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    height: 50,
   },
-  logoIcon: {
-    marginRight: 10,
-    color: '#ffffff',
-  },
-  logoText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+  logoImage: {
+    height: '100%',
+    width: 250,
   },
   nav: {
     flexDirection: 'row',
