@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { Audio } from 'expo-av';
 import { Feather } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from 'expo-router';
 
 // Type pour les métadonnées
@@ -255,7 +256,7 @@ export default function RadioScreen() {
               activeOpacity={0.7}
             >
               <View style={[styles.playButtonBackground, { padding: playButtonPadding }]}>
-                <Feather name={isPlaying ? 'pause' : 'play'} size={playIconSize} color={theme.background} />
+                <Ionicons name={isPlaying ? 'stop-sharp' : 'play-sharp'} size={playIconSize} color={theme.background} />
               </View>
             </TouchableOpacity>
           )}

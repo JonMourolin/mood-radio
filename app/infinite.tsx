@@ -3,13 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   ImageBackground,
   Platform,
   useWindowDimensions,
   SafeAreaView,
   ImageSourcePropType,
+  ScrollView,
 } from 'react-native';
 import { Audio } from 'expo-av';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -118,14 +118,17 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
 
   const canHover = Platform.OS === 'web';
 
-  // Conditionally define hover props for web
+  // Determine icon visibility
+  const showPauseIcon = isActive && isPlaying;
+  const showPlayIcon = !showPauseIcon && (!canHover || isHovered);
+  const shouldShowIcon = showPauseIcon || showPlayIcon;
+
   const webHoverProps = canHover ? {
     onMouseEnter: () => setIsHovered(true),
     onMouseLeave: () => setIsHovered(false),
   } : {};
 
   return (
-    // @ts-ignore - Spread web-specific props
     <TouchableOpacity 
       style={styles.itemOuterContainer}
       {...webHoverProps} 
@@ -133,15 +136,17 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
       activeOpacity={0.8}
     >
       <ImageBackground source={item.imageUrl} style={styles.itemImageBackground} resizeMode="cover">
-        {/* Always render play button */}
-        <TouchableOpacity style={styles.playButton}>
-           {/* Restore Ionicons */}
-           <Ionicons 
-             name={isActive && isPlaying ? "pause" : "play"} 
-             size={24} 
-             color="#000000"
-           />
-        </TouchableOpacity>
+        {/* Conditionally render the button based on visibility logic */}
+        {shouldShowIcon && (
+          <TouchableOpacity style={styles.playButton}>
+            <Ionicons 
+              name={showPauseIcon ? "stop-sharp" : "play-sharp"} 
+              size={48}
+              color="#FFFFFF"
+              style={styles.playIcon}
+            />
+          </TouchableOpacity>
+        )}
 
         {/* Conditionally render hover effects OR non-hover text */}
         {canHover && isHovered ? (
@@ -204,9 +209,8 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
         <Text style={styles.miniPlayerTrackInfo} numberOfLines={1}>{trackInfo}</Text>
       </View>
       <TouchableOpacity onPress={onPlayPausePress} style={styles.miniPlayerPlayButton}>
-         {/* Restore Ionicons */}
          <Ionicons 
-           name={isPlaying ? "pause" : "play"} 
+           name={isPlaying ? "stop-sharp" : "play-sharp"}
            size={24} 
            color="#FFFFFF" 
          />
@@ -222,14 +226,10 @@ export function InfiniteScreen() {
   const { width } = useWindowDimensions();
   const isDarkMode = colorScheme === 'dark';
 
-  // Updated column calculation logic
-  let numColumns = 1; // Default to 1 column for smallest screens
-  if (width > 1200) { // Very large screens
-    numColumns = 4;
-  } else if (width > 768) { // Large screens
-    numColumns = 3;
-  } else if (width > 480) { // Small/Medium screens
-     numColumns = 2;
+  // Updated column calculation logic (Simplified based on user request)
+  let numColumns = 1; // Default to 1 column
+  if (width > 480) { // Screens wider than 480px
+     numColumns = 2; // Use 2 columns
   }
   // If width <= 480, numColumns remains 1
 
@@ -374,25 +374,70 @@ export function InfiniteScreen() {
     };
   }, []);
 
+  // Inject scrollbar styles for web
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      const styleElement = document.createElement('style');
+      styleElement.id = 'custom-scrollbar-styles'; // Add ID for cleanup
+      styleElement.innerHTML = `
+        /* Dark Scrollbar Styles */
+        ::-webkit-scrollbar {
+          width: 8px; /* Width of the scrollbar */
+          height: 8px; /* Height for horizontal scrollbar */
+        }
+
+        ::-webkit-scrollbar-track {
+          background: #2c2c2c; /* Dark track background */
+          border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+          background-color: #555555; /* Darker grey thumb */
+          border-radius: 4px;
+          border: 1px solid #2c2c2c; /* Optional: border matching track */
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          background-color: #777777; /* Slightly lighter on hover */
+        }
+      `;
+      document.head.appendChild(styleElement);
+
+      // Cleanup function to remove the style tag when component unmounts
+      return () => {
+        const existingStyleElement = document.getElementById('custom-scrollbar-styles');
+        if (existingStyleElement) {
+          document.head.removeChild(existingStyleElement);
+        }
+      };
+    }
+  }, []); // Empty dependency array ensures this runs only once on mount/unmount
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Main content container */}
-      <View style={styles.container}>
-        <View style={styles.listWrapper}>
-          {STREAM_DATA.map((item) => (
-            <StreamItem 
-              key={item.id}
-              item={item}
-              onPlayPress={handlePlayPress} 
-              isActive={activeStream?.id === item.id}
-              isPlaying={activeStream?.id === item.id && isPlaying}
-            />
-          ))}
+      {/* Wrap content in ScrollView */}
+      <ScrollView 
+        style={styles.scrollView} 
+        contentContainerStyle={styles.scrollContentContainer}
+      >
+        {/* Restore original container View */}
+        <View style={styles.container}>
+          {/* Restore original listWrapper View and map */}
+          <View style={styles.listWrapper}>
+            {STREAM_DATA.map((item) => (
+              <StreamItem 
+                key={item.id}
+                item={item}
+                onPlayPress={handlePlayPress} 
+                isActive={activeStream?.id === item.id}
+                isPlaying={activeStream?.id === item.id && isPlaying}
+              />
+            ))}
+          </View>
         </View>
-        {/* MiniPlayer removed from here */}
-      </View>
+      </ScrollView>
 
-      {/* Sticky MiniPlayer at the bottom */}
+      {/* Sticky MiniPlayer remains outside ScrollView */}
       <MiniPlayer 
           activeStream={activeStream}
           metadata={currentMetadata}
@@ -404,193 +449,184 @@ export function InfiniteScreen() {
 }
 
 // --- Styles ---
-const getStyles = (isDarkMode: boolean, numColumns: number = 2) => StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#000000', // Restore background color
-  },
-  container: {
-    flex: 1,
-    padding: 10,
-    paddingBottom: 75, // Add padding for sticky MiniPlayer (65 height + 10 margin)
-  },
-  pageTitle: {
-    color: '#FFFFFF',
-    textAlign: 'center',
-    marginVertical: 10,
-  },
-  pageSubtitle: {
-    color: '#BBBBBB',
-    textAlign: 'center',
-    marginBottom: 20,
-    fontSize: 14,
-  },
-  listWrapper: {
-    flexDirection: numColumns === 1 ? 'column' : 'row',
-    flexWrap: 'wrap',
-    width: '100%',
-    maxWidth: 1200,
-    alignSelf: 'center',
-  },
-  itemOuterContainer: {
-    width: `${100 / numColumns}%`,
-    ...(numColumns === 1 ? {
-      paddingHorizontal: 0,
-      marginVertical: 3,
-    } : {
-      padding: 3,
-    }),
-    height: 220,
-    overflow: 'hidden',
-  },
-  itemImageBackground: {
-    height: '100%', 
-    width: '100%',
-    position: 'relative',
-    overflow: 'hidden',
-    backgroundColor: '#000', // Add a fallback background for image loading
-  },
-  itemOverlay: { // Style for non-hover state text
-    flexDirection: 'row',
-    alignItems: 'center',
-    // Position it towards the bottom to avoid the play button
-    position: 'absolute',
-    bottom: 10,
-    // Add background for better text readability if needed
-    // backgroundColor: 'rgba(0, 0, 0, 0.5)', 
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    borderRadius: 4, 
-  },
-  playButton: {
-    position: 'absolute', 
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -15 }, { translateY: -15 }], 
-    zIndex: 3,
-    backgroundColor: '#FFFFFF', 
-    borderRadius: 15, 
-    width: 30, 
-    height: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  itemTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexShrink: 1, 
-  },
-  itemTitle: { // Title style for non-hover state
-    color: '#FFFFFF',
-    fontSize: 13, 
-    fontWeight: 'bold',
-    marginRight: 4,
-    flexShrink: 1,
-    // Text shadow for better visibility on complex backgrounds
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  itemEmoji: { // Emoji style (used in both states)
-    color: '#FFFFFF',
-    fontSize: 13,
-    marginRight: 5,
-    // Text shadow for better visibility
-    textShadowColor: 'rgba(0, 0, 0, 0.75)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  hoverOverlay: { // Text overlay
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'flex-end',
-    alignItems: 'flex-start',
-    padding: 10, 
-    zIndex: 2, // Keep zIndex (below play button)
-  },
-  hoverTitleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 5,
-    paddingHorizontal: 0,
-  },
-  hoverTitle: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: 'bold',
-    textAlign: 'left',
-  },
-  hoverDescription: {
-    color: '#E0E0E0',
-    fontSize: 12, 
-    textAlign: 'left',
-    paddingHorizontal: 0,
-  },
-  miniPlayerContainer: {
-    position: 'absolute', // Make it absolute
-    bottom: 0,            // Stick to bottom
-    left: 0,              // Stick to left
-    right: 0,             // Stick to right
-    flexDirection: 'row',
-    height: 65,
-    backgroundColor: '#111111',
-    borderTopWidth: 1,
-    borderTopColor: '#333',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-  },
-  miniPlayerArt: {
-    width: 45,
-    height: 45,
-    overflow: 'hidden',
-  },
-  miniPlayerArtPlaceholder: { 
-      width: 45,
-      height: 45,
-      backgroundColor: '#282828', 
+const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
+  const isWeb = Platform.OS === 'web'; // Check platform
+
+  return StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: '#000000',
+    },
+    scrollView: {
+      flex: 1,
+    },
+    scrollContentContainer: {
+      flexGrow: 1,
+      paddingBottom: 75,
+    },
+    container: {
+      padding: 10,
+    },
+    listWrapper: {
+      flexDirection: numColumns === 1 ? 'column' : 'row',
+      flexWrap: 'wrap',
+      width: '100%',
+      maxWidth: 1200,
+      alignSelf: 'center',
+    },
+    itemOuterContainer: {
+      width: `${100 / numColumns}%`,
+      ...(numColumns === 1 ? {
+        paddingHorizontal: 0,
+        marginVertical: 3,
+      } : {
+        padding: 3,
+      }),
+      height: 220,
+      overflow: 'hidden',
+    },
+    itemImageBackground: {
+      height: '100%', 
+      width: '100%',
+      position: 'relative',
+      overflow: 'hidden',
+      backgroundColor: '#000',
+    },
+    itemOverlay: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      position: 'absolute',
+      bottom: 10,
+      paddingVertical: 4,
+      paddingHorizontal: 8,
+      borderRadius: 4, 
+    },
+    playButton: {
+      position: 'absolute', 
+      top: '50%',
+      left: '50%',
+      transform: [{ translateX: -24 }, { translateY: -24 }], 
+      zIndex: 3,
+      width: 48,
+      height: 48,
       justifyContent: 'center',
       alignItems: 'center',
-  },
-  miniPlayerArtOverlay: {
+    },
+    playIcon: {
+      textShadowColor: 'rgba(0, 0, 0, 0.6)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 3,
+    },
+    itemTitleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flexShrink: 1, 
+    },
+    itemTitle: {
+      color: '#FFFFFF',
+      fontSize: 13, 
+      fontWeight: 'bold',
+      marginRight: 4,
+      flexShrink: 1,
+      textShadowColor: 'rgba(0, 0, 0, 0.75)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 2,
+    },
+    itemEmoji: {
+      color: '#FFFFFF',
+      fontSize: 13,
+      marginRight: 5,
+      textShadowColor: 'rgba(0, 0, 0, 0.75)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 2,
+    },
+    hoverOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      justifyContent: 'flex-end',
+      alignItems: 'flex-start',
+      padding: 10, 
+      zIndex: 2,
+    },
+    hoverTitleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 5,
+      paddingHorizontal: 0,
+    },
+    hoverTitle: {
+      color: '#FFFFFF',
+      fontSize: 15,
+      fontWeight: 'bold',
+      textAlign: 'left',
+    },
+    hoverDescription: {
+      color: '#E0E0E0',
+      fontSize: 12, 
+      textAlign: 'left',
+      paddingHorizontal: 0,
+    },
+    miniPlayerContainer: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      flexDirection: 'row',
+      height: 65,
+      backgroundColor: '#111111',
+      borderTopWidth: 1,
+      borderTopColor: '#333',
+      alignItems: 'center',
+      paddingHorizontal: 10,
+    },
+    miniPlayerArt: {
+      width: 45,
+      height: 45,
+      overflow: 'hidden',
+    },
+    miniPlayerArtPlaceholder: { 
+        width: 45,
+        height: 45,
+        backgroundColor: '#282828', 
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    miniPlayerArtOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.2)'
+    },
+    miniPlayerInfo: {
       flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.2)'
-  },
-  miniPlayerInfo: {
-    flex: 1,
-    marginLeft: 10,
-    justifyContent: 'center',
-  },
-  miniPlayerStreamTitle: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  miniPlayerTrackInfo: {
-    color: '#AAAAAA', 
-    fontSize: 12,
-  },
-  miniPlayerPlayButton: {
-    padding: 10,
-    marginLeft: 10,
-    // Revert size/alignment changes
-    // width: 44, 
-    // height: 44,
-    // justifyContent: 'center',
-    // alignItems: 'center',
-  },
-  blendLayer: { // Blend effect layer
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#ffffff', 
-    // @ts-ignore - mixBlendMode is web-only
-    mixBlendMode: 'difference',
-    zIndex: 0, // Keep zIndex (behind text and button)
-  },
-});
+      marginLeft: 10,
+      justifyContent: 'center',
+    },
+    miniPlayerStreamTitle: {
+      color: '#FFFFFF',
+      fontSize: 14,
+      fontWeight: 'bold',
+    },
+    miniPlayerTrackInfo: {
+      color: '#AAAAAA', 
+      fontSize: 12,
+    },
+    miniPlayerPlayButton: {
+      padding: 10,
+      marginLeft: 10,
+    },
+    blendLayer: { // Blend effect layer
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: '#ffffff',
+      // Conditionally apply mixBlendMode for web only
+      ...(isWeb && { mixBlendMode: 'difference' as any }), // Use type assertion
+      zIndex: 0,
+    },
+  });
+};

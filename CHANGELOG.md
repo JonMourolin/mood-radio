@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.5.0] - 2024-07-27
+
+### Added
+- Responsive header navigation with dropdown menu for smaller screens (`app/components/Navigation.tsx`).
+- Custom dark scrollbar theme for web (`app/infinite.tsx`).
+
+### Changed
+- Updated header "Radio" link to "Moods" and changed target route to `/infinite` (`app/components/Navigation.tsx`).
+- Refined play/stop icons, sizes, and visibility logic on mixtape tiles (`app/infinite.tsx`, `app/(tabs)/radio.tsx`).
+
+### Fixed
+- Corrected scroll behavior on mixtape screen when MiniPlayer is active (`app/infinite.tsx`).
+
 ## [3.4.0] - 2024-07-27
 
 ### Added
