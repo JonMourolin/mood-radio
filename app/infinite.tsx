@@ -118,14 +118,17 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
 
   const canHover = Platform.OS === 'web';
 
-  // Conditionally define hover props for web
+  // Determine icon visibility
+  const showPauseIcon = isActive && isPlaying;
+  const showPlayIcon = !showPauseIcon && (!canHover || isHovered);
+  const shouldShowIcon = showPauseIcon || showPlayIcon;
+
   const webHoverProps = canHover ? {
     onMouseEnter: () => setIsHovered(true),
     onMouseLeave: () => setIsHovered(false),
   } : {};
 
   return (
-    // @ts-ignore - Spread web-specific props
     <TouchableOpacity 
       style={styles.itemOuterContainer}
       {...webHoverProps} 
@@ -133,15 +136,17 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
       activeOpacity={0.8}
     >
       <ImageBackground source={item.imageUrl} style={styles.itemImageBackground} resizeMode="cover">
-        {/* Always render play button */}
-        <TouchableOpacity style={styles.playButton}>
-           {/* Restore Ionicons */}
-           <Ionicons 
-             name={isActive && isPlaying ? "pause" : "play"} 
-             size={24} 
-             color="#000000"
-           />
-        </TouchableOpacity>
+        {/* Conditionally render the button based on visibility logic */}
+        {shouldShowIcon && (
+          <TouchableOpacity style={styles.playButton}>
+            <Ionicons 
+              name={showPauseIcon ? "stop-sharp" : "play-sharp"} 
+              size={48}
+              color="#FFFFFF"
+              style={styles.playIcon}
+            />
+          </TouchableOpacity>
+        )}
 
         {/* Conditionally render hover effects OR non-hover text */}
         {canHover && isHovered ? (
@@ -204,9 +209,8 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
         <Text style={styles.miniPlayerTrackInfo} numberOfLines={1}>{trackInfo}</Text>
       </View>
       <TouchableOpacity onPress={onPlayPausePress} style={styles.miniPlayerPlayButton}>
-         {/* Restore Ionicons */}
          <Ionicons 
-           name={isPlaying ? "pause" : "play"} 
+           name={isPlaying ? "stop-sharp" : "play-sharp"}
            size={24} 
            color="#FFFFFF" 
          />
@@ -222,14 +226,10 @@ export function InfiniteScreen() {
   const { width } = useWindowDimensions();
   const isDarkMode = colorScheme === 'dark';
 
-  // Updated column calculation logic
-  let numColumns = 1; // Default to 1 column for smallest screens
-  if (width > 1200) { // Very large screens
-    numColumns = 4;
-  } else if (width > 768) { // Large screens
-    numColumns = 3;
-  } else if (width > 480) { // Small/Medium screens
-     numColumns = 2;
+  // Updated column calculation logic (Simplified based on user request)
+  let numColumns = 1; // Default to 1 column
+  if (width > 480) { // Screens wider than 480px
+     numColumns = 2; // Use 2 columns
   }
   // If width <= 480, numColumns remains 1
 
@@ -505,14 +505,17 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
       position: 'absolute', 
       top: '50%',
       left: '50%',
-      transform: [{ translateX: -15 }, { translateY: -15 }], 
+      transform: [{ translateX: -24 }, { translateY: -24 }], 
       zIndex: 3,
-      backgroundColor: '#FFFFFF', 
-      borderRadius: 15, 
-      width: 30, 
-      height: 30,
+      width: 48,
+      height: 48,
       justifyContent: 'center',
       alignItems: 'center',
+    },
+    playIcon: {
+      textShadowColor: 'rgba(0, 0, 0, 0.6)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 3,
     },
     itemTitleContainer: {
       flexDirection: 'row',

@@ -1,10 +1,59 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
 import { Link, usePathname } from 'expo-router';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
+
+const NAV_BREAKPOINT = 768;
+const HEADER_HEIGHT = 65; // Estimate or calculate header height (paddingVert*2 + logoHeight)
 
 export default function Navigation() {
   const pathname = usePathname();
+  const { width } = useWindowDimensions();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const isMobileLayout = width < NAV_BREAKPOINT;
+
+  const handleLinkPress = () => {
+    setIsMenuOpen(false);
+  };
+
+  const renderNavLinks = (mobile = false) => (
+    <View style={mobile ? styles.mobileNav : styles.nav}>
+      <Link href="/infinite" asChild onPress={handleLinkPress}>
+        <TouchableOpacity style={mobile ? styles.mobileNavItem : styles.navItem}>
+          <Ionicons 
+            name="infinite"
+            size={mobile ? 20 : 16} 
+            color={(pathname === '/infinite' || pathname.startsWith('/(tabs)/infinite')) ? '#ffffff' : '#888888'}
+            style={mobile ? styles.mobileMoodsIcon : styles.moodsIcon}
+          />
+          <Text style={[
+            mobile ? styles.mobileNavText : styles.navText,
+            (pathname === '/infinite' || pathname.startsWith('/(tabs)/infinite')) && (mobile ? styles.mobileNavTextActive : styles.navTextActive)
+          ]}>
+            Moods
+          </Text>
+        </TouchableOpacity>
+      </Link>
+
+      <Link href="/mixcloud" asChild onPress={handleLinkPress}>
+        <TouchableOpacity style={mobile ? styles.mobileNavItem : styles.navItem}>
+          <Feather 
+            name="disc" 
+            size={mobile ? 20 : 16} 
+            color={(pathname === '/mixcloud' || pathname.startsWith('/(tabs)/mixcloud')) ? '#ffffff' : '#888888'}
+            style={mobile ? styles.mobileMixesIcon : styles.mixesIcon}
+          />
+          <Text style={[
+            mobile ? styles.mobileNavText : styles.navText,
+            (pathname === '/mixcloud' || pathname.startsWith('/(tabs)/mixcloud')) && (mobile ? styles.mobileNavTextActive : styles.navTextActive)
+          ]}>
+            Mixes
+          </Text>
+        </TouchableOpacity>
+      </Link>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -17,36 +66,20 @@ export default function Navigation() {
           />
         </View>
         
-        <View style={styles.nav}>
-          <Link href="/radio" asChild>
-            <TouchableOpacity style={styles.navItem}>
-              <Text style={[
-                styles.navText,
-                (pathname === '/radio' || pathname.startsWith('/(tabs)/radio')) && styles.navTextActive
-              ]}>
-                Radio
-              </Text>
-            </TouchableOpacity>
-          </Link>
-
-          <Link href="/mixcloud" asChild>
-            <TouchableOpacity style={styles.navItem}>
-              <Feather 
-                name="disc" 
-                size={16} 
-                color={(pathname === '/mixcloud' || pathname.startsWith('/(tabs)/mixcloud')) ? '#ffffff' : '#888888'}
-                style={styles.mixesIcon}
-              />
-              <Text style={[
-                styles.navText,
-                (pathname === '/mixcloud' || pathname.startsWith('/(tabs)/mixcloud')) && styles.navTextActive
-              ]}>
-                Mixes
-              </Text>
-            </TouchableOpacity>
-          </Link>
-        </View>
+        {!isMobileLayout && renderNavLinks()}
       </View>
+
+      {isMobileLayout && (
+        <TouchableOpacity onPress={() => setIsMenuOpen(!isMenuOpen)} style={styles.burgerButton}>
+          <Feather name={isMenuOpen ? "x" : "menu"} size={28} color="#ffffff" />
+        </TouchableOpacity>
+      )}
+
+      {isMobileLayout && isMenuOpen && (
+        <View style={styles.dropdownMenu}>
+          {renderNavLinks(true)} 
+        </View>
+      )}
     </View>
   );
 }
@@ -57,10 +90,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 12, // -> 12 + 40 + 12 = 64 height approx.
     backgroundColor: '#000000',
     borderBottomWidth: 1,
     borderBottomColor: '#333333',
+    zIndex: 10, // Ensure header is above dropdown if positioning gets tricky
   },
   leftSection: {
     flexDirection: 'row',
@@ -71,16 +105,16 @@ const styles = StyleSheet.create({
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 50,
+    height: 40,
   },
   logoImage: {
     height: '100%',
-    width: 250,
+    width: 200,
   },
   nav: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 24,
   },
   navItem: {
     flexDirection: 'row',
@@ -95,7 +129,50 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: 'bold',
   },
+  moodsIcon: {
+    marginRight: 6,
+  },
   mixesIcon: {
     marginRight: 6,
+  },
+  burgerButton: {
+    padding: 8,
+  },
+  dropdownMenu: {
+    position: 'absolute',
+    top: HEADER_HEIGHT, // Position below header
+    left: 0,
+    right: 0,
+    backgroundColor: '#000000', // Match header background
+    paddingVertical: 15,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1, // Optional: match header border
+    borderBottomColor: '#333333',
+    zIndex: 5, // Below header container but above page content
+  },
+  mobileNav: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 15,
+  },
+  mobileNavItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 5,
+  },
+  mobileNavText: {
+    fontSize: 18,
+    color: '#888888',
+    fontWeight: '500',
+  },
+  mobileNavTextActive: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+  },
+  mobileMoodsIcon: {
+    marginRight: 10,
+  },
+  mobileMixesIcon: {
+    marginRight: 10,
   },
 }); 
