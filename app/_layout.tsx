@@ -1,11 +1,11 @@
 import { Stack } from 'expo-router';
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
 import Navigation from './components/Navigation';
 
 export default function Layout() {
   return (
     <View style={{ flex: 1, backgroundColor: '#121418' }}>
-      <Navigation />
+      {Platform.OS === 'web' && <Navigation />}
       <Stack 
         screenOptions={{
           headerShown: false,

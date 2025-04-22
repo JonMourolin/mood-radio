@@ -226,12 +226,8 @@ export function InfiniteScreen() {
   const { width } = useWindowDimensions();
   const isDarkMode = colorScheme === 'dark';
 
-  // Updated column calculation logic (Simplified based on user request)
-  let numColumns = 1; // Default to 1 column
-  if (width > 480) { // Screens wider than 480px
-     numColumns = 2; // Use 2 columns
-  }
-  // If width <= 480, numColumns remains 1
+  // Set numColumns to 2 unconditionally
+  const numColumns = 2;
 
   // --- Debugging Log --- 
   console.log(`Screen Width: ${width}, Calculated Columns: ${numColumns}`);

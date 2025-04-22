@@ -16,6 +16,10 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: tintColor,
         headerShown: true,
+        tabBarStyle: {
+          backgroundColor: '#000000',
+          borderTopColor: '#333333',
+        },
       }}
     >
       <Tabs.Screen
@@ -31,7 +35,7 @@ export default function TabLayout() {
         options={{
           title: 'Infinite',
           tabBarIcon: ({ color }) => <Ionicons name="infinite-outline" size={24} color={color} />,
-          headerShown: true,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
