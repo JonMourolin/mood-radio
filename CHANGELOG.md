@@ -48,6 +48,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical
 - Added various image assets for mixtape moods.
 
+## [3.3.1] - YYYY-MM-DD
+
+### Added
+- Close button to MiniPlayer on web to stop audio and hide player.
+- Vertical separator before the close button in MiniPlayer on web.
+
+### Changed
+- Rearranged MiniPlayer layout on web: Play button left, info middle, close button right.
+- Reworked MiniPlayer metadata display: [Icon] Now playing: [Track Info] | [Playlist Title].
+
 ## [3.3.0] - 2024-04-16
 
 ### Added
