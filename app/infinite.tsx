@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   ImageSourcePropType,
   ScrollView,
+  Image,
 } from 'react-native';
 import { Audio } from 'expo-av';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -48,6 +49,7 @@ interface MiniPlayerProps {
   metadata: StreamMetadata | null;
   isPlaying: boolean;
   onPlayPausePress: () => void; 
+  onClosePress?: () => void;
 }
 
 // --- Sample Data --- 
@@ -177,7 +179,7 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
 };
 
 // --- Mini Player Component ---
-const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlaying, onPlayPausePress }) => {
+const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlaying, onPlayPausePress, onClosePress }) => {
   if (!activeStream) return null;
 
   const styles = getStyles(useColorScheme() === 'dark');
@@ -188,9 +190,11 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
     imageSource = activeStream.imageUrl; 
   }
   const trackInfo = metadata?.song || (isPlaying ? "Playing..." : "Paused");
+  const isWeb = Platform.OS === 'web'; // Check if web
 
   return (
     <View style={styles.miniPlayerContainer}>
+      {/* Album Art Section */}
       {metadata?.artUrl ? (
         <ImageBackground 
           source={{ uri: metadata.artUrl }} 
@@ -200,21 +204,54 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
           <View style={styles.miniPlayerArtOverlay} />
         </ImageBackground>
       ) : (
-        <View style={styles.miniPlayerArtPlaceholder}>
-          <Ionicons name="musical-note" size={20} color="#555" />
-        </View>
+        activeStream.imageUrl ? (
+           <Image 
+            source={activeStream.imageUrl}
+            style={styles.miniPlayerArt} 
+            resizeMode="cover" 
+          />
+        ) : (
+          <View style={styles.miniPlayerArtPlaceholder}>
+             <Ionicons name="musical-note" size={20} color="#555" />
+          </View>
+        )
       )}
-      <View style={styles.miniPlayerInfo}>
-        <Text style={styles.miniPlayerStreamTitle} numberOfLines={1}>{activeStream.title}</Text>
-        <Text style={styles.miniPlayerTrackInfo} numberOfLines={1}>{trackInfo}</Text>
-      </View>
+      
+      {/* Play/Pause Button (Moved Left) */}
       <TouchableOpacity onPress={onPlayPausePress} style={styles.miniPlayerPlayButton}>
-         <Ionicons 
-           name={isPlaying ? "stop-sharp" : "play-sharp"}
-           size={24} 
-           color="#FFFFFF" 
-         />
+        <Ionicons 
+          name={isPlaying ? "stop-sharp" : "play-sharp"}
+          size={24} 
+          color="#FFFFFF" 
+        />
       </TouchableOpacity>
+
+      {/* Info Section */}
+      <View style={styles.miniPlayerInfo}>
+        {/* Red Icon */}  
+        <View style={styles.nowPlayingIcon} />
+        {/* "Now playing:" Label */}
+        <Text style={styles.miniPlayerNowPlayingLabel}>Now playing: </Text>
+        {/* Track Info */}
+        <Text style={styles.miniPlayerTrackInfo} numberOfLines={1}>{trackInfo}</Text>
+        {/* Separator */}  
+        <View style={styles.miniPlayerTextSeparator} />
+        {/* Playlist Title */}  
+        <Text style={styles.miniPlayerStreamTitle} numberOfLines={1}>{activeStream.title}</Text>
+      </View>
+      
+      {/* Right Buttons Container (Separator & Close) */}
+      <View style={styles.miniPlayerButtonsContainer}>
+        {/* Close Button (Web Only) with Separator */}
+        {isWeb && onClosePress && (
+          <>
+            <View style={styles.miniPlayerSeparator} />
+            <TouchableOpacity onPress={onClosePress} style={styles.miniPlayerCloseButton}>
+              <Ionicons name="close" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
     </View>
   );
 }
@@ -345,27 +382,39 @@ export function InfiniteScreen() {
     if (activeStream?.id === item.id) {
       if (soundRef.current) {
         if (isPlaying) {
+          console.log("Pausing stream via main control");
           soundRef.current.pauseAsync();
         } else {
+          console.log("Resuming stream via main control");
           soundRef.current.playAsync();
         }
-        setIsPlaying(!isPlaying); 
       } else {
-        playStream(item); 
+         console.log("Playing new stream (or stopped stream) via main control");
+        playStream(item);
       }
     } else {
+      console.log("Switching to new stream via main control");
       playStream(item);
     }
   };
 
   const handleMiniPlayerPlayPause = () => {
+     console.log("Mini player play/pause pressed");
     if (activeStream) {
-      handlePlayPress(activeStream); 
+      handlePlayPress(activeStream);
     }
+  };
+  
+  const handleCloseMiniPlayer = () => {
+    console.log("Closing mini player and stopping audio via close button.");
+    cleanupAudio();
+    setActiveStream(null);
+    setCurrentMetadata(null);
   };
 
   useEffect(() => {
     return () => {
+       console.log("InfiniteScreen unmounting, cleaning up audio.");
       cleanupAudio();
     };
   }, []);
@@ -439,6 +488,7 @@ export function InfiniteScreen() {
           metadata={currentMetadata}
           isPlaying={isPlaying}
           onPlayPausePress={handleMiniPlayerPlayPause}
+          onClosePress={handleCloseMiniPlayer}
       />
     </SafeAreaView>
   );
@@ -467,8 +517,6 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
       flexDirection: numColumns === 1 ? 'column' : 'row',
       flexWrap: 'wrap',
       width: '100%',
-      maxWidth: 1200,
-      alignSelf: 'center',
     },
     itemOuterContainer: {
       width: `${100 / numColumns}%`,
@@ -478,7 +526,7 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
       } : {
         padding: 3,
       }),
-      height: 220,
+      height: 230,
       overflow: 'hidden',
     },
     itemImageBackground: {
@@ -577,14 +625,15 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
       borderTopWidth: 1,
       borderTopColor: '#333',
       alignItems: 'center',
-      paddingHorizontal: 10,
+      paddingLeft: 10, 
+      paddingRight: 5, 
     },
     miniPlayerArt: {
       width: 45,
       height: 45,
       overflow: 'hidden',
     },
-    miniPlayerArtPlaceholder: { 
+     miniPlayerArtPlaceholder: { 
         width: 45,
         height: 45,
         backgroundColor: '#282828', 
@@ -595,23 +644,65 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.2)'
     },
-    miniPlayerInfo: {
-      flex: 1,
-      marginLeft: 10,
-      justifyContent: 'center',
+    miniPlayerPlayButton: {
+      paddingHorizontal: 12, 
+      paddingVertical: 10, 
     },
-    miniPlayerStreamTitle: {
-      color: '#FFFFFF',
-      fontSize: 14,
-      fontWeight: 'bold',
+    miniPlayerInfo: {
+      flex: 1, 
+      flexDirection: 'row', // Arrange items horizontally
+      alignItems: 'center', // Vertically center items
+      marginLeft: 8, // Adjust margin as needed
+      marginRight: 8, // Adjust margin as needed
+      overflow: 'hidden',
+    },
+    // New Style: Red Dot Icon
+    nowPlayingIcon: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: 'red',
+      marginRight: 6,
+    },
+    // New Style: "Now playing:" Label
+    miniPlayerNowPlayingLabel: {
+        color: '#AAAAAA', // Grey color like track info
+        fontSize: 12,
+        marginRight: 3, // Small space before track info
     },
     miniPlayerTrackInfo: {
-      color: '#AAAAAA', 
+      color: '#FFFFFF', // White color for main track info
       fontSize: 12,
+      fontWeight: '500', // Slightly bolder than label
+      flexShrink: 1, // Allow track info to shrink if needed
+      marginRight: 6, // Space before separator
     },
-    miniPlayerPlayButton: {
-      padding: 10,
-      marginLeft: 10,
+    // New Style: Text Separator
+    miniPlayerTextSeparator: {
+        width: 1,
+        height: 12, // Smaller height for text separator
+        backgroundColor: '#555555', // Slightly lighter grey separator
+        marginHorizontal: 6, // Spacing around separator
+    },
+    miniPlayerStreamTitle: {
+      color: '#AAAAAA', // Grey color for playlist title
+      fontSize: 12,
+      fontWeight: 'normal', // Normal weight
+      flexShrink: 1, // Allow playlist title to shrink
+    },
+    miniPlayerButtonsContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    miniPlayerSeparator: {
+      width: 1,
+      height: 24, 
+      backgroundColor: '#444444', 
+      marginHorizontal: 5, 
+    },
+    miniPlayerCloseButton: {
+      paddingHorizontal: 12, 
+      paddingVertical: 10, 
     },
     blendLayer: { // Blend effect layer
       position: 'absolute',

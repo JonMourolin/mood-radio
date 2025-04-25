@@ -92,8 +92,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12, // -> 12 + 40 + 12 = 64 height approx.
     backgroundColor: '#000000',
-    borderBottomWidth: 1,
-    borderBottomColor: '#333333',
     zIndex: 10, // Ensure header is above dropdown if positioning gets tricky
   },
   leftSection: {
@@ -146,8 +144,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000', // Match header background
     paddingVertical: 15,
     paddingHorizontal: 16,
-    borderBottomWidth: 1, // Optional: match header border
-    borderBottomColor: '#333333',
     zIndex: 5, // Below header container but above page content
   },
   mobileNav: {
