@@ -48,6 +48,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical
 - Added various image assets for mixtape moods.
 
+## [3.3.3] - YYYY-MM-DD
+
+### Changed
+- Updated stream grid to display single column on mobile (`numColumns=1`) and two columns on web (`numColumns=2`).
+- Removed horizontal padding from grid container on mobile to attempt full-width layout.
+
+### Refactoring
+- Attempted refactor from `ScrollView` + `.map` to `FlatList` for stream grid.
+- Reverted grid implementation back to `ScrollView` + `.map` due to rendering issues with `FlatList` on web.
+
 ## [3.3.2] - YYYY-MM-DD
 
 ### Changed
