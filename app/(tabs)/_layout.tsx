@@ -22,18 +22,18 @@ export default function TabLayout() {
         },
       }}
     >
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="radio"
         options={{
           title: 'Radio',
           tabBarIcon: ({ color }) => <Ionicons name="radio" size={24} color={color} />,
           headerShown: false,
         }}
-      />
+      /> */}
       <Tabs.Screen
-        name="infinite"
+        name="moods"
         options={{
-          title: 'Infinite',
+          title: 'Moods',
           tabBarIcon: ({ color }) => <Ionicons name="infinite-outline" size={24} color={color} />,
           headerShown: false,
         }}
