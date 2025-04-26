@@ -48,6 +48,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical
 - Added various image assets for mixtape moods.
 
+## [3.3.2] - YYYY-MM-DD
+
+### Changed
+- Updated MiniPlayer label to "NOW PLAYING |" using a grey separator.
+- Made MiniPlayer text (label, track info, stream title) uppercase and slightly larger (13pt).
+- Renamed "M00D RADIO" stream to "MOOD RADIO MAIN MIX" and updated its description and emoji.
+- Renamed "RAGE / RAVE" stream emoji.
+- Renamed "EXPLORE" stream emoji.
+- Reduced header navigation vertical padding for a slightly smaller height.
+- Adjusted stream tile grid positioning on web to remove gap below header.
+- Matched default stream tile text size and position to the hover state.
+
+### Fixed
+- Removed accidental dark background overlay from the default stream tile text.
+- Corrected MiniPlayer separator color after "NOW PLAYING" to grey.
+
 ## [3.3.1] - YYYY-MM-DD
 
 ### Added
