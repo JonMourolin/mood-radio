@@ -1,0 +1,19 @@
+import { ImageSourcePropType } from 'react-native';
+
+// Type for individual stream/station data
+export interface StreamData {
+  id: string;
+  title: string;
+  emoji: string;
+  description: string;
+  imageUrl: ImageSourcePropType; 
+  streamUrl: string; 
+  metadataUrl?: string; 
+}
+
+// Type for fetched track metadata
+export interface StreamMetadata {
+  // Removed title, artist, album as they are combined into song
+  song: string; // e.g., "Artist Name - Track Title"
+  artUrl?: string;
+} 

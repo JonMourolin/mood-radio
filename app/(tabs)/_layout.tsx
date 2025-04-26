@@ -17,7 +17,7 @@ export default function TabLayout() {
         tabBarActiveTintColor: tintColor,
         headerShown: true,
         tabBarStyle: {
-          backgroundColor: '#000000',
+          backgroundColor: '#111111',
           borderTopColor: '#333333',
         },
       }}
@@ -41,8 +41,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="mixcloud"
         options={{
-          title: 'DJ Sets',
-          tabBarIcon: ({ color }) => <Ionicons name="musical-notes" size={24} color={color} />,
+          title: 'Mixes',
+          tabBarIcon: ({ color }) => <Ionicons name="headset-sharp" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
