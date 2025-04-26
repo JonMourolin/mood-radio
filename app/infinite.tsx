@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   ScrollView,
   Image,
+  ViewStyle,
 } from 'react-native';
 import { Audio } from 'expo-av';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -112,7 +113,7 @@ const STREAM_DATA: StreamData[] = [
 // --- Stream Item Component ---
 const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, isPlaying }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const styles = getStyles(useColorScheme() === 'dark', Platform.OS === 'web' ? 2 : 1);
+  const styles = getStyles(useColorScheme() === 'dark', Platform.OS === 'web' && useWindowDimensions().width >= 480 ? 2 : 1);
 
   const handlePress = () => {
     onPlayPress(item);
@@ -254,21 +255,17 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
 }
 
 
-// --- Main Screen Component ---
+// --- Main Screen Component: Conditionally render Root ---
 export function InfiniteScreen() { 
   const colorScheme = useColorScheme();
   const { width } = useWindowDimensions();
   const isDarkMode = colorScheme === 'dark';
+  const isWeb = Platform.OS === 'web';
+  
+  // Restore breakpoint logic for numColumns
+  const numColumns = isWeb && width >= 480 ? 2 : 1;
 
-  // Set numColumns based on platform
-  const numColumns = Platform.OS === 'web' ? 2 : 1;
-
-  // --- Debugging Log --- 
-  console.log(`Screen Width: ${width}, Platform: ${Platform.OS}, Calculated Columns: ${numColumns}`);
-  // ---------------------
-
-  // Remove insets and screenWidth from getStyles call
-  const styles = getStyles(isDarkMode, numColumns); 
+  const styles = getStyles(isDarkMode, numColumns);
 
   const [activeStream, setActiveStream] = useState<StreamData | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -456,25 +453,25 @@ export function InfiniteScreen() {
     }
   }, []); // Empty dependency array ensures this runs only once on mount/unmount
 
+  // Restore root component logic
+  const RootComponent = isWeb ? View : SafeAreaView;
+
   return (
-    // Restore SafeAreaView -> ScrollView -> container -> listWrapper -> map
-    <SafeAreaView style={styles.safeArea}> 
+    <RootComponent style={styles.safeArea}> 
       <ScrollView 
         style={styles.scrollView} 
         contentContainerStyle={styles.scrollContentContainer}
       >
-        <View style={styles.container}>
-          <View style={styles.listWrapper}>
-            {STREAM_DATA.map((item) => (
-              <StreamItem 
-                key={item.id} // Key back in map
-                item={item}
-                onPlayPress={handlePlayPress} 
-                isActive={activeStream?.id === item.id}
-                isPlaying={activeStream?.id === item.id && isPlaying}
-              />
-            ))}
-          </View>
+        <View style={styles.listWrapper}>
+          {STREAM_DATA.map((item) => ( 
+            <StreamItem 
+              key={item.id} 
+              item={item}
+              isActive={activeStream?.id === item.id}
+              isPlaying={activeStream?.id === item.id && isPlaying}
+              onPlayPress={handlePlayPress}
+            />
+          ))}
         </View>
       </ScrollView>
 
@@ -486,12 +483,11 @@ export function InfiniteScreen() {
           onPlayPausePress={handleMiniPlayerPlayPause}
           onClosePress={handleCloseMiniPlayer}
       />
-    </SafeAreaView>
+    </RootComponent>
   );
 }
 
-// --- Styles ---
-// Remove insets and screenWidth parameters
+// --- Styles: Ensure explicit conditionals, remove scroll padding H ---
 const getStyles = ( 
   isDarkMode: boolean,
   numColumns: number = 2, 
@@ -502,38 +498,29 @@ const getStyles = (
     safeArea: {
       flex: 1,
       backgroundColor: '#000000',
-      ...(isWeb && { paddingTop: 0 }), 
     },
-    // Restore scrollView style
     scrollView: { 
       flex: 1,
     },
-    // Restore scrollContentContainer style
     scrollContentContainer: { 
       flexGrow: 1,
       paddingBottom: 75, 
+      // Remove all horizontal padding from scroll container
+      paddingHorizontal: 0, 
     },
-    // Restore container style
-    container: {
-      paddingHorizontal: numColumns === 1 ? 0 : 10, // Keep conditional horizontal padding for now
-      paddingBottom: 10,
-      // ...(isWeb ? { paddingTop: 0 } : { paddingTop: 10 }), // Keep conditional top padding for now
-    },
-    // Restore listWrapper style
     listWrapper: { 
       flexDirection: numColumns === 1 ? 'column' : 'row',
-      flexWrap: 'wrap', // Restore wrap for web
-      width: '100%', 
+      flexWrap: numColumns === 1 ? undefined : 'wrap', 
+      width: '100%',
+      // Add padding here ONLY for web 2-col to space from edges
+      paddingHorizontal: numColumns === 1 ? 0 : 7, // 10 - 3 item padding = 7
     },
-    itemOuterContainer: { 
-      width: `${100 / numColumns}%`, 
-      ...(numColumns === 1 ? {
-        // Keep mobile margin
-         marginBottom: 6,
-      } : {
-        padding: 3, // Restore padding for web
-      }),
-      height: 230, // Restore fixed height
+    itemOuterContainer: { // Renamed from itemBase
+      // Explicit conditional styles based EXACTLY on numColumns
+      width: numColumns === 1 ? '100%' : '50%', 
+      height: numColumns === 1 ? 200 : 230,
+      padding: numColumns === 1 ? 0 : 3, // Padding only for 2-col items
+      marginBottom: numColumns === 1 ? 6 : 0, // Margin only for 1-col items
       overflow: 'hidden',
     },
     itemImageBackground: {
