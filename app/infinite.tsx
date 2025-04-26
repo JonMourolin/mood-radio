@@ -7,8 +7,8 @@ import {
   ImageBackground,
   Platform,
   useWindowDimensions,
-  SafeAreaView,
   ImageSourcePropType,
+  SafeAreaView,
   ScrollView,
   Image,
 } from 'react-native';
@@ -112,7 +112,7 @@ const STREAM_DATA: StreamData[] = [
 // --- Stream Item Component ---
 const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, isPlaying }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const styles = getStyles(useColorScheme() === 'dark');
+  const styles = getStyles(useColorScheme() === 'dark', Platform.OS === 'web' ? 2 : 1);
 
   const handlePress = () => {
     onPlayPress(item);
@@ -138,9 +138,8 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
       activeOpacity={0.8}
     >
       <ImageBackground source={item.imageUrl} style={styles.itemImageBackground} resizeMode="cover">
-        {/* Conditionally render the button based on visibility logic */}
         {shouldShowIcon && (
-          <TouchableOpacity style={styles.playButton}>
+          <TouchableOpacity style={styles.playButton} onPress={handlePress}> 
             <Ionicons 
               name={showPauseIcon ? "stop-sharp" : "play-sharp"} 
               size={48}
@@ -150,12 +149,9 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
           </TouchableOpacity>
         )}
 
-        {/* Conditionally render hover effects OR non-hover text */}
         {canHover && isHovered ? (
           <>
-            {/* Web-only blend layer for negative effect */}
             <View style={styles.blendLayer as any} /> 
-            {/* Existing hover text overlay */}
             <View style={styles.hoverOverlay}>
               <View style={styles.hoverTitleContainer}> 
                 <Text style={styles.itemEmoji}>{item.emoji}</Text> 
@@ -165,7 +161,6 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
             </View>
           </>
         ) : (
-          /* Non-hover text overlay */
           <View style={styles.itemOverlay}> 
             <View style={styles.itemTitleContainer}>
                 <Text style={styles.itemEmoji}>{item.emoji}</Text>
@@ -182,7 +177,7 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
 const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlaying, onPlayPausePress, onClosePress }) => {
   if (!activeStream) return null;
 
-  const styles = getStyles(useColorScheme() === 'dark');
+  const styles = getStyles(useColorScheme() === 'dark', Platform.OS === 'web' ? 2 : 1);
   let imageSource: ImageSourcePropType;
   if (metadata?.artUrl) {
     imageSource = { uri: metadata.artUrl }; 
@@ -265,14 +260,15 @@ export function InfiniteScreen() {
   const { width } = useWindowDimensions();
   const isDarkMode = colorScheme === 'dark';
 
-  // Set numColumns to 2 unconditionally
-  const numColumns = 2;
+  // Set numColumns based on platform
+  const numColumns = Platform.OS === 'web' ? 2 : 1;
 
   // --- Debugging Log --- 
-  console.log(`Screen Width: ${width}, Calculated Columns: ${numColumns}`);
+  console.log(`Screen Width: ${width}, Platform: ${Platform.OS}, Calculated Columns: ${numColumns}`);
   // ---------------------
 
-  const styles = getStyles(isDarkMode, numColumns);
+  // Remove insets and screenWidth from getStyles call
+  const styles = getStyles(isDarkMode, numColumns); 
 
   const [activeStream, setActiveStream] = useState<StreamData | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -461,19 +457,17 @@ export function InfiniteScreen() {
   }, []); // Empty dependency array ensures this runs only once on mount/unmount
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      {/* Wrap content in ScrollView */}
+    // Restore SafeAreaView -> ScrollView -> container -> listWrapper -> map
+    <SafeAreaView style={styles.safeArea}> 
       <ScrollView 
         style={styles.scrollView} 
         contentContainerStyle={styles.scrollContentContainer}
       >
-        {/* Restore original container View */}
         <View style={styles.container}>
-          {/* Restore original listWrapper View and map */}
           <View style={styles.listWrapper}>
             {STREAM_DATA.map((item) => (
               <StreamItem 
-                key={item.id}
+                key={item.id} // Key back in map
                 item={item}
                 onPlayPress={handlePlayPress} 
                 isActive={activeStream?.id === item.id}
@@ -484,7 +478,7 @@ export function InfiniteScreen() {
         </View>
       </ScrollView>
 
-      {/* Sticky MiniPlayer remains outside ScrollView */}
+      {/* Sticky MiniPlayer */}
       <MiniPlayer 
           activeStream={activeStream}
           metadata={currentMetadata}
@@ -497,8 +491,12 @@ export function InfiniteScreen() {
 }
 
 // --- Styles ---
-const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
-  const isWeb = Platform.OS === 'web'; // Check platform
+// Remove insets and screenWidth parameters
+const getStyles = ( 
+  isDarkMode: boolean,
+  numColumns: number = 2, 
+) => { 
+  const isWeb = Platform.OS === 'web'; 
 
   return StyleSheet.create({
     safeArea: {
@@ -506,32 +504,36 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
       backgroundColor: '#000000',
       ...(isWeb && { paddingTop: 0 }), 
     },
-    scrollView: {
+    // Restore scrollView style
+    scrollView: { 
       flex: 1,
     },
-    scrollContentContainer: {
+    // Restore scrollContentContainer style
+    scrollContentContainer: { 
       flexGrow: 1,
-      paddingBottom: 75,
+      paddingBottom: 75, 
     },
+    // Restore container style
     container: {
-      paddingHorizontal: 10,
+      paddingHorizontal: numColumns === 1 ? 0 : 10, // Keep conditional horizontal padding for now
       paddingBottom: 10,
-      ...(isWeb ? { paddingTop: 0 } : { paddingTop: 10 }),
+      // ...(isWeb ? { paddingTop: 0 } : { paddingTop: 10 }), // Keep conditional top padding for now
     },
-    listWrapper: {
+    // Restore listWrapper style
+    listWrapper: { 
       flexDirection: numColumns === 1 ? 'column' : 'row',
-      flexWrap: 'wrap',
-      width: '100%',
+      flexWrap: 'wrap', // Restore wrap for web
+      width: '100%', 
     },
-    itemOuterContainer: {
-      width: `${100 / numColumns}%`,
+    itemOuterContainer: { 
+      width: `${100 / numColumns}%`, 
       ...(numColumns === 1 ? {
-        paddingHorizontal: 0,
-        marginVertical: 3,
+        // Keep mobile margin
+         marginBottom: 6,
       } : {
-        padding: 3,
+        padding: 3, // Restore padding for web
       }),
-      height: 230,
+      height: 230, // Restore fixed height
       overflow: 'hidden',
     },
     itemImageBackground: {
