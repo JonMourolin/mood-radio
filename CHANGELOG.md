@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.8.0] - 2025-04-26
+
+### Added
+- Implemented full-screen player modal accessible from mini player (native only).
+- Centralized player state management using React Context (`PlayerContext`).
+- Added scrollable header title ("Listen to your mood") to Moods screen (native only).
+
+### Changed
+- Refactored MiniPlayer to use two lines for metadata (track/station) with updated styling.
+- Positioned MiniPlayer play/pause button on the right side.
+- Updated "DJ Sets" tab title to "Mixes" and changed icon to `headset-sharp`.
+- Adjusted status bar background color on Moods screen (native only).
+- Updated MiniPlayer navigation to be native-only.
+
+### Refactoring
+- Moved `StreamData` and `StreamMetadata` types to `types/player.ts`.
+- Refactored `moods.tsx` and created `FullScreenPlayer.native.tsx` to use `PlayerContext`.
+
 ## [3.7.1] - 2025-04-26
 
 ### Fixed
