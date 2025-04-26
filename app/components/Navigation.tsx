@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12, // -> 12 + 40 + 12 = 64 height approx.
+    paddingVertical: 8, // Reduced from 12
     backgroundColor: '#000000',
     zIndex: 10, // Ensure header is above dropdown if positioning gets tricky
   },

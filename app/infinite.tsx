@@ -56,9 +56,9 @@ interface MiniPlayerProps {
 const STREAM_DATA: StreamData[] = [
   {
     id: 'sonic-drift',
-    title: 'M00D RADIO',
-    emoji: '📡',
-    description: 'The main station feed.',
+    title: 'MOOD RADIO MAIN MIX',
+    emoji: '♾️',
+    description: 'The main station feed, a bit of everything, right in the middle',
     imageUrl: require('../assets/images/moods/sonic-drift.jpg'),
     streamUrl: 'http://51.75.200.205/listen/tangerine_radio/radio.mp3', 
     metadataUrl: 'http://51.75.200.205/api/nowplaying/tangerine_radio',
@@ -84,7 +84,7 @@ const STREAM_DATA: StreamData[] = [
   {
     id: 'low-key',
     title: 'RAGE / RAVE',
-    emoji: '🔑',
+    emoji: '💥',
     description: 'Angry, aggressive and intense',
     imageUrl: require('../assets/images/moods/low-key.jpg'),
     streamUrl: 'http://51.75.200.205/listen/rage/radio.mp3',
@@ -102,7 +102,7 @@ const STREAM_DATA: StreamData[] = [
   {
     id: 'memory-lane',
     title: 'EXPLORE',
-    emoji: '📼',
+    emoji: '🔮',
     description: 'Futuristic, experimental and cosmic',
     imageUrl: require('../assets/images/moods/memory-lane.jpg'),
     streamUrl: 'http://51.75.200.205/listen/cosmics_trip/radio.mp3',
@@ -230,8 +230,10 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
       <View style={styles.miniPlayerInfo}>
         {/* Red Icon */}  
         <View style={styles.nowPlayingIcon} />
-        {/* "Now playing:" Label */}
-        <Text style={styles.miniPlayerNowPlayingLabel}>Now playing: </Text>
+        {/* "NOW PLAYING" Label */}
+        <Text style={styles.miniPlayerNowPlayingLabel}>NOW PLAYING</Text>
+        {/* Red Separator */}
+        <View style={styles.nowPlayingSeparator} />
         {/* Track Info */}
         <Text style={styles.miniPlayerTrackInfo} numberOfLines={1}>{trackInfo}</Text>
         {/* Separator */}  
@@ -502,6 +504,7 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
     safeArea: {
       flex: 1,
       backgroundColor: '#000000',
+      ...(isWeb && { paddingTop: 0 }), 
     },
     scrollView: {
       flex: 1,
@@ -511,7 +514,9 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
       paddingBottom: 75,
     },
     container: {
-      padding: 10,
+      paddingHorizontal: 10,
+      paddingBottom: 10,
+      ...(isWeb ? { paddingTop: 0 } : { paddingTop: 10 }),
     },
     listWrapper: {
       flexDirection: numColumns === 1 ? 'column' : 'row',
@@ -537,13 +542,15 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
       backgroundColor: '#000',
     },
     itemOverlay: {
-      flexDirection: 'row',
-      alignItems: 'center',
       position: 'absolute',
-      bottom: 10,
-      paddingVertical: 4,
-      paddingHorizontal: 8,
-      borderRadius: 4, 
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      justifyContent: 'flex-end', 
+      alignItems: 'flex-start', 
+      padding: 10, 
+      zIndex: 2,
     },
     playButton: {
       position: 'absolute', 
@@ -564,11 +571,12 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
     itemTitleContainer: {
       flexDirection: 'row',
       alignItems: 'center',
+      marginBottom: 5,
       flexShrink: 1, 
     },
     itemTitle: {
       color: '#FFFFFF',
-      fontSize: 13, 
+      fontSize: 15,
       fontWeight: 'bold',
       marginRight: 4,
       flexShrink: 1,
@@ -578,7 +586,7 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
     },
     itemEmoji: {
       color: '#FFFFFF',
-      fontSize: 13,
+      fontSize: 15,
       marginRight: 5,
       textShadowColor: 'rgba(0, 0, 0, 0.75)',
       textShadowOffset: { width: 0, height: 1 },
@@ -664,18 +672,26 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
       backgroundColor: 'red',
       marginRight: 6,
     },
-    // New Style: "Now playing:" Label
+    // Updated Style: "NOW PLAYING" Label
     miniPlayerNowPlayingLabel: {
-        color: '#AAAAAA', // Grey color like track info
-        fontSize: 12,
-        marginRight: 3, // Small space before track info
+        color: 'red', 
+        fontSize: 13, 
+        textTransform: 'uppercase', 
+    },
+    // New Style: Grey Separator after NOW PLAYING
+    nowPlayingSeparator: {
+      width: 1,
+      height: 12, 
+      backgroundColor: '#555555', // Same grey as other text separator
+      marginHorizontal: 6, 
     },
     miniPlayerTrackInfo: {
-      color: '#FFFFFF', // White color for main track info
-      fontSize: 12,
-      fontWeight: '500', // Slightly bolder than label
-      flexShrink: 1, // Allow track info to shrink if needed
-      marginRight: 6, // Space before separator
+      color: '#FFFFFF', 
+      fontSize: 13,
+      fontWeight: '500', 
+      flexShrink: 1, 
+      marginRight: 6, 
+      textTransform: 'uppercase',
     },
     // New Style: Text Separator
     miniPlayerTextSeparator: {
@@ -685,10 +701,11 @@ const getStyles = (isDarkMode: boolean, numColumns: number = 2) => {
         marginHorizontal: 6, // Spacing around separator
     },
     miniPlayerStreamTitle: {
-      color: '#AAAAAA', // Grey color for playlist title
-      fontSize: 12,
-      fontWeight: 'normal', // Normal weight
-      flexShrink: 1, // Allow playlist title to shrink
+      color: '#AAAAAA', 
+      fontSize: 13,
+      fontWeight: 'normal', 
+      flexShrink: 1, 
+      textTransform: 'uppercase',
     },
     miniPlayerButtonsContainer: {
       flexDirection: 'row',
