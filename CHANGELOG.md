@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.6.0] - 2024-07-27
+## [3.6.0] - 2025-04-22
 
 ### Changed
 - Forced 2-column layout for infinite mixtapes screen on all screen sizes (`app/infinite.tsx`).
@@ -14,8 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Removed redundant default header from infinite mixtapes screen on mobile (`app/(tabs)/_layout.tsx`).
+- Corrected scroll behavior on mixtape screen when MiniPlayer is active (`app/infinite.tsx`).
 
-## [3.5.0] - 2024-07-27
+## [3.5.0] - 2025-04-22
 
 ### Added
 - Responsive header navigation with dropdown menu for smaller screens (`app/components/Navigation.tsx`).
@@ -48,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical
 - Added various image assets for mixtape moods.
 
-## [3.3.4] - YYYY-MM-DD
+## [3.3.4] - 2025-04-26
 
 ### Changed
 - Adjusted stream tile height on mobile to 200px.
@@ -61,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reverted `useSafeAreaInsets` hook usage back to standard `SafeAreaView` component.
 - Simplified styling logic for grid layout based on platform/breakpoint.
 
-## [3.3.3] - YYYY-MM-DD
+## [3.3.3] - 2025-04-26
 
 ### Changed
 - Updated stream grid to display single column on mobile (`numColumns=1`) and two columns on web (`numColumns=2`).
@@ -71,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Attempted refactor from `ScrollView` + `.map` to `FlatList` for stream grid.
 - Reverted grid implementation back to `ScrollView` + `.map` due to rendering issues with `FlatList` on web.
 
-## [3.3.2] - YYYY-MM-DD
+## [3.3.2] - 2025-04-26
 
 ### Changed
 - Updated MiniPlayer label to "NOW PLAYING |" using a grey separator.
@@ -87,7 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed accidental dark background overlay from the default stream tile text.
 - Corrected MiniPlayer separator color after "NOW PLAYING" to grey.
 
-## [3.3.1] - YYYY-MM-DD
+## [3.3.1] - 2025-04-26
 
 ### Added
 - Close button to MiniPlayer on web to stop audio and hide player.
@@ -117,7 +118,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Resolved issue where only the first few mixtape grid items were displayed on larger screen sizes (web); all 5 items are now consistently visible.
 - Corrected TypeScript errors related to web-specific hover event props (`onMouseEnter`, `onMouseLeave`) in `app/infinite.tsx`.
 
-## [3.1.0] - 2025-04-15
+## [3.1.0] - 2025-04-26
 
 ### Added
 - Background image added to the main radio screen.
@@ -154,13 +155,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Gestion des images de remplacement (placeholder).
 - Configuration de la lecture audio en arrière-plan.
 
-## [2.8.0] - 2024-04-06
+## [2.8.0] - 2025-04-06
 
 ### Changed
 - Interface utilisateur : Masquage du header redondant sur l'écran Radio (mobile).
 - Interface utilisateur : Masquage de la barre d'onglets sur la plateforme Web (remplacée par `<Slot />` pour afficher le contenu).
 
-## [2.7.0] - 2024-04-06
+## [2.7.0] - 2025-04-06
 
 ### Changed
 - Refactoring majeur de la gestion du lecteur radio.
@@ -187,7 +188,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Transmission des métadonnées d'album via l'endpoint /metadata
 - Amélioration de l'affichage des informations d'album dans l'interface
 
-## [2.6.0] - 2024-03-31
+## [2.6.0] - 2025-04-06
 
 ### Added
 - Migration complète vers AzuraCast comme service de streaming
@@ -206,7 +207,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Mise à jour de l'URL du flux : http://51.75.200.205/listen/tangerine_radio/radio.mp3
 - Amélioration de la gestion des métadonnées avec support des pochettes
 
-## [2.5.0] - 2024-03-31
+## [2.5.0] - 2025-03-30
 
 ### Changed
 - Simplification majeure de l'architecture de l'application
@@ -270,7 +271,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Correction des chemins d'importation dans les composants
 - Amélioration de la récupération des pistes via Telnet
 
-## [2.1.0] - 2024-03-26
+## [2.1.0] - 2025-03-25
 
 ### Ajouté
 - Amélioration de l'intégration avec Mixcloud
