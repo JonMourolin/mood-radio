@@ -19,17 +19,17 @@ export default function Navigation() {
 
   const renderNavLinks = (mobile = false) => (
     <View style={mobile ? styles.mobileNav : styles.nav}>
-      <Link href="/infinite" asChild onPress={handleLinkPress}>
+      <Link href="/moods" asChild onPress={handleLinkPress}>
         <TouchableOpacity style={mobile ? styles.mobileNavItem : styles.navItem}>
           <Ionicons 
             name="infinite"
             size={mobile ? 20 : 16} 
-            color={(pathname === '/infinite' || pathname.startsWith('/(tabs)/infinite')) ? '#ffffff' : '#888888'}
+            color={(pathname === '/moods' || pathname.startsWith('/(tabs)/moods')) ? '#ffffff' : '#888888'}
             style={mobile ? styles.mobileMoodsIcon : styles.moodsIcon}
           />
           <Text style={[
             mobile ? styles.mobileNavText : styles.navText,
-            (pathname === '/infinite' || pathname.startsWith('/(tabs)/infinite')) && (mobile ? styles.mobileNavTextActive : styles.navTextActive)
+            (pathname === '/moods' || pathname.startsWith('/(tabs)/moods')) && (mobile ? styles.mobileNavTextActive : styles.navTextActive)
           ]}>
             Moods
           </Text>

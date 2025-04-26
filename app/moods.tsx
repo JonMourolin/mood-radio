@@ -226,16 +226,17 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
       <View style={styles.miniPlayerInfo}>
         {/* Red Icon */}  
         <View style={styles.nowPlayingIcon} />
-        {/* "NOW PLAYING" Label */}
-        <Text style={styles.miniPlayerNowPlayingLabel}>NOW PLAYING</Text>
-        {/* Red Separator */}
-        <View style={styles.nowPlayingSeparator} />
         {/* Track Info */}
-        <Text style={styles.miniPlayerTrackInfo} numberOfLines={1}>{trackInfo}</Text>
-        {/* Separator */}  
-        <View style={styles.miniPlayerTextSeparator} />
-        {/* Playlist Title */}  
-        <Text style={styles.miniPlayerStreamTitle} numberOfLines={1}>{activeStream.title}</Text>
+        <View style={styles.miniPlayerTextContainer}>
+          {/* Track Title & Artist */}
+          <Text style={styles.miniPlayerTrackInfo} numberOfLines={1} ellipsizeMode="tail">
+            {trackInfo}
+          </Text>
+          {/* Separator */} 
+          <View style={styles.miniPlayerTextSeparator} />
+          {/* Playlist Title */}
+          <Text style={styles.miniPlayerStreamTitle} numberOfLines={1}>{activeStream.title}</Text>
+        </View>
       </View>
       
       {/* Right Buttons Container (Separator & Close) */}
@@ -661,18 +662,10 @@ const getStyles = (
       backgroundColor: 'red',
       marginRight: 6,
     },
-    // Updated Style: "NOW PLAYING" Label
-    miniPlayerNowPlayingLabel: {
-        color: 'red', 
-        fontSize: 13, 
-        textTransform: 'uppercase', 
-    },
-    // New Style: Grey Separator after NOW PLAYING
-    nowPlayingSeparator: {
-      width: 1,
-      height: 12, 
-      backgroundColor: '#555555', // Same grey as other text separator
-      marginHorizontal: 6, 
+    miniPlayerTextContainer: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
     },
     miniPlayerTrackInfo: {
       color: '#FFFFFF', 
@@ -682,13 +675,14 @@ const getStyles = (
       marginRight: 6, 
       textTransform: 'uppercase',
     },
-    // New Style: Text Separator
+    // Restore Text Separator
     miniPlayerTextSeparator: {
         width: 1,
         height: 12, // Smaller height for text separator
         backgroundColor: '#555555', // Slightly lighter grey separator
         marginHorizontal: 6, // Spacing around separator
     },
+    // Restore Stream Title
     miniPlayerStreamTitle: {
       color: '#AAAAAA', 
       fontSize: 13,
