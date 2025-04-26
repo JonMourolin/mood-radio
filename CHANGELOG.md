@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.7.0] - 2025-04-26
+
+### Removed
+- Removed `/radio` route, associated components (`app/(tabs)/radio.tsx`, `app/web/radio.tsx`), and tab navigator entry.
+
+### Changed
+- Renamed `/infinite` route and associated files to `/moods`.
+- Updated MiniPlayer text, removing the explicit "NOW PLAYING" label.
+- Corrected historical version dates in CHANGELOG.md based on git history.
+
+### Refactoring
+- Updated tab layout (`app/(tabs)/_layout.tsx`), index redirect (`app/index.tsx`), and header navigation (`app/components/Navigation.tsx`) to reflect route changes.
+- Added `app/(tabs)/moods.tsx` to explicitly link the tab to the screen component.
+
 ## [3.6.0] - 2025-04-22
 
 ### Changed
