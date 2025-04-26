@@ -48,6 +48,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical
 - Added various image assets for mixtape moods.
 
+## [3.3.4] - YYYY-MM-DD
+
+### Changed
+- Adjusted stream tile height on mobile to 200px.
+- Added responsive web layout: Single column below 480px, two columns at 480px and above.
+
+### Fixed
+- Resolved layout issue where single-column stream tiles did not fill the full screen width on mobile and small web breakpoints.
+
+### Refactoring
+- Reverted `useSafeAreaInsets` hook usage back to standard `SafeAreaView` component.
+- Simplified styling logic for grid layout based on platform/breakpoint.
+
 ## [3.3.3] - YYYY-MM-DD
 
 ### Changed
