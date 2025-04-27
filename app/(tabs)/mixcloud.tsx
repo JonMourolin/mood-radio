@@ -51,7 +51,7 @@ export default function MixcloudScreen() {
     return (
       <View style={styles.listHeaderContainer}>
         <Text style={styles.listHeaderText}>Selected mixes</Text>
-        {/* You can add an icon here if desired */}
+        <Ionicons name="headset-sharp" size={22} color="#D22F49" />
       </View>
     );
   };
@@ -194,6 +194,7 @@ const useStyles = () => {
           color: '#FFFFFF',
           fontSize: 22, 
           fontWeight: '600',
+          marginRight: 8,
       },
       loadingContainer: {
         flex: 1,
@@ -227,7 +228,8 @@ const useStyles = () => {
         color: '#9ca3af',
       },
       mixList: {
-        padding: 12,
+        paddingHorizontal: 0,
+        paddingBottom: 75,
       },
       mixCard: {
         flexDirection: 'row',
@@ -270,7 +272,7 @@ const useStyles = () => {
       },
       tagText: {
         fontSize: 12,
-        color: '#D22F49',
+        color: '#FFFFFF',
       },
       playerContainer: {
         height: 160,

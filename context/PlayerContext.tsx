@@ -90,7 +90,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
           console.log("Context: Metadata fetch returned no song data.");
       }
     } catch (error) {
-      console.error('Context: Error fetching metadata:', error);
+      console.error(`Context: Error fetching metadata from ${url}:`, error);
       // Don't clear metadata on fetch error, keep the last known
       // setCurrentMetadata(null); 
     }

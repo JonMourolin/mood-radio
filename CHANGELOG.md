@@ -38,6 +38,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved `StreamData` and `StreamMetadata` types to `types/player.ts`.
 - Refactored `moods.tsx` and created `FullScreenPlayer.native.tsx` to use `PlayerContext`.
 
+## [3.7.2] - 2025-04-27
+
+### Fixed
+- Resolved network errors by reverting metadata URLs to HTTP and ensuring App Transport Security (ATS) allows HTTP connections for the stream/metadata domain.
+- Corrected text rendering errors in FullScreenPlayer.
+- Adjusted padding on Mixcloud page to match Moods page.
+
+### Added
+- Configured custom app icons for iOS and Android.
+- Added headset icon next to title on Mixcloud page.
+
+### Changed
+- Set Mixcloud headset icon color to match Moods infinite icon color.
+
 ## [3.7.1] - 2025-04-26
 
 ### Fixed
