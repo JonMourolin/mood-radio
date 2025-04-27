@@ -15,7 +15,7 @@ export default function FullScreenPlayer() {
   } = usePlayerContext();
 
   // Use data from context instead of params
-  const trackInfo = currentMetadata?.song || (isPlaying ? "Playing..." : "Paused");
+  const trackInfo = String(currentMetadata?.song || (isPlaying ? "Playing..." : "Paused"));
   const streamTitle = activeStream?.title || 'Unknown Station';
   const artUrl = currentMetadata?.artUrl;
   const imageUrl = typeof activeStream?.imageUrl === 'object' && 

@@ -4,7 +4,7 @@
     "slug": "web-radio-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/app-icons/mood_radio_ios_icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -15,17 +15,26 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
+      "icon": "./assets/app-icons/mood_radio_ios_icon.png",
       "infoPlist": {
         "UIBackgroundModes": [
           "audio",
           "audio"
-        ]
+        ],
+        "NSAppTransportSecurity": {
+          "NSExceptionDomains": {
+            "51.75.200.205": {
+              "NSIncludesSubdomains": true,
+              "NSExceptionAllowsInsecureHTTPLoads": true
+            }
+          }
+        }
       },
       "bundleIdentifier": "com.jonmourolin.web-radio-mobile"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/app-icons/mood_radio_android_icon.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
