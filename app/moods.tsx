@@ -206,23 +206,15 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
         {/* Text Container (Now Column) */}
         <View style={styles.miniPlayerTextContainer}>
           {/* Wrap Ticker in a View */}
-          {/* <View style={{ overflow: 'hidden' }}> */}
-            {/* <TextTicker
-              style={styles.miniPlayerTrackInfo}
-              duration={15000}
-              loop
-              bounce={false}
-              repeatSpacer={50}
-              marqueeDelay={1000}
-              shouldAnimateTreshold={0} // Keep this for testing
+          <View style={{ overflow: 'hidden' }}> 
+            <Text 
+              style={styles.miniPlayerTrackInfo} 
+              numberOfLines={1} 
+              ellipsizeMode="tail"
             >
               {trackInfo}
-            </TextTicker> */}
-            {/* Replace with standard Text */}
-            <Text style={styles.miniPlayerTrackInfo} numberOfLines={1} ellipsizeMode="tail">
-              {trackInfo}
             </Text>
-          {/* </View> */}
+          </View>
           {/* Playlist Title */}
           <Text style={styles.miniPlayerStreamTitle} numberOfLines={1} ellipsizeMode="tail">
              {activeStream.title}
