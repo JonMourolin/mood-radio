@@ -22,6 +22,7 @@ import { Link } from 'expo-router';
 import { StreamData, StreamMetadata } from '@/types/player';
 import { usePlayerContext } from '@/context/PlayerContext';
 import { StatusBar } from 'expo-status-bar';
+import TextTicker from 'react-native-text-ticker';
 
 // --- Interfaces --- 
 interface StreamItemProps {
@@ -205,10 +206,20 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
         <View style={styles.nowPlayingIcon} />
         {/* Text Container (Now Column) */}
         <View style={styles.miniPlayerTextContainer}>
-          {/* Track Title & Artist */}
-          <Text style={styles.miniPlayerTrackInfo} numberOfLines={1} ellipsizeMode="tail">
-            {trackInfo}
-          </Text>
+          {/* Wrap Ticker in a View */}
+          <View style={{ overflow: 'hidden' }}> 
+            <TextTicker
+              style={styles.miniPlayerTrackInfo} 
+              duration={15000} 
+              loop
+              bounce={false} 
+              repeatSpacer={50} 
+              marqueeDelay={1000} 
+              shouldAnimateTreshold={0} // Keep this for testing
+            >
+              {trackInfo}
+            </TextTicker>
+          </View>
           {/* Playlist Title */}
           <Text style={styles.miniPlayerStreamTitle} numberOfLines={1} ellipsizeMode="tail">
              {activeStream.title}

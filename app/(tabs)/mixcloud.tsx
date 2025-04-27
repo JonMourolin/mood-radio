@@ -1,16 +1,19 @@
-import { StyleSheet, View, FlatList, TouchableOpacity, Image, ActivityIndicator, Text, Linking, Platform } from 'react-native';
+import { StyleSheet, View, FlatList, TouchableOpacity, Image, ActivityIndicator, Text, Linking, Platform, Modal, SafeAreaView } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { ThemedText } from '../../components/ThemedText';
 import { ThemedView } from '../../components/ThemedView';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { SimplifiedMix, getMixes, formatDuration } from '../../services/mixcloudService';
+import { WebView } from 'react-native-webview';
 
 export default function MixcloudScreen() {
   const [mixes, setMixes] = useState<SimplifiedMix[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedMix, setSelectedMix] = useState<SimplifiedMix | null>(null);
+  const isWeb = Platform.OS === 'web';
+  const styles = useStyles();
 
   // Charger les mixes depuis l'API Mixcloud
   useEffect(() => {
@@ -41,6 +44,18 @@ export default function MixcloudScreen() {
     Linking.openURL(url);
   };
 
+  // Function to render the list header (mobile only)
+  const renderListHeader = () => {
+    if (isWeb) return null; // Don't render header on web
+    
+    return (
+      <View style={styles.listHeaderContainer}>
+        <Text style={styles.listHeaderText}>Selected mixes</Text>
+        {/* You can add an icon here if desired */}
+      </View>
+    );
+  };
+
   // Rendu des mixes
   const renderMix = ({ item }: { item: SimplifiedMix }) => {
     const isSelected = selectedMix?.id === item.id;
@@ -58,9 +73,6 @@ export default function MixcloudScreen() {
         />
         <View style={styles.mixInfo}>
           <ThemedText style={styles.mixTitle}>{item.title}</ThemedText>
-          <ThemedText style={styles.mixDetails}>
-            {formatDuration(item.durationInSeconds)} • {item.playCount} écoutes
-          </ThemedText>
           
           {item.tags.length > 0 && (
             <View style={styles.tagsContainer}>
@@ -71,28 +83,16 @@ export default function MixcloudScreen() {
               ))}
             </View>
           )}
-          
-          {isSelected && (
-            <TouchableOpacity 
-              style={styles.listenButton} 
-              onPress={() => openInBrowser(item.url)}
-            >
-              <Ionicons name="headset" size={18} color="#fff" />
-              <Text style={styles.listenButtonText}>Écouter sur Mixcloud</Text>
-            </TouchableOpacity>
-          )}
         </View>
       </TouchableOpacity>
     );
   };
 
+  const RootComponent = isWeb ? ThemedView : SafeAreaView;
+
   return (
-    <ThemedView style={styles.container}>
-      <StatusBar style="auto" />
-      <ThemedView style={styles.header}>
-        <ThemedText type="title">Mixcloud DJ Sets</ThemedText>
-        <ThemedText>Découvrez mes mixes sur Mixcloud</ThemedText>
-      </ThemedView>
+    <RootComponent style={styles.container}>
+      {!isWeb && <StatusBar style="light" />}
       
       {loading ? (
         <View style={styles.loadingContainer}>
@@ -114,139 +114,202 @@ export default function MixcloudScreen() {
           data={mixes}
           keyExtractor={item => item.id}
           renderItem={renderMix}
+          ListHeaderComponent={renderListHeader}
           contentContainerStyle={styles.mixList}
           showsVerticalScrollIndicator={false}
         />
       )}
       
-      {selectedMix && Platform.OS === 'web' && (
-        <View style={styles.iframeContainer}>
-          <iframe
-            title={selectedMix.title}
-            width="100%"
-            height="100%"
-            src={selectedMix.embedUrl}
-            frameBorder="0"
-            allow="autoplay"
-          ></iframe>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={!!selectedMix}
+        onRequestClose={() => {
+          setSelectedMix(null);
+        }}
+      >
+        <View style={styles.modalContainer}> 
+          <View style={styles.modalPlayerContent}> 
+            <View style={styles.modalHeader}>
+                <ThemedText style={styles.modalTitle} numberOfLines={1}>{selectedMix?.title || 'Mix Player'}</ThemedText>
+                <TouchableOpacity onPress={() => setSelectedMix(null)} style={styles.closeButton}>
+                    <Ionicons name="close-circle" size={30} color="#ccc" />
+                </TouchableOpacity>
+            </View>
+            
+            {selectedMix && (
+              Platform.OS === 'web' ? (
+                <iframe
+                  title={selectedMix.title}
+                  width="100%"
+                  height="100%"
+                  src={selectedMix.embedUrl}
+                  frameBorder="0"
+                  allow="autoplay"
+                ></iframe>
+              ) : (
+                <WebView
+                  style={{ flex: 1 }} 
+                  source={{ uri: selectedMix.embedUrl }}
+                  allowsInlineMediaPlayback={true}
+                  mediaPlaybackRequiresUserAction={false}
+                  onError={(syntheticEvent) => {
+                    const { nativeEvent } = syntheticEvent;
+                    console.warn('WebView error: ', nativeEvent);
+                    setError(`Erreur chargement player: ${nativeEvent.description}`);
+                    setSelectedMix(null);
+                  }}
+                  onLoadProgress={({ nativeEvent }) => {
+                     console.log("WebView Load Progress: ", nativeEvent.progress);
+                  }}
+                  onLoadEnd={() => console.log("WebView finished loading")}
+                />
+              )
+            )}
+          </View>
         </View>
-      )}
-    </ThemedView>
+      </Modal>
+
+    </RootComponent>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 20,
-  },
-  header: {
-    padding: 16,
-    marginBottom: 8,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  errorText: {
-    marginTop: 16,
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#ef4444',
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  emptyText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#9ca3af',
-  },
-  mixList: {
-    padding: 12,
-  },
-  mixCard: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: 12,
-    marginBottom: 16,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  selectedMixCard: {
-    borderColor: '#3b82f6',
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-  },
-  mixCover: {
-    width: 120,
-    height: 120,
-  },
-  mixInfo: {
-    flex: 1,
-    padding: 12,
-    justifyContent: 'space-between',
-  },
-  mixTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  mixDetails: {
-    fontSize: 14,
-    opacity: 0.7,
-    marginBottom: 8,
-  },
-  tagsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 8,
-  },
-  tag: {
-    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 16,
-    marginRight: 8,
-    marginBottom: 8,
-  },
-  tagText: {
-    fontSize: 12,
-    color: '#3b82f6',
-  },
-  listenButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#3b82f6',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    alignSelf: 'flex-start',
-    marginTop: 12,
-  },
-  listenButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    marginLeft: 8,
-  },
-  iframeContainer: {
-    height: 160,
-    marginTop: 8,
-    borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: '#000',
-  },
-}); 
+const useStyles = () => {
+    const isWeb = Platform.OS === 'web';
+    return StyleSheet.create({
+      container: {
+        flex: 1,
+        paddingTop: 0, 
+        backgroundColor: '#000000',
+      },
+      listHeaderContainer: {
+          paddingHorizontal: 15,
+          paddingVertical: 15,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'flex-start', 
+          backgroundColor: '#000000', 
+      },
+      listHeaderText: {
+          color: '#FFFFFF',
+          fontSize: 22, 
+          fontWeight: '600',
+      },
+      loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      loadingText: {
+        marginTop: 16,
+        fontSize: 16,
+      },
+      errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+      },
+      errorText: {
+        marginTop: 16,
+        fontSize: 16,
+        textAlign: 'center',
+        color: '#ef4444',
+      },
+      emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      emptyText: {
+        marginTop: 16,
+        fontSize: 16,
+        color: '#9ca3af',
+      },
+      mixList: {
+        padding: 12,
+      },
+      mixCard: {
+        flexDirection: 'row',
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        borderRadius: 12,
+        marginBottom: 16,
+        overflow: 'hidden',
+      },
+      selectedMixCard: {
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderWidth: 1,
+      },
+      mixCover: {
+        width: 120,
+        height: 120,
+      },
+      mixInfo: {
+        flex: 1,
+        padding: 12,
+        justifyContent: 'space-between',
+      },
+      mixTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 4,
+      },
+      tagsContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginTop: 8,
+      },
+      tag: {
+        backgroundColor: 'rgba(210, 47, 73, 0.2)',
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 16,
+        marginRight: 8,
+        marginBottom: 8,
+      },
+      tagText: {
+        fontSize: 12,
+        color: '#D22F49',
+      },
+      playerContainer: {
+        height: 160,
+        marginTop: 12,
+        marginHorizontal: 12,
+        borderRadius: 12,
+        overflow: 'hidden',
+        backgroundColor: '#000',
+        borderWidth: 1,
+        borderColor: '#333',
+      },
+      modalContainer: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      },
+      modalPlayerContent: {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#1C1C1E',
+      },
+      modalHeader: {
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingHorizontal: 15,
+          paddingVertical: 10,
+          paddingTop: Platform.OS === 'ios' ? 50 : 20,
+          borderBottomWidth: 1,
+          borderBottomColor: '#333',
+          backgroundColor: '#1C1C1E',
+      },
+      modalTitle: {
+          flex: 1,
+          fontSize: 16,
+          fontWeight: 'bold',
+          marginRight: 10,
+      },
+      closeButton: {
+      },
+    });
+}; 
