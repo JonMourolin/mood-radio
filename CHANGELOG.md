@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.9.0] - 2025-04-27
+
+### Added
+- Initial native splash screen configuration and hiding logic.
+- Scrolling text ticker (`react-native-text-ticker`) for MiniPlayer track info.
+- Embedded Mixcloud player using `WebView` within a modal on the Mixes screen (native only).
+
+### Changed
+- Updated Mixes screen UI: removed card borders, duration/play count; changed tag colors; hid default header; replicated Moods screen header style.
+- Updated active tab bar tint color.
+
+### Fixed
+- Corrected splash screen image path in `app.json`.
+- Addressed native build issues by regenerating native folders.
+
 ## [3.8.0] - 2025-04-26
 
 ### Added
