@@ -43,7 +43,7 @@ export default function TabLayout() {
           headerShown: false,
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="mixcloud"
         options={{
           title: 'Mixes',
@@ -57,7 +57,7 @@ export default function TabLayout() {
           title: 'Paramètres',
           tabBarIcon: ({ color }) => <Ionicons name="settings" size={24} color={color} />,
         }}
-      />
+      /> */}
     </Tabs>
   );
 } 
