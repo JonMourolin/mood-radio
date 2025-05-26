@@ -29,6 +29,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
       staysActiveInBackground: true,
+      playsInSilentModeIOS: true,
     });
 
     // Cleanup on unmount
