@@ -1,5 +1,5 @@
 import React from 'react';
-import { InfiniteScreen } from '../moods'; // Import from the renamed file
+import InfiniteScreen from '../moods';
 
 console.log('[MoodsTabScreen] File loaded');
 
