@@ -5,15 +5,19 @@ import * as SplashScreen from 'expo-splash-screen';
 import Navigation from './components/Navigation';
 import { PlayerProvider } from '@/context/PlayerContext';
 
+console.log('[RootLayout] File loaded');
+
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  console.log('[RootLayout] Component rendering');
   // We'll use simple readiness flags for now
   const [appIsReady, setAppIsReady] = useState(false);
   const [rootViewRendered, setRootViewRendered] = useState(false);
 
   useEffect(() => {
+    console.log('[RootLayout] useEffect running');
     // Simulate app preparation (e.g., loading assets, fonts)
     async function prepare() {
       try {

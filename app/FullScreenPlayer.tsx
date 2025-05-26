@@ -5,7 +5,10 @@ import { Ionicons } from '@expo/vector-icons';
 // import { BlurView } from 'expo-blur'; // BlurView might not be needed if Image blurRadius works well
 import { usePlayerContext } from '@/context/PlayerContext'; // Import player context
 
+console.log('[FullScreenPlayer] File loaded');
+
 export default function FullScreenPlayer() {
+  console.log('[FullScreenPlayer] Component rendering');
   const router = useRouter(); // Hook for navigation actions like goBack
   const {
     activeStream,

@@ -19,6 +19,7 @@ interface PlayerProviderProps {
 }
 
 export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
+  console.log('[PlayerContext] PlayerProvider component rendering');
   const [activeStream, setActiveStream] = useState<StreamData | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentMetadata, setCurrentMetadata] = useState<StreamMetadata | null>(null);
@@ -26,6 +27,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
   const metadataIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    console.log('[PlayerContext] PlayerProvider useEffect running for setAudioModeAsync');
     Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
       staysActiveInBackground: true,

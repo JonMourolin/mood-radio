@@ -4,7 +4,10 @@ import { Ionicons } from '@expo/vector-icons';
 // import { useThemeColor } from '../../hooks/useThemeColor'; // No longer needed for tint
 import { Platform, View } from 'react-native';
 
+console.log('[TabsLayout] File loaded');
+
 export default function TabLayout() {
+  console.log('[TabsLayout] Component rendering');
   // const tintColor = useThemeColor({ light: '#3b82f6', dark: '#60a5fa' }, 'tint'); // Remove this line
   const activeTabColor = '#D22F49'; // Define the desired color
   
