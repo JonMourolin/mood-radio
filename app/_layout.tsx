@@ -5,6 +5,9 @@ import * as SplashScreen from 'expo-splash-screen';
 import Navigation from './components/Navigation';
 import { PlayerProvider } from '@/context/PlayerContext';
 
+// Explicitly import the tabs layout to see if it affects bundling in preview
+import './(tabs)/_layout';
+
 console.log('[RootLayout] File loaded');
 
 // Keep the splash screen visible while we fetch resources
