@@ -72,9 +72,8 @@ export default function FullScreenPlayer() {
             <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
                 <Ionicons name="chevron-down" size={32} color="#FFFFFF" />
             </TouchableOpacity>
-             {/* Optional: Add screen title or other header elements here */}
             <Text style={styles.headerTitle}>{streamTitle}</Text>
-            <View style={{ width: 40 }} /> { /* Spacer to balance */}
+            <View style={{ width: 40 }} />
         </View>
 
       <View style={styles.container}>
@@ -90,8 +89,6 @@ export default function FullScreenPlayer() {
         {/* Track Info */}
         <View style={styles.trackInfoContainer}>
             <Text style={styles.trackTitle} numberOfLines={2}>{trackInfo}</Text>
-            {/* Display stream title below track info now */}
-            {/* <Text style={styles.stationTitle}>{streamTitle}</Text> */}
         </View>
 
         {/* Controls */}
