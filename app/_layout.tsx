@@ -6,7 +6,7 @@ import Navigation from './components/Navigation';
 import { PlayerProvider } from '@/context/PlayerContext';
 
 // Explicitly import the tabs layout to see if it affects bundling in preview
-import './(tabs)/_layout';
+// import './(tabs)/_layout'; // Removing this explicit import
 
 console.log('[RootLayout] File loaded');
 

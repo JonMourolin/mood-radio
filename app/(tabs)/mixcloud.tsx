@@ -139,14 +139,14 @@ export default function MixcloudScreen() {
             
             {selectedMix && (
               Platform.OS === 'web' ? (
-                <iframe
-                  title={selectedMix.title}
-                  width="100%"
-                  height="100%"
-                  src={selectedMix.embedUrl}
-                  frameBorder="0"
-                  allow="autoplay"
-                ></iframe>
+          <iframe
+            title={selectedMix.title}
+            width="100%"
+            height="100%"
+            src={selectedMix.embedUrl}
+            frameBorder="0"
+            allow="autoplay"
+          ></iframe>
               ) : (
                 <WebView
                   style={{ flex: 1 }} 
@@ -177,8 +177,8 @@ export default function MixcloudScreen() {
 const useStyles = () => {
     const isWeb = Platform.OS === 'web';
     return StyleSheet.create({
-      container: {
-        flex: 1,
+  container: {
+    flex: 1,
         paddingTop: 0, 
         backgroundColor: '#000000',
       },
@@ -195,92 +195,92 @@ const useStyles = () => {
           fontSize: 22, 
           fontWeight: '600',
           marginRight: 8,
-      },
-      loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
-      loadingText: {
-        marginTop: 16,
-        fontSize: 16,
-      },
-      errorContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-      },
-      errorText: {
-        marginTop: 16,
-        fontSize: 16,
-        textAlign: 'center',
-        color: '#ef4444',
-      },
-      emptyContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
-      emptyText: {
-        marginTop: 16,
-        fontSize: 16,
-        color: '#9ca3af',
-      },
-      mixList: {
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    marginTop: 16,
+    fontSize: 16,
+    textAlign: 'center',
+    color: '#ef4444',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#9ca3af',
+  },
+  mixList: {
         paddingHorizontal: 0,
         paddingBottom: 75,
-      },
-      mixCard: {
-        flexDirection: 'row',
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        borderRadius: 12,
-        marginBottom: 16,
-        overflow: 'hidden',
-      },
-      selectedMixCard: {
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+  },
+  mixCard: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    marginBottom: 16,
+    overflow: 'hidden',
+  },
+  selectedMixCard: {
+    borderColor: '#3b82f6',
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
         borderWidth: 1,
-      },
-      mixCover: {
-        width: 120,
-        height: 120,
-      },
-      mixInfo: {
-        flex: 1,
-        padding: 12,
-        justifyContent: 'space-between',
-      },
-      mixTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
+  },
+  mixCover: {
+    width: 120,
+    height: 120,
+  },
+  mixInfo: {
+    flex: 1,
+    padding: 12,
+    justifyContent: 'space-between',
+  },
+  mixTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
         marginBottom: 4,
-      },
-      tagsContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        marginTop: 8,
-      },
-      tag: {
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 8,
+  },
+  tag: {
         backgroundColor: 'rgba(210, 47, 73, 0.2)',
         paddingHorizontal: 10,
         paddingVertical: 5,
-        borderRadius: 16,
-        marginRight: 8,
-        marginBottom: 8,
-      },
-      tagText: {
-        fontSize: 12,
+    borderRadius: 16,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  tagText: {
+    fontSize: 12,
         color: '#FFFFFF',
-      },
+  },
       playerContainer: {
         height: 160,
-        marginTop: 12,
+    marginTop: 12,
         marginHorizontal: 12,
-        borderRadius: 12,
-        overflow: 'hidden',
-        backgroundColor: '#000',
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#000',
         borderWidth: 1,
         borderColor: '#333',
       },
@@ -312,6 +312,6 @@ const useStyles = () => {
           marginRight: 10,
       },
       closeButton: {
-      },
-    });
+  },
+}); 
 }; 

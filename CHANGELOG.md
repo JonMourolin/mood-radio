@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [3.9.2] - 2025-06-04
+
+### Changed
+- Upgraded to Expo SDK 53.
+- Ensured React 19 compatibility and updated related dependencies.
+- Addressed EAS Build issues related to `package-lock.json`.
+
+### Fixed
+- Resolved the missing tab bar issue by correcting the initial route redirection to properly load the tabs layout.
+- Ensured the `TabLayout` component in `app/(tabs)/_layout.tsx` executes correctly.
+- Cleaned up routing by ensuring `app/(tabs)/moods.tsx` correctly imports and renders the main `InfiniteScreen` component from `app/moods.tsx`.
+
 ## [3.9.1] - 2025-05-27
 
 ### Fixed

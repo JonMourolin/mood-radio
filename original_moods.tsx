@@ -18,26 +18,12 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText'; 
 import { Ionicons } from '@expo/vector-icons';
+import { Link } from 'expo-router';
+import { StreamData, StreamMetadata } from '@/types/player';
+import { usePlayerContext } from '@/context/PlayerContext';
+import { StatusBar } from 'expo-status-bar';
 
 // --- Interfaces --- 
-interface StreamData {
-  id: string;
-  title: string;
-  emoji: string;
-  description: string;
-  imageUrl: ImageSourcePropType; 
-  streamUrl: string; 
-  metadataUrl?: string; 
-}
-
-interface StreamMetadata {
-  title: string;
-  artist: string;
-  album?: string;
-  song?: string;
-  artUrl?: string;
-}
-
 interface StreamItemProps {
   item: StreamData;
   onPlayPress: (item: StreamData) => void;
@@ -213,33 +199,40 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
         )
       )}
       
-      {/* Play/Pause Button (Moved Left) */}
-      <TouchableOpacity onPress={onPlayPausePress} style={styles.miniPlayerPlayButton}>
-        <Ionicons 
-          name={isPlaying ? "stop-sharp" : "play-sharp"}
-          size={24} 
-          color="#FFFFFF" 
-        />
-      </TouchableOpacity>
-
       {/* Info Section */}
       <View style={styles.miniPlayerInfo}>
-        {/* Red Icon */}  
+        {/* Red Icon */}
         <View style={styles.nowPlayingIcon} />
-        {/* "NOW PLAYING" Label */}
-        <Text style={styles.miniPlayerNowPlayingLabel}>NOW PLAYING</Text>
-        {/* Red Separator */}
-        <View style={styles.nowPlayingSeparator} />
-        {/* Track Info */}
-        <Text style={styles.miniPlayerTrackInfo} numberOfLines={1}>{trackInfo}</Text>
-        {/* Separator */}  
-        <View style={styles.miniPlayerTextSeparator} />
-        {/* Playlist Title */}  
-        <Text style={styles.miniPlayerStreamTitle} numberOfLines={1}>{activeStream.title}</Text>
+        {/* Text Container (Now Column) */}
+        <View style={styles.miniPlayerTextContainer}>
+          {/* Wrap Ticker in a View */}
+          <View style={{ overflow: 'hidden' }}> 
+            <Text 
+              style={styles.miniPlayerTrackInfo} 
+              numberOfLines={1} 
+              ellipsizeMode="tail"
+            >
+              {trackInfo}
+            </Text>
+          </View>
+          {/* Playlist Title */}
+          <Text style={styles.miniPlayerStreamTitle} numberOfLines={1} ellipsizeMode="tail">
+             {activeStream.title}
+          </Text>
+        </View>
       </View>
       
-      {/* Right Buttons Container (Separator & Close) */}
+      {/* Right Buttons Container (Play/Pause, Separator & Close) */}
       <View style={styles.miniPlayerButtonsContainer}>
+         {/* Play/Pause Button (MOVED HERE) */}
+        <TouchableOpacity onPress={onPlayPausePress} style={styles.miniPlayerPlayButton}>
+            <Ionicons
+            name={isPlaying ? "stop-sharp" : "play-sharp"}
+            size={24}
+            color="#FFFFFF"
+            />
+        </TouchableOpacity>
+
         {/* Close Button (Web Only) with Separator */}
         {isWeb && onClosePress && (
           <>
@@ -256,7 +249,7 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
 
 
 // --- Main Screen Component: Conditionally render Root ---
-export function InfiniteScreen() { 
+export default function InfiniteScreen() { 
   const colorScheme = useColorScheme();
   const { width } = useWindowDimensions();
   const isDarkMode = colorScheme === 'dark';
@@ -267,201 +260,58 @@ export function InfiniteScreen() {
 
   const styles = getStyles(isDarkMode, numColumns);
 
-  const [activeStream, setActiveStream] = useState<StreamData | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentMetadata, setCurrentMetadata] = useState<StreamMetadata | null>(null);
-  const soundRef = useRef<Audio.Sound | null>(null);
-  const metadataIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  // Get player state and controls from context
+  const {
+    activeStream,
+    currentMetadata,
+    isPlaying,
+    playStream,       // Use this to start a new stream
+    togglePlayPause,  // Use this for the mini player's button
+    cleanupAudio      // Use this for closing
+  } = usePlayerContext();
 
-  // --- Audio & Metadata Logic ---
-  useEffect(() => {
-    Audio.setAudioModeAsync({
-      allowsRecordingIOS: false,
-      staysActiveInBackground: true,
-    });
-  }, []);
-
-  const cleanupAudio = async () => {
-    console.log("Cleaning up audio...");
-    if (soundRef.current) {
-      await soundRef.current.stopAsync();
-      await soundRef.current.unloadAsync();
-      soundRef.current = null;
-    }
-    if (metadataIntervalRef.current) {
-      clearInterval(metadataIntervalRef.current);
-      metadataIntervalRef.current = null;
-    }
-    setIsPlaying(false);
-    setCurrentMetadata(null);
-  };
-
-  const fetchMetadata = async (url: string | undefined) => {
-    if (!url) {
-      setCurrentMetadata(null);
-      return;
-    }
-    console.log(`Fetching metadata from: ${url}`);
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      if (data.now_playing) {
-        const track = data.now_playing.song;
-        const newMetadata: StreamMetadata = {
-          title: track.title || 'Unknown Title',
-          artist: track.artist || 'Unknown Artist',
-          album: track.album || 'Unknown Album',
-          song: track.text || `${track.artist} - ${track.title}`,
-          artUrl: track.art || undefined,
-        };
-        setCurrentMetadata(newMetadata);
-        console.log("Metadata updated:", newMetadata);
-      }
-    } catch (error) {
-      console.error('Error fetching metadata:', error);
-      setCurrentMetadata(null); 
-    }
-  };
-
-  const playStream = async (stream: StreamData) => {
-    console.log(`Attempting to play stream: ${stream.title}`);
-    await cleanupAudio(); 
-
-    if (stream.streamUrl === 'placeholder') {
-      console.warn("Placeholder stream selected, cannot play.");
-      setActiveStream(stream); 
-      setIsPlaying(false);
-      setCurrentMetadata({ title: stream.title, artist: "(No Stream URL)" }); 
-      return;
-    }
-
-    try {
-      console.log(`Loading sound: ${stream.streamUrl}`);
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: stream.streamUrl },
-        { shouldPlay: true }
-      );
-      soundRef.current = sound;
-      
-      soundRef.current.setOnPlaybackStatusUpdate((status) => {
-          if (status.isLoaded) {
-              setIsPlaying(status.isPlaying);
-          } else {
-              if (status.error) {
-                  console.error(`Playback Error: ${status.error}`);
-                  cleanupAudio(); 
-                  setActiveStream(null); 
-              }
-          }
-      });
-      
-      console.log("Sound loaded and playing.");
-      setActiveStream(stream);
-      setIsPlaying(true);
-
-      if (stream.metadataUrl) {
-        fetchMetadata(stream.metadataUrl);
-        metadataIntervalRef.current = setInterval(() => fetchMetadata(stream.metadataUrl), 5000); 
-      } else {
-        setCurrentMetadata(null); 
-      }
-
-    } catch (error) {
-      console.error('Error playing stream:', error);
-      cleanupAudio();
-      setActiveStream(null); 
-    }
-  };
-
+  // --- Event Handlers --- 
   const handlePlayPress = (item: StreamData) => {
+    // Use context functions directly
     if (activeStream?.id === item.id) {
-      if (soundRef.current) {
-        if (isPlaying) {
-          console.log("Pausing stream via main control");
-          soundRef.current.pauseAsync();
-        } else {
-          console.log("Resuming stream via main control");
-          soundRef.current.playAsync();
-        }
-      } else {
-         console.log("Playing new stream (or stopped stream) via main control");
-        playStream(item);
-      }
+      togglePlayPause(); 
     } else {
-      console.log("Switching to new stream via main control");
       playStream(item);
     }
   };
 
   const handleMiniPlayerPlayPause = () => {
-     console.log("Mini player play/pause pressed");
-    if (activeStream) {
-      handlePlayPress(activeStream);
-    }
+    // Use context toggle function
+    togglePlayPause();
   };
   
   const handleCloseMiniPlayer = () => {
-    console.log("Closing mini player and stopping audio via close button.");
+    // Use context cleanup function
+    console.log("Closing mini player via web button.");
     cleanupAudio();
-    setActiveStream(null);
-    setCurrentMetadata(null);
+    // activeStream and currentMetadata will be cleared by cleanupAudio in context if desired
   };
-
-  useEffect(() => {
-    return () => {
-       console.log("InfiniteScreen unmounting, cleaning up audio.");
-      cleanupAudio();
-    };
-  }, []);
-
-  // Inject scrollbar styles for web
-  useEffect(() => {
-    if (Platform.OS === 'web') {
-      const styleElement = document.createElement('style');
-      styleElement.id = 'custom-scrollbar-styles'; // Add ID for cleanup
-      styleElement.innerHTML = `
-        /* Dark Scrollbar Styles */
-        ::-webkit-scrollbar {
-          width: 8px; /* Width of the scrollbar */
-          height: 8px; /* Height for horizontal scrollbar */
-        }
-
-        ::-webkit-scrollbar-track {
-          background: #2c2c2c; /* Dark track background */
-          border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-          background-color: #555555; /* Darker grey thumb */
-          border-radius: 4px;
-          border: 1px solid #2c2c2c; /* Optional: border matching track */
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-          background-color: #777777; /* Slightly lighter on hover */
-        }
-      `;
-      document.head.appendChild(styleElement);
-
-      // Cleanup function to remove the style tag when component unmounts
-      return () => {
-        const existingStyleElement = document.getElementById('custom-scrollbar-styles');
-        if (existingStyleElement) {
-          document.head.removeChild(existingStyleElement);
-        }
-      };
-    }
-  }, []); // Empty dependency array ensures this runs only once on mount/unmount
 
   // Restore root component logic
   const RootComponent = isWeb ? View : SafeAreaView;
 
   return (
     <RootComponent style={styles.safeArea}> 
+      {/* Set Status Bar style */}
+      {!isWeb && <StatusBar style="light" />}
+      
       <ScrollView 
         style={styles.scrollView} 
         contentContainerStyle={styles.scrollContentContainer}
       >
+        {/* Header Content Inside ScrollView (Mobile Only) */}
+        {!isWeb && (
+            <View style={styles.scrollHeaderContainer}>
+              <Text style={styles.scrollHeaderText}>Listen to your mood</Text>
+              <Ionicons name="infinite-outline" size={26} color="#D22F49" />
+            </View>
+        )}
+
         <View style={styles.listWrapper}>
           {STREAM_DATA.map((item) => ( 
             <StreamItem 
@@ -475,14 +325,49 @@ export function InfiniteScreen() {
         </View>
       </ScrollView>
 
-      {/* Sticky MiniPlayer */}
-      <MiniPlayer 
-          activeStream={activeStream}
-          metadata={currentMetadata}
-          isPlaying={isPlaying}
-          onPlayPausePress={handleMiniPlayerPlayPause}
-          onClosePress={handleCloseMiniPlayer}
-      />
+      {/* Sticky MiniPlayer Area - Conditionally Clickable */}
+      {activeStream && (
+        isWeb ? (
+          // Web: Render MiniPlayer directly, not clickable for navigation
+           <MiniPlayer 
+                activeStream={activeStream}
+                metadata={currentMetadata}
+                isPlaying={isPlaying}
+                onPlayPausePress={handleMiniPlayerPlayPause} 
+                onClosePress={handleCloseMiniPlayer} // Web close button still works
+            />
+        ) : (
+          // Native: Render MiniPlayer wrapped in Link and TouchableOpacity
+          <Link 
+            href={{
+              pathname: "/FullScreenPlayer", // Route name stays the same
+              // Params are only needed for native navigation now, but can stay
+              params: { 
+                artUrl: currentMetadata?.artUrl, 
+                imageUrl: typeof activeStream.imageUrl === 'object' && 
+                          !Array.isArray(activeStream.imageUrl) && 
+                          activeStream.imageUrl.uri 
+                          ? activeStream.imageUrl.uri 
+                          : undefined,
+                trackInfo: currentMetadata?.song || (isPlaying ? 'Playing...' : 'Paused'),
+                streamTitle: activeStream.title,
+                isPlaying: isPlaying.toString(),
+              }
+            }} 
+            asChild
+          >
+            <TouchableOpacity activeOpacity={0.8}>
+              <MiniPlayer 
+                  activeStream={activeStream}
+                  metadata={currentMetadata}
+                  isPlaying={isPlaying}
+                  onPlayPausePress={handleMiniPlayerPlayPause} // Play/pause still works
+                  onClosePress={undefined} // No close button on native MiniPlayer
+              />
+            </TouchableOpacity>
+          </Link>
+        )
+      )}
     </RootComponent>
   );
 }
@@ -497,10 +382,12 @@ const getStyles = (
   return StyleSheet.create({
     safeArea: {
       flex: 1,
-      backgroundColor: '#000000',
+      // Set background back to black for all platforms
+      backgroundColor: '#000000', 
     },
     scrollView: { 
       flex: 1,
+      backgroundColor: '#000000', // Explicitly set ScrollView background to black
     },
     scrollContentContainer: { 
       flexGrow: 1,
@@ -642,12 +529,12 @@ const getStyles = (
         backgroundColor: 'rgba(0,0,0,0.2)'
     },
     miniPlayerPlayButton: {
-      paddingHorizontal: 12, 
-      paddingVertical: 10, 
+      paddingHorizontal: 12,
+      paddingVertical: 10,
     },
     miniPlayerInfo: {
-      flex: 1, 
-      flexDirection: 'row', // Arrange items horizontally
+      flex: 1,
+      flexDirection: 'row', // Arrange icon and text container horizontally
       alignItems: 'center', // Vertically center items
       marginLeft: 8, // Adjust margin as needed
       marginRight: 8, // Adjust margin as needed
@@ -661,40 +548,25 @@ const getStyles = (
       backgroundColor: 'red',
       marginRight: 6,
     },
-    // Updated Style: "NOW PLAYING" Label
-    miniPlayerNowPlayingLabel: {
-        color: 'red', 
-        fontSize: 13, 
-        textTransform: 'uppercase', 
-    },
-    // New Style: Grey Separator after NOW PLAYING
-    nowPlayingSeparator: {
-      width: 1,
-      height: 12, 
-      backgroundColor: '#555555', // Same grey as other text separator
-      marginHorizontal: 6, 
+    miniPlayerTextContainer: {
+      flex: 1,
+      flexDirection: 'column', // Stack text vertically
+      justifyContent: 'center', // Center text vertically in the container
+      marginLeft: 6, // Space between red dot and text block
     },
     miniPlayerTrackInfo: {
-      color: '#FFFFFF', 
-      fontSize: 13,
-      fontWeight: '500', 
-      flexShrink: 1, 
-      marginRight: 6, 
-      textTransform: 'uppercase',
+      color: '#FFFFFF',
+      fontSize: 14, // Set font size to 14
+      fontWeight: '500',
+      // flexShrink: 1, // Keep shrinking if needed
+      // marginRight: 6, // Remove margin as separator is gone
     },
-    // New Style: Text Separator
-    miniPlayerTextSeparator: {
-        width: 1,
-        height: 12, // Smaller height for text separator
-        backgroundColor: '#555555', // Slightly lighter grey separator
-        marginHorizontal: 6, // Spacing around separator
-    },
+    // Restore Stream Title
     miniPlayerStreamTitle: {
-      color: '#AAAAAA', 
-      fontSize: 13,
-      fontWeight: 'normal', 
-      flexShrink: 1, 
-      textTransform: 'uppercase',
+      color: '#AAAAAA',
+      fontSize: 12, // Slightly smaller font size
+      fontWeight: 'normal',
+      // flexShrink: 1, // Keep shrinking if needed
     },
     miniPlayerButtonsContainer: {
       flexDirection: 'row',
@@ -720,6 +592,22 @@ const getStyles = (
       // Conditionally apply mixBlendMode for web only
       ...(isWeb && { mixBlendMode: 'difference' as any }), // Use type assertion
       zIndex: 0,
+    },
+    // Styles for Header Content inside ScrollView
+    scrollHeaderContainer: {
+        paddingHorizontal: 15,
+        paddingVertical: 15, // Increased vertical padding
+        paddingTop: 25,      // Slightly more top padding
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start', // Align items to the left
+        backgroundColor: '#000000', // Change background back to black
+    },
+    scrollHeaderText: {
+        color: '#FFFFFF',
+        fontSize: 22, // Increased font size
+        fontWeight: '600',
+        marginRight: 8,
     },
   });
 };
