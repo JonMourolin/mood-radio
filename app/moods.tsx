@@ -13,7 +13,7 @@ import {
   Image,
   ViewStyle,
 } from 'react-native';
-import { Audio } from 'expo-av';
+import { Audio, Video, ResizeMode } from 'expo-av';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText'; 
@@ -47,6 +47,7 @@ const STREAM_DATA: StreamData[] = [
     emoji: '♾️',
     description: 'The main station feed, a bit of everything, right in the middle',
     imageUrl: require('../assets/images/moods/sonic-drift.jpg'),
+    videoUrl: require('../assets/images/moods_videos/sonic-drift.mp4'),
     streamUrl: 'http://51.75.200.205/listen/tangerine_radio/radio.mp3', 
     metadataUrl: 'http://51.75.200.205/api/nowplaying/tangerine_radio',
   },
@@ -56,6 +57,7 @@ const STREAM_DATA: StreamData[] = [
     emoji: '🧘',
     description: 'Meditation, relax and focus',
     imageUrl: require('../assets/images/moods/slow-focus.jpg'),
+    videoUrl: require('../assets/images/moods_videos/slow-focus.mp4'),
     streamUrl: 'http://51.75.200.205/listen/the_big_calm/radio.mp3',
     metadataUrl: 'http://51.75.200.205/api/nowplaying/the_big_calm',
 },
@@ -65,6 +67,7 @@ const STREAM_DATA: StreamData[] = [
     emoji: '☀️',
     description: 'Uplifting, energetic and fun',
     imageUrl: require('../assets/images/moods/poolside.jpg'),
+    videoUrl: require('../assets/images/moods_videos/poolside.mp4'),
     streamUrl: 'http://51.75.200.205/listen/high_energy/radio.mp3', 
     metadataUrl: 'http://51.75.200.205/api/nowplaying/high_energy',
   },
@@ -74,6 +77,7 @@ const STREAM_DATA: StreamData[] = [
     emoji: '💥',
     description: 'Angry, aggressive and intense',
     imageUrl: require('../assets/images/moods/low-key.jpg'),
+    videoUrl: require('../assets/images/moods_videos/low-key.mp4'),
     streamUrl: 'http://51.75.200.205/listen/rage/radio.mp3',
     metadataUrl: 'http://51.75.200.205/api/nowplaying/rage',
   },
@@ -83,6 +87,7 @@ const STREAM_DATA: StreamData[] = [
     emoji: '🌙',
     description: 'Dark, moody and melancholic',
     imageUrl: require('../assets/images/moods/melancholia.jpg'),
+    videoUrl: require('../assets/images/moods_videos/melancholia.mp4'),
     streamUrl: 'http://51.75.200.205/listen/melancholia/radio.mp3',
     metadataUrl: 'http://51.75.200.205/api/nowplaying/melancholia',
   },
@@ -92,6 +97,7 @@ const STREAM_DATA: StreamData[] = [
     emoji: '🔮',
     description: 'Futuristic, experimental and cosmic',
     imageUrl: require('../assets/images/moods/memory-lane.jpg'),
+    videoUrl: require('../assets/images/moods_videos/memory-lane.mp4'),
     streamUrl: 'http://51.75.200.205/listen/cosmics_trip/radio.mp3',
   },
 ];
@@ -99,6 +105,7 @@ const STREAM_DATA: StreamData[] = [
 // --- Stream Item Component ---
 const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, isPlaying }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [videoKey, setVideoKey] = useState(Date.now());
   const styles = getStyles(useColorScheme() === 'dark', Platform.OS === 'web' && useWindowDimensions().width >= 480 ? 2 : 1);
 
   const handlePress = () => {
@@ -107,15 +114,30 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
 
   const canHover = Platform.OS === 'web';
 
+  const handleMouseEnter = () => {
+    if (canHover) {
+      setIsHovered(true);
+      setVideoKey(Date.now()); // Change key to force remount and restart video
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (canHover) {
+      setIsHovered(false);
+      // By changing the key on leave as well, we force a remount to a paused state
+      setVideoKey(Date.now()); 
+    }
+  };
+
+  const webHoverProps = canHover ? {
+    onMouseEnter: handleMouseEnter,
+    onMouseLeave: handleMouseLeave,
+  } : {};
+
   // Determine icon visibility
   const showPauseIcon = isActive && isPlaying;
   const showPlayIcon = !showPauseIcon && (!canHover || isHovered);
   const shouldShowIcon = showPauseIcon || showPlayIcon;
-
-  const webHoverProps = canHover ? {
-    onMouseEnter: () => setIsHovered(true),
-    onMouseLeave: () => setIsHovered(false),
-  } : {};
 
   return (
     <TouchableOpacity 
@@ -124,7 +146,16 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
       onPress={handlePress}
       activeOpacity={0.8}
     >
-      <ImageBackground source={item.imageUrl} style={styles.itemImageBackground} resizeMode="cover">
+      <Video
+        key={videoKey}
+        source={item.videoUrl}
+        style={styles.itemImageBackground}
+        resizeMode={ResizeMode.COVER}
+        isLooping
+        isMuted
+        shouldPlay={isHovered}
+      />
+      <View style={StyleSheet.absoluteFill}>
         {shouldShowIcon && (
           <TouchableOpacity style={styles.playButton} onPress={handlePress}> 
             <Ionicons 
@@ -137,16 +168,13 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
         )}
 
         {canHover && isHovered ? (
-          <>
-            <View style={styles.blendLayer as any} /> 
-            <View style={styles.hoverOverlay}>
-              <View style={styles.hoverTitleContainer}> 
-                <Text style={styles.itemEmoji}>{item.emoji}</Text> 
-                <Text style={styles.hoverTitle}>{item.title}</Text>
-              </View>
-              <Text style={styles.hoverDescription}>{item.description}</Text>
+          <View style={styles.hoverOverlay}>
+            <View style={styles.hoverTitleContainer}> 
+              <Text style={styles.itemEmoji}>{item.emoji}</Text> 
+              <Text style={styles.hoverTitle}>{item.title}</Text>
             </View>
-          </>
+            <Text style={styles.hoverDescription}>{item.description}</Text>
+          </View>
         ) : (
           <View style={styles.itemOverlay}> 
             <View style={styles.itemTitleContainer}>
@@ -155,7 +183,7 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
             </View>
           </View>
         )}
-      </ImageBackground>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -466,7 +494,7 @@ const getStyles = (
       marginRight: 5,
       textShadowColor: 'rgba(0, 0, 0, 0.75)',
       textShadowOffset: { width: 0, height: 1 },
-      textShadowRadius: 2,
+      textShadowRadius: 10,
     },
     hoverOverlay: {
       position: 'absolute',
@@ -474,11 +502,11 @@ const getStyles = (
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.7)',
       justifyContent: 'flex-end',
       alignItems: 'flex-start',
-      padding: 10, 
+      padding: 10,
       zIndex: 2,
+      // backgroundColor: 'rgba(0, 0, 0, 0.7)', // Effet d'assombrissement retiré
     },
     hoverTitleContainer: {
       flexDirection: 'row',

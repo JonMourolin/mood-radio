@@ -7,6 +7,7 @@ export interface StreamData {
   emoji: string;
   description: string;
   imageUrl: ImageSourcePropType; 
+  videoUrl?: any; // or specific video type if you have one
   streamUrl: string; 
   metadataUrl?: string; 
 }
