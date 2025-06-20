@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.11.0] - 2025-06-20
+
+### Fixed
+- Corrected the mini-player close button functionality. It now properly stops the audio stream and hides the player by clearing the active stream state in the PlayerContext.
+- Resolved a related TypeScript error for `NodeJS.Timeout` in the PlayerContext.
+
 ## [3.10.0] - 2025-06-20
 
 ### Added

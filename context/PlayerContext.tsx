@@ -24,7 +24,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentMetadata, setCurrentMetadata] = useState<StreamMetadata | null>(null);
   const soundRef = useRef<Audio.Sound | null>(null);
-  const metadataIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const metadataIntervalRef = useRef<NodeJS.Timeout | number | null>(null);
 
   useEffect(() => {
     console.log('[PlayerContext] PlayerProvider useEffect running for setAudioModeAsync');
@@ -60,7 +60,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     // Don't clear metadata here, keep it until a new stream starts
     // setCurrentMetadata(null); 
     // Don't clear active stream here? Or maybe we should?
-    // setActiveStream(null);
+    setActiveStream(null);
   };
 
   const fetchMetadata = async (url: string | undefined) => {

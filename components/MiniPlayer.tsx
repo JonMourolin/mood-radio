@@ -4,10 +4,10 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import { ThemedText } from './ThemedText';
 import { ThemedView } from './ThemedView';
-import { LongMix } from '@/services/cloudinaryService';
+import { StreamData } from '@/types/player';
 
 interface MiniPlayerProps {
-  mix: LongMix | null;
+  mix: StreamData | null;
   sound: Audio.Sound | null;
   onClose: () => void;
 }
@@ -60,6 +60,13 @@ export default function MiniPlayer({ mix, sound, onClose }: MiniPlayerProps) {
     }
   };
 
+  const handleClose = async () => {
+    if (sound) {
+      await sound.stopAsync();
+    }
+    onClose(); // Appelle la fonction originale pour fermer le lecteur
+  };
+
   if (!mix) return null;
 
   return (
@@ -75,7 +82,7 @@ export default function MiniPlayer({ mix, sound, onClose }: MiniPlayerProps) {
       
       <View style={styles.content}>
         <Image 
-          source={{ uri: mix.coverUrl }} 
+          source={mix.imageUrl} 
           style={styles.cover} 
         />
         
@@ -84,7 +91,7 @@ export default function MiniPlayer({ mix, sound, onClose }: MiniPlayerProps) {
             {mix.title}
           </ThemedText>
           <ThemedText numberOfLines={1}>
-            {mix.artist}
+            {mix.description}
           </ThemedText>
         </View>
         
@@ -97,7 +104,7 @@ export default function MiniPlayer({ mix, sound, onClose }: MiniPlayerProps) {
             />
           </TouchableOpacity>
           
-          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+          <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
             <MaterialIcons name="close" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
