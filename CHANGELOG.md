@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.12.0] - 2025-06-20
+
+### Documentation
+- Added detailed descriptions of all root-level configuration files and primary project directories to `architecture.md`.
+- Clarified the roles and relationships between key concepts like React Hooks and Context.
+- Identified and documented architectural points for future improvement (e.g., config vs. constants).
+
 ## [3.11.0] - 2025-06-20
 
 ### Fixed
