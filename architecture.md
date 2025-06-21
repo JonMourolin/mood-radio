@@ -105,4 +105,43 @@ La distinction est clé : le **Hook** est l'**outil**, le **Context** est le **t
 
 ### `ios/` et `android/`
 **Rôle :** Artefacts de build natif local.
-Ces dossiers contiennent les projets natifs (Xcode pour iOS, Android Studio pour Android) qui sont générés automatiquement lorsque l'on lance des commandes comme `npx expo run:ios` ou `npx expo run:android`. Ils sont créés à partir de la configuration définie dans `app.json` et ne sont pas destinés à être modifiés manuellement dans un workflow Expo "managé". Comme indiqué dans `.gitignore`, ils sont ignorés par Git et peuvent être supprimés sans risque, car ils seront recréés à la prochaine exécution. 
+Ces dossiers contiennent les projets natifs (Xcode pour iOS, Android Studio pour Android) qui sont générés automatiquement lorsque l'on lance des commandes comme `npx expo run:ios` ou `npx expo run:android`. Ils sont créés à partir de la configuration définie dans `app.json` et ne sont pas destinés à être modifiés manuellement dans un workflow Expo "managé". Comme indiqué dans `.gitignore`, ils sont ignorés par Git et peuvent être supprimés sans risque, car ils seront recréés à la prochaine exécution.
+
+---
+
+### `components/`
+**Rôle :** Boîte à outils de "briques" d'interface réutilisables.
+Ce dossier est la "boîte de Lego" du projet. Il contient des composants React indépendants qui sont assemblés pour construire les écrans.
+
+- **Composants fondamentaux (activement utilisés) :**
+  - `ThemedText.tsx` et `ThemedView.tsx` : La base du système de design, ils appliquent automatiquement les bonnes couleurs de texte et de fond en fonction du thème (clair/sombre).
+  - `MiniPlayer.tsx` : Le lecteur audio qui apparaît en bas de l'écran.
+  - `Header.tsx` : L'en-tête de navigation supérieur.
+
+- **Code mort (vestiges du template Expo) :**
+  - `ParallaxScrollView.tsx`, `Collapsible.tsx`, `ExternalLink.tsx`, `HapticTab.tsx`, `HelloWave.tsx` : Ces composants ne sont actuellement pas utilisés dans l'application et peuvent être supprimés pour nettoyer le code.
+
+- **Sous-dossiers :**
+  - `ui/` : Contient des composants d'interface de bas niveau, souvent avec des implémentations spécifiques à une plateforme (ex: `IconSymbol.ios.tsx` pour les icônes natives d'Apple).
+  - `__tests__/` : Contient les fichiers de test pour s'assurer que les composants fonctionnent correctement.
+
+---
+
+### `app/`
+**Rôle :** Cœur du routage et des écrans de l'application.
+Ce dossier est géré par **Expo Router** et sa structure de fichiers définit les URL de l'application. Il contient les écrans finaux, qui assemblent les briques du dossier `components/`.
+
+- **Fichiers de layout (les "poupées russes") :**
+  - `_layout.tsx` : La **coquille principale** (la plus grande poupée). Il gère le splash screen, enveloppe toute l'application dans le `PlayerProvider` pour rendre le lecteur audio global, et définit la structure de navigation de base (`<Stack>`).
+  - `(tabs)/_layout.tsx` : La **coquille des onglets** (la poupée du milieu). Ce layout est un enfant du layout racine et ne s'applique qu'aux applications natives (iOS/Android). Il construit la barre de navigation inférieure et configure les icônes et titres pour chaque onglet (`moods`, `mixcloud`, `settings`). Sur le web, il s'efface pour laisser la navigation du header prendre le relais.
+
+- **Les écrans et les routes :**
+  - `index.tsx` : Le "portier" de l'application. Il redirige l'utilisateur de la racine (`/`) vers le premier écran pertinent.
+  - `moods.tsx`, `mixcloud.tsx`, `settings.tsx` : Les fichiers de contenu des écrans principaux.
+  - `(tabs)/moods.tsx` : Un simple **"pointeur"** qui importe le vrai contenu depuis `app/moods.tsx` pour l'afficher dans l'onglet correspondant.
+  - `(tabs)/mixcloud.tsx` : La version de l'écran Mixcloud **spécifique au natif**, qui utilise une `WebView` dans un modal.
+  - `FullScreenPlayer.tsx` : L'écran du lecteur en plein écran, utilisé **uniquement sur natif**.
+
+- **Le sous-dossier `app/components/` :**
+  - **Rôle :** Contient des composants spécifiques au **layout**, par opposition aux composants génériques du dossier `components/` racine.
+  - **Exemple (`Navigation.tsx`) :** C'est l'en-tête de navigation du **site web**, "colocalisé" ici car il est fortement couplé à la structure de routage de `/app`. 

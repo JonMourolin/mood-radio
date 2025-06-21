@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.13.0] - 2025-06-21
+
+### Documentation
+- Completed and enriched the `architecture.md` file with a comprehensive overview of the project structure.
+- Documented the role of each directory (`/app`, `/components`, `/context`, `/hooks`, etc.).
+- Detailed the purpose of key configuration files (`package.json`, `config.ts`, etc.).
+
 ## [3.12.0] - 2025-06-20
 
 ### Documentation
