@@ -22,6 +22,7 @@ import { Link } from 'expo-router';
 import { StreamData, StreamMetadata } from '@/types/player';
 import { usePlayerContext } from '@/context/PlayerContext';
 import { StatusBar } from 'expo-status-bar';
+import { AZURACAST_BASE_URL } from '../config';
 
 // --- Interfaces --- 
 interface StreamItemProps {
@@ -40,7 +41,7 @@ interface MiniPlayerProps {
 }
 
 // --- Sample Data --- 
-const STREAM_DATA: StreamData[] = [
+const rawStreamData = [
   {
     id: 'sonic-drift',
     title: 'MOOD RADIO MAIN MIX',
@@ -48,8 +49,7 @@ const STREAM_DATA: StreamData[] = [
     description: 'The main station feed, a bit of everything, right in the middle',
     imageUrl: require('../assets/images/moods/sonic-drift.jpg'),
     videoUrl: require('../assets/images/moods_videos/sonic-drift.mp4'),
-    streamUrl: 'http://51.75.200.205/listen/tangerine_radio/radio.mp3', 
-    metadataUrl: 'http://51.75.200.205/api/nowplaying/tangerine_radio',
+    stationSlug: 'tangerine_radio',
   },
   {
     id: 'slow-focus',
@@ -58,8 +58,7 @@ const STREAM_DATA: StreamData[] = [
     description: 'Meditation, relax and focus',
     imageUrl: require('../assets/images/moods/slow-focus.jpg'),
     videoUrl: require('../assets/images/moods_videos/slow-focus.mp4'),
-    streamUrl: 'http://51.75.200.205/listen/the_big_calm/radio.mp3',
-    metadataUrl: 'http://51.75.200.205/api/nowplaying/the_big_calm',
+    stationSlug: 'the_big_calm',
 },
 {
     id: 'poolside',
@@ -68,8 +67,7 @@ const STREAM_DATA: StreamData[] = [
     description: 'Uplifting, energetic and fun',
     imageUrl: require('../assets/images/moods/poolside.jpg'),
     videoUrl: require('../assets/images/moods_videos/poolside.mp4'),
-    streamUrl: 'http://51.75.200.205/listen/high_energy/radio.mp3', 
-    metadataUrl: 'http://51.75.200.205/api/nowplaying/high_energy',
+    stationSlug: 'high_energy', 
   },
   {
     id: 'low-key',
@@ -78,8 +76,7 @@ const STREAM_DATA: StreamData[] = [
     description: 'Angry, aggressive and intense',
     imageUrl: require('../assets/images/moods/low-key.jpg'),
     videoUrl: require('../assets/images/moods_videos/low-key.mp4'),
-    streamUrl: 'http://51.75.200.205/listen/rage/radio.mp3',
-    metadataUrl: 'http://51.75.200.205/api/nowplaying/rage',
+    stationSlug: 'rage',
   },
   {
     id: 'melancholia',
@@ -88,8 +85,7 @@ const STREAM_DATA: StreamData[] = [
     description: 'Dark, moody and melancholic',
     imageUrl: require('../assets/images/moods/melancholia.jpg'),
     videoUrl: require('../assets/images/moods_videos/melancholia.mp4'),
-    streamUrl: 'http://51.75.200.205/listen/melancholia/radio.mp3',
-    metadataUrl: 'http://51.75.200.205/api/nowplaying/melancholia',
+    stationSlug: 'melancholia',
   },
   {
     id: 'memory-lane',
@@ -98,9 +94,15 @@ const STREAM_DATA: StreamData[] = [
     description: 'Futuristic, experimental and cosmic',
     imageUrl: require('../assets/images/moods/memory-lane.jpg'),
     videoUrl: require('../assets/images/moods_videos/memory-lane.mp4'),
-    streamUrl: 'http://51.75.200.205/listen/cosmics_trip/radio.mp3',
+    stationSlug: 'cosmics_trip',
   },
 ];
+
+const STREAM_DATA: StreamData[] = rawStreamData.map(item => ({
+  ...item,
+  streamUrl: `${AZURACAST_BASE_URL}/listen/${item.stationSlug}/radio.mp3`,
+  metadataUrl: `${AZURACAST_BASE_URL}/api/nowplaying/${item.stationSlug}`,
+}));
 
 // --- Stream Item Component ---
 const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, isPlaying }) => {

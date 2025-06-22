@@ -8,8 +8,9 @@ export interface StreamData {
   description: string;
   imageUrl: ImageSourcePropType; 
   videoUrl?: any; // or specific video type if you have one
-  streamUrl: string; 
+  streamUrl?: string; 
   metadataUrl?: string; 
+  stationSlug?: string;
 }
 
 // Type for fetched track metadata
