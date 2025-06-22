@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.15.0] - 2025-06-22
+
+### Refactoring
+- Centralized AzuraCast configuration (`AZURACAST_BASE_URL`, `METADATA_REFRESH_INTERVAL_MS`) into `config.ts`.
+- Refactored Mixcloud service to centralize its configuration and add strong typing for the API response.
+- Created dedicated type files (`types/api.ts`, `types/mix.ts`) to separate external API contracts from internal data models, improving type safety and code clarity.
+- Removed dead code: the unused `app/web/mixcloud.tsx` screen.
+
 ## [3.14.0] - 2025-06-22
 
 ### Refactoring
