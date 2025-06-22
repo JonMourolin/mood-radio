@@ -1,55 +1,11 @@
 import { Platform } from 'react-native';
-
-// Types pour les données Mixcloud
-export interface MixcloudTrack {
-  id: string;
-  key: string;
-  url: string;
-  name: string;
-  description?: string;
-  pictures: {
-    medium?: string;
-    large?: string;
-    "320wx320h"?: string;
-    "640wx640h"?: string;
-    "768wx768h"?: string;
-    "1024wx1024h"?: string;
-  };
-  created_time: string;
-  audio_length: number;
-  slug: string;
-  user: {
-    username: string;
-    name: string;
-    pictures?: {
-      medium?: string;
-      "320wx320h"?: string;
-    };
-  };
-  tags: Array<{
-    key: string;
-    name: string;
-  }>;
-  play_count?: number;
-  listener_count?: number;
-}
-
-export interface SimplifiedMix {
-  id: string;
-  title: string;
-  description: string;
-  coverUrl: string;
-  durationInSeconds: number;
-  username: string;
-  url: string;
-  embedUrl: string;
-  tags: string[];
-  playCount: number;
-}
+import { MIXCLOUD_API_BASE, MIXCLOUD_USERNAME } from '../config';
+import { MixcloudApiResponse, MixcloudTrack } from '@/types/api';
+import { SimplifiedMix } from '@/types/mix';
 
 // Configuration de l'API Mixcloud
-const MIXCLOUD_USERNAME = 'jonprod18';
-const MIXCLOUD_API_BASE = 'https://api.mixcloud.com';
+// const MIXCLOUD_USERNAME = 'jonprod18';
+// const MIXCLOUD_API_BASE = 'https://api.mixcloud.com';
 
 /**
  * Récupère les mixes d'un utilisateur Mixcloud
@@ -62,7 +18,7 @@ export async function fetchUserMixes(username: string = MIXCLOUD_USERNAME): Prom
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
     }
     
-    const data = await response.json();
+    const data: MixcloudApiResponse = await response.json();
     
     if (!data.data || !Array.isArray(data.data)) {
       console.error('Unexpected response format:', data);

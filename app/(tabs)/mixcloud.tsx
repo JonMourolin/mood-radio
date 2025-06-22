@@ -4,7 +4,8 @@ import { ThemedText } from '../../components/ThemedText';
 import { ThemedView } from '../../components/ThemedView';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
-import { SimplifiedMix, getMixes, formatDuration } from '../../services/mixcloudService';
+import { getMixes, formatDuration } from '../../services/mixcloudService';
+import { SimplifiedMix } from '@/types/mix';
 import { WebView } from 'react-native-webview';
 
 export default function MixcloudScreen() {
