@@ -42,7 +42,11 @@ Il configure ESLint, un outil qui analyse le code pour trouver des erreurs coura
 
 ### `config.ts`
 **Rôle :** Tableau de bord de la configuration de l'application.
-Ce fichier centralise les variables de configuration utilisées par l'application elle-même, comme les URL d'API ou les noms d'utilisateur de services externes. Cela permet de modifier facilement ces valeurs sans avoir à chercher dans tout le code.
+Ce fichier centralise les variables de configuration utilisées par l'application pour interagir avec des services externes. On y trouve par exemple :
+- Les URL de base des API (AzuraCast, Mixcloud).
+- Les clés d'API ou identifiants.
+- Les paramètres de comportement externe, comme l'intervalle de rafraîchissement des métadonnées.
+Cela permet de modifier facilement ces valeurs sans avoir à chercher dans tout le code.
 
 ---
 
@@ -61,21 +65,19 @@ Ce fichier isole toute la logique de communication avec le service externe Mixcl
 
 ---
 
-### `types/` (player.ts, env.d.ts)
-**Rôle :** Dossier des "plans" de données.
-Il contient les définitions de types (`interface`) qui décrivent la structure des objets manipulés dans l'application (ex: `StreamData` dans `player.ts`). Cela garantit que toutes les parties de l'application s'attendent à la même forme de données, ce qui prévient de nombreux bugs. `types/env.d.ts` sert spécifiquement à définir les types des variables d'environnement.
+### `types/`
+**Rôle :** Dossier des "plans" de données (les `interface` TypeScript).
+Ce dossier est crucial pour la robustesse du code. Il est divisé en deux concepts :
+- **`player.ts` :** Définit les **modèles de données internes** de l'application. Ce sont les structures de données que nos composants et nos services manipulent au quotidien (ex: `StreamData`, `StreamMetadata`). C'est la "langue" que parle notre application.
+- **`api.ts` :** Définit les **contrats d'API externes**. Ces types décrivent la structure brute et exacte des données JSON reçues des serveurs (ex: `AzuraCastApiResponse`). Le code de l'application agit ensuite comme un "traducteur" qui convertit ces données brutes en nos modèles internes propres.
 
----
-
-### `expo-env.d.ts`
-**Rôle :** Dictionnaire pour TypeScript.
-Ce fichier aide TypeScript à comprendre comment gérer les imports de fichiers qui ne sont pas du code, comme les images (`.png`, `.jpg`). Il dit à TypeScript de faire confiance aux définitions de types fournies par Expo pour ces fichiers, permettant une intégration fluide des assets.
+Cette séparation rend l'application résiliente aux changements d'API externes.
 
 ---
 
 ### `scripts/`
 **Rôle :** Boîte à outils de développement.
-Ce dossier contient des scripts utilitaires (en JavaScript ou autre) qui ne font pas partie de l'application elle-même, mais qui aident à l'automatiser ou à la gérer. Ces scripts sont souvent lancés via les raccourcis définis dans la section `"scripts"` du `package.json`.
+Ce dossier contient des scripts utilitaires qui ne font pas partie de l'application elle-même, mais qui aident à l'automatiser ou à la gérer.
 
 ---
 
@@ -113,13 +115,9 @@ Ces dossiers contiennent les projets natifs (Xcode pour iOS, Android Studio pour
 **Rôle :** Boîte à outils de "briques" d'interface réutilisables.
 Ce dossier est la "boîte de Lego" du projet. Il contient des composants React indépendants qui sont assemblés pour construire les écrans.
 
-- **Composants fondamentaux (activement utilisés) :**
+- **Composants fondamentaux :**
   - `ThemedText.tsx` et `ThemedView.tsx` : La base du système de design, ils appliquent automatiquement les bonnes couleurs de texte et de fond en fonction du thème (clair/sombre).
   - `MiniPlayer.tsx` : Le lecteur audio qui apparaît en bas de l'écran.
-  - `Header.tsx` : L'en-tête de navigation supérieur.
-
-- **Code mort (vestiges du template Expo) :**
-  - `ParallaxScrollView.tsx`, `Collapsible.tsx`, `ExternalLink.tsx`, `HapticTab.tsx`, `HelloWave.tsx` : Ces composants ne sont actuellement pas utilisés dans l'application et peuvent être supprimés pour nettoyer le code.
 
 - **Sous-dossiers :**
   - `ui/` : Contient des composants d'interface de bas niveau, souvent avec des implémentations spécifiques à une plateforme (ex: `IconSymbol.ios.tsx` pour les icônes natives d'Apple).

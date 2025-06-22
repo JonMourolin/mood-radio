@@ -2,6 +2,7 @@ import React, { createContext, useState, useRef, useContext, useEffect, ReactNod
 import { Audio } from 'expo-av';
 import { StreamData, StreamMetadata } from '@/types/player';
 import { METADATA_REFRESH_INTERVAL_MS } from '../config';
+import { AzuraCastApiResponse } from '@/types/api';
 
 interface PlayerContextProps {
   activeStream: StreamData | null;
@@ -73,13 +74,11 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     console.log(`Context: Fetching metadata from: ${url}`);
     try {
       const response = await fetch(url);
-      const data = await response.json();
-      if (data.now_playing && data.now_playing.song) { // Ensure song object exists
+      const data: AzuraCastApiResponse = await response.json();
+      
+      if (data.now_playing && data.now_playing.song) {
         const track = data.now_playing.song;
         const newMetadata: StreamMetadata = {
-          // title: track.title || 'Unknown Title',
-          // artist: track.artist || 'Unknown Artist',
-          // album: track.album || 'Unknown Album',
           song: track.text || `${track.artist || 'Unknown Artist'} - ${track.title || 'Unknown Title'}`,
           artUrl: track.art || undefined,
         };
