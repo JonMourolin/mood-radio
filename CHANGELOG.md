@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.14.0] - 2025-06-22
+
+### Refactoring
+- Performed a major cleanup of the project structure.
+- Removed numerous unused components, configuration files, scripts, and old documentation (`ParallaxScrollView`, `Collapsible`, `Header.tsx`, `app/config.ts`, `reset-project.js`, etc.).
+- Deleted obsolete type definition files (`expo-env.d.ts`, `types/env.d.ts`).
+
+### Chore
+- Improved and cleaned up the `.gitignore` file.
+- Centralized versioning in `package.json` and removed the redundant `VERSION` file.
+- Updated project version to `3.14.0`.
+
+### Documentation
+- Created a new `docs/` directory to centralize all project documentation.
+- Renamed documentation files to uppercase (`ARCHITECTURE.md`, `STACK.md`).
+- Added a comprehensive `STACK.md` file detailing the project's tech stack.
+
 ## [3.13.0] - 2025-06-21
 
 ### Documentation
