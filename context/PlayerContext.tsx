@@ -1,6 +1,7 @@
 import React, { createContext, useState, useRef, useContext, useEffect, ReactNode } from 'react';
 import { Audio } from 'expo-av';
 import { StreamData, StreamMetadata } from '@/types/player';
+import { METADATA_REFRESH_INTERVAL_MS } from '../config';
 
 interface PlayerContextProps {
   activeStream: StreamData | null;
@@ -101,6 +102,11 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
 
   const playStream = async (stream: StreamData) => {
     console.log(`Context: Attempting to play stream: ${stream.title}`);
+    if (!stream.streamUrl) {
+      console.error(`Context: Stream "${stream.title}" has no streamUrl. Cannot play.`);
+      return;
+    }
+
     if (soundRef.current && activeStream?.id === stream.id) {
         console.log("Context: Stream already loaded. Toggling play/pause instead.");
         await togglePlayPause();
@@ -144,7 +150,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
       // Initial metadata fetch + interval
       if (stream.metadataUrl) {
         fetchMetadata(stream.metadataUrl); // Fetch immediately
-        metadataIntervalRef.current = setInterval(() => fetchMetadata(stream.metadataUrl), 7000); // Fetch every 7s
+        metadataIntervalRef.current = setInterval(() => fetchMetadata(stream.metadataUrl), METADATA_REFRESH_INTERVAL_MS); // Fetch every 7s
       } else {
         setCurrentMetadata(null); // No metadata URL
       }
