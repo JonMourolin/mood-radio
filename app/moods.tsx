@@ -43,15 +43,6 @@ interface MiniPlayerProps {
 // --- Sample Data --- 
 const rawStreamData = [
   {
-    id: 'sonic-drift',
-    title: 'MOOD RADIO MAIN MIX',
-    emoji: '♾️',
-    description: 'The main station feed, a bit of everything, right in the middle',
-    imageUrl: require('../assets/images/moods/sonic-drift.jpg'),
-    videoUrl: require('../assets/images/moods_videos/sonic-drift.mp4'),
-    stationSlug: 'tangerine_radio',
-  },
-  {
     id: 'slow-focus',
     title: 'FOCUS',
     emoji: '🧘',
@@ -59,8 +50,8 @@ const rawStreamData = [
     imageUrl: require('../assets/images/moods/slow-focus.jpg'),
     videoUrl: require('../assets/images/moods_videos/slow-focus.mp4'),
     stationSlug: 'the_big_calm',
-},
-{
+  },
+  {
     id: 'poolside',
     title: 'HIGH ENERGY',
     emoji: '☀️',
@@ -68,15 +59,6 @@ const rawStreamData = [
     imageUrl: require('../assets/images/moods/poolside.jpg'),
     videoUrl: require('../assets/images/moods_videos/poolside.mp4'),
     stationSlug: 'high_energy', 
-  },
-  {
-    id: 'low-key',
-    title: 'RAGE / RAVE',
-    emoji: '💥',
-    description: 'Angry, aggressive and intense',
-    imageUrl: require('../assets/images/moods/low-key.jpg'),
-    videoUrl: require('../assets/images/moods_videos/low-key.mp4'),
-    stationSlug: 'rage',
   },
   {
     id: 'melancholia',
@@ -88,6 +70,15 @@ const rawStreamData = [
     stationSlug: 'melancholia',
   },
   {
+    id: 'low-key',
+    title: 'RAGE / RAVE',
+    emoji: '💥',
+    description: 'Angry, aggressive and intense',
+    imageUrl: require('../assets/images/moods/low-key.jpg'),
+    videoUrl: require('../assets/images/moods_videos/low-key.mp4'),
+    stationSlug: 'rage',
+  },
+  {
     id: 'memory-lane',
     title: 'EXPLORE',
     emoji: '🔮',
@@ -95,6 +86,15 @@ const rawStreamData = [
     imageUrl: require('../assets/images/moods/memory-lane.jpg'),
     videoUrl: require('../assets/images/moods_videos/memory-lane.mp4'),
     stationSlug: 'cosmics_trip',
+  },
+  {
+    id: 'sonic-drift',
+    title: 'MOOD RADIO MAIN MIX',
+    emoji: '♾️',
+    description: 'The main station feed, a bit of everything, right in the middle',
+    imageUrl: require('../assets/images/moods/sonic-drift.jpg'),
+    videoUrl: require('../assets/images/moods_videos/sonic-drift.mp4'),
+    stationSlug: 'tangerine_radio',
   },
 ];
 
