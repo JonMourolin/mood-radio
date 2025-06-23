@@ -333,6 +333,7 @@ export default function InfiniteScreen() {
       <ScrollView 
         style={styles.scrollView} 
         contentContainerStyle={styles.scrollContentContainer}
+        showsVerticalScrollIndicator={false}
       >
         {/* Header Content Inside ScrollView (Mobile Only) */}
         {!isWeb && (
