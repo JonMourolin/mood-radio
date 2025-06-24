@@ -23,6 +23,7 @@ import { StreamData, StreamMetadata } from '@/types/player';
 import { usePlayerContext } from '@/context/PlayerContext';
 import { StatusBar } from 'expo-status-bar';
 import { AZURACAST_BASE_URL } from '../config';
+import { Footer } from '@/components/Footer';
 
 // --- Interfaces --- 
 interface StreamItemProps {
@@ -402,17 +403,19 @@ export default function InfiniteScreen() {
             </View>
         )}
 
-        <View style={styles.listWrapper}>
-          {STREAM_DATA.map((item) => ( 
-            <StreamItem 
-              key={item.id} 
+        <View style={styles.itemsGridContainer}>
+          {STREAM_DATA.map((item) => (
+            <StreamItem
+              key={item.id}
               item={item}
-              isActive={activeStream?.id === item.id}
-              isPlaying={activeStream?.id === item.id && isPlaying}
               onPlayPress={handlePlayPress}
+              isActive={activeStream?.id === item.id}
+              isPlaying={isPlaying && activeStream?.id === item.id}
             />
           ))}
         </View>
+
+        {Platform.OS === 'web' && <Footer />}
       </ScrollView>
 
       {/* Sticky MiniPlayer Area - Conditionally Clickable */}
@@ -485,7 +488,7 @@ const getStyles = (
       // Remove all horizontal padding from scroll container
       paddingHorizontal: 0, 
     },
-    listWrapper: { 
+    itemsGridContainer: {
       flexDirection: numColumns === 1 ? 'column' : 'row',
       flexWrap: numColumns === 1 ? undefined : 'wrap', 
       width: '100%',

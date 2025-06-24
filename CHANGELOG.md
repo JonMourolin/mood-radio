@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.17.0] - 2025-06-24
+
+### Added
+- Added a non-sticky footer to the Moods page with a logo and navigation links.
+
+### Changed
+- The "Mixes" section is now temporarily hidden from all navigation (mobile tab bar and web header) without deleting the underlying code.
+
 ## [3.16.0] - 2025-06-24
 
 ### Changed

@@ -36,7 +36,7 @@ export default function Navigation() {
         </TouchableOpacity>
       </Link>
 
-      <Link href="/mixcloud" asChild onPress={handleLinkPress}>
+      {/* <Link href="/mixcloud" asChild onPress={handleLinkPress}>
         <TouchableOpacity style={mobile ? styles.mobileNavItem : styles.navItem}>
           <Feather 
             name="disc" 
@@ -51,7 +51,7 @@ export default function Navigation() {
             Mixes
           </Text>
         </TouchableOpacity>
-      </Link>
+      </Link> */}
     </View>
   );
 
