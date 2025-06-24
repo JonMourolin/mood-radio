@@ -41,7 +41,7 @@ interface MiniPlayerProps {
 }
 
 // --- Sample Data --- 
-const rawStreamData = [
+const nativeRawStreamData = [
   {
     id: 'slow-focus',
     title: 'FOCUS',
@@ -62,7 +62,7 @@ const rawStreamData = [
   },
   {
     id: 'melancholia',
-    title: 'MELANCHOLIA',
+    title: 'MELANCHOLIC',
     emoji: '🌙',
     description: 'Dark, moody and melancholic',
     imageUrl: require('../assets/images/moods/melancholia.jpg'),
@@ -71,7 +71,7 @@ const rawStreamData = [
   },
   {
     id: 'low-key',
-    title: 'RAGE / RAVE',
+    title: 'RAVE',
     emoji: '💥',
     description: 'Angry, aggressive and intense',
     imageUrl: require('../assets/images/moods/low-key.jpg'),
@@ -97,6 +97,65 @@ const rawStreamData = [
     stationSlug: 'tangerine_radio',
   },
 ];
+
+const webRawStreamData = [
+  {
+    id: 'slow-focus',
+    title: 'FOCUS',
+    emoji: '🧘',
+    description: 'Meditation, relax and focus',
+    imageUrl: '/images/moods/slow-focus.jpg',
+    videoUrl: '/images/moods_videos/slow-focus.mp4',
+    stationSlug: 'the_big_calm',
+  },
+  {
+    id: 'poolside',
+    title: 'HIGH ENERGY',
+    emoji: '☀️',
+    description: 'Uplifting, energetic and fun',
+    imageUrl: '/images/moods/poolside.jpg',
+    videoUrl: '/images/moods_videos/poolside.mp4',
+    stationSlug: 'high_energy', 
+  },
+  {
+    id: 'melancholia',
+    title: 'MELANCHOLIC',
+    emoji: '🌙',
+    description: 'Dark, moody and melancholic',
+    imageUrl: '/images/moods/melancholia.jpg',
+    videoUrl: '/images/moods_videos/melancholia.mp4',
+    stationSlug: 'melancholia',
+  },
+  {
+    id: 'low-key',
+    title: 'RAVE',
+    emoji: '💥',
+    description: 'Angry, aggressive and intense',
+    imageUrl: '/images/moods/low-key.jpg',
+    videoUrl: '/images/moods_videos/low-key.mp4',
+    stationSlug: 'rage',
+  },
+  {
+    id: 'memory-lane',
+    title: 'EXPLORE',
+    emoji: '🔮',
+    description: 'Futuristic, experimental and cosmic',
+    imageUrl: '/images/moods/memory-lane.jpg',
+    videoUrl: '/images/moods_videos/memory-lane.mp4',
+    stationSlug: 'cosmics_trip',
+  },
+  {
+    id: 'sonic-drift',
+    title: 'MOOD RADIO MAIN MIX',
+    emoji: '♾️',
+    description: 'The main station feed, a bit of everything, right in the middle',
+    imageUrl: '/images/moods/sonic-drift.jpg',
+    videoUrl: '/images/moods_videos/sonic-drift.mp4',
+    stationSlug: 'tangerine_radio',
+  },
+];
+
+const rawStreamData = Platform.OS === 'web' ? webRawStreamData : nativeRawStreamData;
 
 const STREAM_DATA: StreamData[] = rawStreamData.map(item => ({
   ...item,

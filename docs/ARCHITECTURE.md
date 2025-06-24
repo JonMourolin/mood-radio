@@ -125,9 +125,30 @@ Ce dossier est la "boîte de Lego" du projet. Il contient des composants React i
 
 ---
 
+### `assets/`
+**Rôle :** Ressources statiques **intégrées** à l'application native (iOS/Android).
+Ce dossier contient les images, polices, et vidéos qui sont packagées directement dans l'application mobile. Pour les plateformes natives, les assets de ce dossier sont chargés via `require()`, ce qui garantit leur disponibilité immédiate et hors ligne.
+
+**Important :** Pour la version Web, afin d'optimiser les temps de chargement, les assets lourds (images des tuiles, vidéos) ne sont pas chargés depuis ce dossier mais depuis le dossier `public/`.
+
+---
+
+### `public/`
+**Rôle :** Ressources statiques **servies** à l'application Web.
+Ce dossier a été ajouté pour optimiser radicalement les performances de la version Web. Tout fichier placé ici (images, vidéos, etc.) est rendu accessible via une URL simple, comme sur un site web traditionnel.
+Le navigateur peut ainsi télécharger ces ressources de manière asynchrone, sans qu'elles soient intégrées dans le fichier JavaScript principal de l'application. Cela réduit drastiquement la taille du bundle initial et élimine l'écran blanc au premier chargement.
+
+---
+
 ### `app/`
 **Rôle :** Cœur du routage et des écrans de l'application.
 Ce dossier est géré par **Expo Router** et sa structure de fichiers définit les URL de l'application. Il contient les écrans finaux, qui assemblent les briques du dossier `components/`.
+
+- **Stratégie de chargement des assets :**
+  Pour optimiser les performances sur chaque plateforme, l'application utilise une stratégie de chargement conditionnelle.
+  - **Natif (iOS/Android) :** Utilise `require()` pour charger les médias depuis `assets/`, les intégrant directement pour un accès rapide.
+  - **Web :** Utilise des chemins d'URL simples (ex: `/images/moods/poolside.jpg`) qui pointent vers les fichiers du dossier `public/`.
+  Cette logique est isolée dans la définition des données (ex: `app/moods.tsx`) pour garder le code des composants propre et agnostique à la plateforme.
 
 - **Fichiers de layout (les "poupées russes") :**
   - `_layout.tsx` : La **coquille principale** (la plus grande poupée). Il gère le splash screen, enveloppe toute l'application dans le `PlayerProvider` pour rendre le lecteur audio global, et définit la structure de navigation de base (`<Stack>`).
