@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.16.0] - 2025-06-24
+
+### Changed
+- Reordered mood tiles to a new default layout.
+- Renamed "MELANCHOLIA" mood to "MELANCHOLIC".
+- Hid the vertical scroll indicator on the Moods screen.
+
+### Performance
+- Implemented a new asset loading strategy for the web using a `public` directory to serve static media files. This drastically improves initial page load speed and removes the white screen flash.
+- Updated `ARCHITECTURE.md` to document the new asset strategy and the role of the `public` directory.
+
 ## [3.15.0] - 2025-06-22
 
 ### Refactoring
