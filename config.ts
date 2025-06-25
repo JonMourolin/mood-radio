@@ -8,5 +8,5 @@ export const MIXCLOUD_USERNAME = 'jonprod18';
 export const MIXCLOUD_API_BASE = 'https://api.mixcloud.com';
 
 // Configuration d'AzuraCast
-export const AZURACAST_BASE_URL = 'http://51.75.200.205';
+export const AZURACAST_BASE_URL = 'https://radio.moodradio.fr';
 export const METADATA_REFRESH_INTERVAL_MS = 7000; 

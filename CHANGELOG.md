@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.18.0] - 2025-06-25
+
+### Added
+- Configured custom domain `moodradio.fr` for production deployment on Vercel.
+- Set up SSL certificate with Let's Encrypt for the AzuraCast server using subdomain `radio.moodradio.fr`.
+
+### Changed
+- Migrated from IP-based audio streaming (`51.75.200.205`) to domain-based HTTPS streaming (`radio.moodradio.fr`).
+- Updated `AZURACAST_BASE_URL` configuration to use HTTPS with the new domain.
+- Resolved Mixed Content security issues by serving all resources over HTTPS.
+
+### Fixed
+- Fixed SSL certificate authority validation errors by implementing proper domain-based SSL certificates.
+- Eliminated browser security warnings related to mixed HTTP/HTTPS content.
+
 ## [3.17.0] - 2025-06-24
 
 ### Added
