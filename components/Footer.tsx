@@ -12,7 +12,7 @@ export const Footer = () => {
         <ThemedText style={styles.link}>CONTACT</ThemedText>
       </View> */}
       <ThemedText style={styles.copyrightText}>
-        Copyright © 2025 - All rights reserved. Made with ☕️ by Jon.
+        Copyright © 2025 Mood Radio - All rights reserved.
       </ThemedText>
     </View>
   );
