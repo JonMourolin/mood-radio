@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.19.0] - 2025-01-23
+
+### Changed
+- Simplified header navigation by hiding the "Moods" section and burger menu for a cleaner interface.
+- Centered the logo in the header for better visual balance.
+- Commented out footer navigation links (ABOUT, FAQ, CONTACT) to reduce clutter.
+- Reduced footer infinity logo size from 48px to 32px for better proportions.
+
+### UI/UX
+- Streamlined navigation experience by removing redundant header navigation elements.
+- Improved header layout with centered logo positioning.
+- Cleaned up footer design with smaller logo and hidden navigation links.
+
 ## [3.18.0] - 2025-06-25
 
 ### Added

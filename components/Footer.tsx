@@ -6,11 +6,11 @@ export const Footer = () => {
   return (
     <View style={styles.footerContainer}>
       <ThemedText style={styles.logo}>∞</ThemedText>
-      <View style={styles.linksContainer}>
+      {/* <View style={styles.linksContainer}>
         <ThemedText style={styles.link}>ABOUT</ThemedText>
         <ThemedText style={styles.link}>FAQ</ThemedText>
         <ThemedText style={styles.link}>CONTACT</ThemedText>
-      </View>
+      </View> */}
       <ThemedText style={styles.copyrightText}>
         Copyright © 2025 - All rights reserved. Made with ☕️ by Jon.
       </ThemedText>
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   logo: {
-    fontSize: 48,
+    fontSize: 32,
     color: '#b30000',
     marginBottom: 20,
   },

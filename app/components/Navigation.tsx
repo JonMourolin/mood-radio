@@ -17,9 +17,9 @@ export default function Navigation() {
     setIsMenuOpen(false);
   };
 
-  const renderNavLinks = (mobile = false) => (
+    const renderNavLinks = (mobile = false) => (
     <View style={mobile ? styles.mobileNav : styles.nav}>
-      <Link href="/moods" asChild onPress={handleLinkPress}>
+      {/* <Link href="/moods" asChild onPress={handleLinkPress}>
         <TouchableOpacity style={mobile ? styles.mobileNavItem : styles.navItem}>
           <Ionicons 
             name="infinite"
@@ -34,7 +34,7 @@ export default function Navigation() {
             Moods
           </Text>
         </TouchableOpacity>
-      </Link>
+      </Link> */}
 
       {/* <Link href="/mixcloud" asChild onPress={handleLinkPress}>
         <TouchableOpacity style={mobile ? styles.mobileNavItem : styles.navItem}>
@@ -57,29 +57,25 @@ export default function Navigation() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.leftSection}>
-        <View style={styles.logoContainer}>
-          <Image 
-            source={require('../../assets/images/logo/logo1.png')}
-            style={styles.logoImage} 
-            resizeMode="contain"
-          />
-        </View>
-        
-        {!isMobileLayout && renderNavLinks()}
+      <View style={styles.logoContainer}>
+        <Image 
+          source={require('../../assets/images/logo/logo1.png')}
+          style={styles.logoImage} 
+          resizeMode="contain"
+        />
       </View>
 
-      {isMobileLayout && (
+      {/* {isMobileLayout && (
         <TouchableOpacity onPress={() => setIsMenuOpen(!isMenuOpen)} style={styles.burgerButton}>
           <Feather name={isMenuOpen ? "x" : "menu"} size={28} color="#ffffff" />
         </TouchableOpacity>
-      )}
+      )} */}
 
-      {isMobileLayout && isMenuOpen && (
+      {/* {isMobileLayout && isMenuOpen && (
         <View style={styles.dropdownMenu}>
           {renderNavLinks(true)} 
         </View>
-      )}
+      )} */}
     </View>
   );
 }
@@ -88,21 +84,16 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8, // Reduced from 12
     backgroundColor: '#000000',
     zIndex: 10, // Ensure header is above dropdown if positioning gets tricky
   },
-  leftSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    flexShrink: 1,
-  },
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     height: 40,
   },
   logoImage: {
