@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.20.0] - 2025-01-28
+
+### Added
+- Implemented comprehensive SEO optimization with meta tags, Open Graph, and Twitter Cards.
+- Added structured data (JSON-LD) for better search engine understanding as a RadioStation.
+- Created centralized SEO component (`SEOHead`) for managing all meta tags.
+- Added robots.txt file to guide search engine crawling.
+
+### Changed
+- Updated site URL from Vercel deployment to custom domain `https://moodradio.fr`.
+- Configured international SEO with English content (`en`) and French hosting (`geo.region=FR`).
+- Added support for multiple English locales (US, GB, FR) for better international reach.
+- Enhanced keywords with additional genres including "drum & bass" and "jungle".
+- Updated site title to "Mood Radio - Listen to your moods" for better branding.
+
+### SEO Improvements
+- Optimized meta descriptions for electronic music streaming and mood-based radio stations.
+- Implemented proper canonical URLs and favicon configuration.
+- Added theme color and mobile app meta tags for better mobile experience.
+- Configured music-specific Open Graph properties for social media sharing.
+
 ## [3.19.0] - 2025-01-23
 
 ### Changed

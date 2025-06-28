@@ -4,6 +4,7 @@ import { View, Platform } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import Navigation from './components/Navigation';
 import { PlayerProvider } from '@/context/PlayerContext';
+import SEOHead from '@/components/SEOHead';
 
 // Explicitly import the tabs layout to see if it affects bundling in preview
 // import './(tabs)/_layout'; // Removing this explicit import
@@ -69,6 +70,12 @@ export default function RootLayout() {
   console.log("Rendering main app layout.");
   return (
     <PlayerProvider>
+      <SEOHead 
+        title="Electronic Music Moods"
+        description="Choose your electronic music mood: Focus & Meditation, High Energy, Melancholic, Rave, Explore, or Main Mix. Stream curated electronic radio stations 24/7."
+        type="music.radio_station"
+        keywords="electronic music moods, focus music, meditation music, high energy music, melancholic music, rave music, ambient radio, electronic radio stations"
+      />
       {/* Attach onLayout here to the final root view */}
       <View style={{ flex: 1, backgroundColor: '#121418' }} onLayout={onLayoutRootView}>
         {Platform.OS === 'web' && <Navigation />}

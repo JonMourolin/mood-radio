@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Allow all search engines to index all content
+# Specific pages
+Allow: /moods
+
+# Disallow any admin or private directories (if they exist in the future)
+Disallow: /admin/
+Disallow: /api/private/
+
+# Crawl-delay (optional, helps prevent server overload)
+Crawl-delay: 1 
