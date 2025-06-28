@@ -3,7 +3,7 @@ Allow: /
 
 # Allow all search engines to index all content
 # Specific pages
-Allow: /moods
+Allow: /live
 
 # Disallow any admin or private directories (if they exist in the future)
 Disallow: /admin/

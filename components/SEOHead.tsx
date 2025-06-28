@@ -8,7 +8,7 @@ interface SEOHeadProps {
 }
 
 const DEFAULT_TITLE = 'Mood Radio - Listen to your moods';
-const DEFAULT_DESCRIPTION = 'Discover and listen to curated electronic music radio stations. From focus and meditation to high energy and melancholic vibes. Stream 24/7 electronic music for every mood.';
+const DEFAULT_DESCRIPTION = 'Listen to your moods : Focus, High Energy, Melancholic, Rave, Explore. Stream curated electronic radio stations 24/7.';
 const DEFAULT_KEYWORDS = 'electronic music, radio, ambient, focus music, meditation music, electronic radio, online radio, streaming music, mood music, chill music, techno, house, experimental music, drum & bass, jungle';
 
 export default function SEOHead({
@@ -22,7 +22,7 @@ export default function SEOHead({
       return;
     }
 
-    const fullTitle = title ? `${title} | Mood Radio` : DEFAULT_TITLE;
+    const fullTitle = title || DEFAULT_TITLE;
 
     // Update document title
     document.title = fullTitle;

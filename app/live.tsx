@@ -354,7 +354,7 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
 
 
 // --- Main Screen Component: Conditionally render Root ---
-export default function InfiniteScreen() { 
+export default function LiveScreen() { 
   const colorScheme = useColorScheme();
   const { width } = useWindowDimensions();
   const isDarkMode = colorScheme === 'dark';

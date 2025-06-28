@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.22.0] - 2025-06-28
+
+### Changed
+- **URL Structure Update**: Changed main navigation URL from `/moods` to `/live` for better semantic meaning.
+- Renamed all mood-related routes and components to reflect live streaming focus.
+- Updated SEO meta tags to emphasize "Live Electronic Music Radio" branding.
+- Removed automatic "| Mood Radio" suffix from page titles for cleaner SEO presentation.
+
+### Refactoring
+- Renamed `InfiniteScreen` component to `LiveScreen` for better naming consistency.
+- Updated tab navigation labels from "Moods" to "Live".
+- Refactored component imports and exports to match new naming convention.
+
 ## [3.21.0] - 2025-01-28
 
 ### Fixed

@@ -24,14 +24,14 @@ export default function TabLayout() {
         },
       }}
     >
-      <Tabs.Screen
-        name="moods"
-        options={{
-          title: 'Moods',
-          tabBarIcon: ({ color }) => <Ionicons name="infinite-outline" size={24} color={color} />,
-          headerShown: false,
-        }}
-      />
+          <Tabs.Screen
+      name="live"
+      options={{
+        title: 'Live',
+        tabBarIcon: ({ color }) => <Ionicons name="infinite-outline" size={24} color={color} />,
+        headerShown: false,
+      }}
+    />
       <Tabs.Screen
         name="mixcloud"
         options={{

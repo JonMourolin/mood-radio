@@ -72,8 +72,8 @@ export default function RootLayout() {
   return (
     <PlayerProvider>
       <SEOHead 
-        title="Electronic Music Moods"
-        description="Choose your electronic music mood: Focus & Meditation, High Energy, Melancholic, Rave, Explore, or Main Mix. Stream curated electronic radio stations 24/7."
+        title="Mood Radio - Listen to your moods"
+        description="Listen to your moods : Focus, High Energy, Melancholic, Rave, Explore. Stream curated electronic radio stations 24/7."
         keywords="electronic music moods, focus music, meditation music, high energy music, melancholic music, rave music, ambient radio, electronic radio stations"
       />
       {/* Attach onLayout here to the final root view */}
