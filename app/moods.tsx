@@ -175,7 +175,13 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
     onPlayPress(item);
   };
 
-  const canHover = Platform.OS === 'web';
+  // Detect if it's mobile web
+  const isMobileWeb = Platform.OS === 'web' && (
+    typeof navigator !== 'undefined' && 
+    (navigator.userAgent.includes('Mobile') || navigator.userAgent.includes('Android') || navigator.userAgent.includes('iPhone'))
+  );
+
+  const canHover = Platform.OS === 'web' && !isMobileWeb;
 
   const handleMouseEnter = () => {
     if (canHover) {
@@ -209,15 +215,23 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
       onPress={handlePress}
       activeOpacity={0.8}
     >
-      <Video
-        key={videoKey}
-        source={item.videoUrl}
-        style={styles.itemImageBackground}
-        resizeMode={ResizeMode.COVER}
-        isLooping
-        isMuted
-        shouldPlay={isHovered}
-      />
+      {isMobileWeb ? (
+        <Image
+          source={item.imageUrl}
+          style={styles.itemImageBackground}
+          resizeMode="cover"
+        />
+      ) : (
+        <Video
+          key={videoKey}
+          source={item.videoUrl}
+          style={styles.itemImageBackground}
+          resizeMode={ResizeMode.COVER}
+          isLooping
+          isMuted
+          shouldPlay={isHovered}
+        />
+      )}
       <View style={StyleSheet.absoluteFill}>
         {shouldShowIcon && (
           <TouchableOpacity style={styles.playButton} onPress={handlePress}> 

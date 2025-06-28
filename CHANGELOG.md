@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.21.0] - 2025-01-28
+
+### Fixed
+- Fixed mobile web video display issue by implementing conditional rendering based on device type.
+- Replaced video backgrounds with static images on mobile web to prevent black screens.
+- Maintained video hover functionality on desktop while providing proper fallback for mobile browsers.
+
+### Changed
+- Enhanced user agent detection to differentiate between desktop and mobile web experiences.
+- Improved performance on mobile devices by avoiding unnecessary video loading.
+
 ## [3.20.0] - 2025-01-28
 
 ### Added

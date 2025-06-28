@@ -1,115 +1,79 @@
-import React from 'react';
-import { Head } from 'expo-head';
+import React, { useEffect } from 'react';
 import { Platform } from 'react-native';
 
 interface SEOHeadProps {
   title?: string;
   description?: string;
-  image?: string;
-  url?: string;
-  type?: 'website' | 'music.radio_station' | 'music.playlist';
   keywords?: string;
 }
 
 const DEFAULT_TITLE = 'Mood Radio - Listen to your moods';
 const DEFAULT_DESCRIPTION = 'Discover and listen to curated electronic music radio stations. From focus and meditation to high energy and melancholic vibes. Stream 24/7 electronic music for every mood.';
 const DEFAULT_KEYWORDS = 'electronic music, radio, ambient, focus music, meditation music, electronic radio, online radio, streaming music, mood music, chill music, techno, house, experimental music, drum & bass, jungle';
-const BASE_URL = 'https://moodradio.fr';
-const DEFAULT_OG_IMAGE = '/images/logo/mood_logo_test.svg';
 
 export default function SEOHead({
   title,
   description = DEFAULT_DESCRIPTION,
-  image = DEFAULT_OG_IMAGE,
-  url = BASE_URL,
-  type = 'website',
   keywords = DEFAULT_KEYWORDS,
 }: SEOHeadProps) {
-  // Only render on web platform
-  if (Platform.OS !== 'web') {
-    return null;
-  }
+  useEffect(() => {
+    // Only run on web platform
+    if (Platform.OS !== 'web' || typeof document === 'undefined') {
+      return;
+    }
 
-  const fullTitle = title ? `${title} | Mood Radio` : DEFAULT_TITLE;
-  const fullImageUrl = image.startsWith('http') ? image : `${BASE_URL}${image}`;
-  const fullUrl = url.startsWith('http') ? url : `${BASE_URL}${url}`;
+    const fullTitle = title ? `${title} | Mood Radio` : DEFAULT_TITLE;
 
-  return (
-    <Head>
-      {/* Basic Meta Tags */}
-      <title>{fullTitle}</title>
-      <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
-      <meta name="author" content="Mood Radio" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta name="robots" content="index, follow" />
+    // Update document title
+    document.title = fullTitle;
+
+    // Update or create meta tags
+    const updateMetaTag = (name: string, content: string, property = false) => {
+      const selector = property ? `meta[property="${name}"]` : `meta[name="${name}"]`;
+      let meta = document.querySelector(selector) as HTMLMetaElement;
       
-      {/* Theme and App Meta */}
-      <meta name="theme-color" content="#D22F49" />
-      <meta name="application-name" content="Mood Radio" />
-      <meta name="apple-mobile-web-app-title" content="Mood Radio" />
-      <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-      
-      {/* Open Graph Meta Tags */}
-      <meta property="og:type" content={type} />
-      <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
-      <meta property="og:image" content={fullImageUrl} />
-      <meta property="og:url" content={fullUrl} />
-      <meta property="og:site_name" content="Mood Radio" />
-      <meta property="og:locale" content="en" />
-      <meta property="og:locale:alternate" content="en_US" />
-      <meta property="og:locale:alternate" content="en_GB" />
-      <meta property="og:locale:alternate" content="en_FR" />
-      
-      {/* Twitter Card Meta Tags */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={fullImageUrl} />
-      
-      {/* Music-specific Open Graph (when type is music related) */}
-      {type.startsWith('music.') && (
-        <>
-          <meta property="music:creator" content="Mood Radio" />
-          <meta property="music:genre" content="Electronic" />
-        </>
-      )}
-      
-      {/* Additional SEO Meta Tags */}
-      <meta name="language" content="en" />
-      <meta name="geo.region" content="FR" />
-      <meta name="geo.placename" content="France" />
-      <meta name="revisit-after" content="7 days" />
-      <meta name="distribution" content="global" />
-      <meta name="rating" content="general" />
-      
-      {/* Canonical URL */}
-      <link rel="canonical" href={fullUrl} />
-      
-      {/* Favicon and Icons */}
-      <link rel="icon" type="image/png" href="/favicon.png" />
-      <link rel="apple-touch-icon" href="/images/icon.png" />
-      
-      {/* Structured Data for Music Service */}
-      <script type="application/ld+json">
-        {JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "RadioStation",
-          "name": "Mood Radio",
-          "description": description,
-          "url": fullUrl,
-          "logo": fullImageUrl,
-          "genre": ["Electronic", "Ambient", "Techno", "House", "Experimental", "Drum & Bass"],
-          "broadcastServiceTier": "Free",
-          "inLanguage": "en",
-          "audience": {
-            "@type": "Audience",
-            "audienceType": "Music Lovers"
-          }
-        })}
-      </script>
-    </Head>
-  );
+      if (!meta) {
+        meta = document.createElement('meta');
+        if (property) {
+          meta.setAttribute('property', name);
+        } else {
+          meta.setAttribute('name', name);
+        }
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute('content', content);
+    };
+
+    // Basic meta tags
+    updateMetaTag('description', description);
+    updateMetaTag('keywords', keywords);
+    updateMetaTag('author', 'Mood Radio');
+    updateMetaTag('robots', 'index, follow');
+    updateMetaTag('theme-color', '#D22F49');
+    updateMetaTag('language', 'en');
+    updateMetaTag('geo.region', 'FR');
+    updateMetaTag('geo.placename', 'France');
+
+    // Open Graph tags
+    updateMetaTag('og:title', fullTitle, true);
+    updateMetaTag('og:description', description, true);
+    updateMetaTag('og:type', 'music.radio_station', true);
+    updateMetaTag('og:url', 'https://moodradio.fr', true);
+    updateMetaTag('og:site_name', 'Mood Radio', true);
+    updateMetaTag('og:image', 'https://moodradio.fr/images/logo/mood_logo_test.svg', true);
+    updateMetaTag('og:locale', 'en', true);
+
+    // Twitter Card tags
+    updateMetaTag('twitter:card', 'summary_large_image');
+    updateMetaTag('twitter:title', fullTitle);
+    updateMetaTag('twitter:description', description);
+    updateMetaTag('twitter:image', 'https://moodradio.fr/images/logo/mood_logo_test.svg');
+
+    // Cleanup function
+    return () => {
+      // No cleanup needed for meta tags as they should persist
+    };
+  }, [title, description, keywords]);
+
+  return null; // This component doesn't render anything
 } 
