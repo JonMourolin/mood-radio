@@ -43,121 +43,94 @@ interface MiniPlayerProps {
 }
 
 // --- Sample Data --- 
-const nativeRawStreamData = [
+// Asset mappings for native (require needs static paths)
+const nativeAssets = {
+  'slow-focus': {
+    image: require('../assets/images/moods/slow-focus.jpg'),
+    video: require('../assets/images/moods_videos/slow-focus.mp4'),
+  },
+  'poolside': {
+    image: require('../assets/images/moods/poolside.jpg'),
+    video: require('../assets/images/moods_videos/poolside.mp4'),
+  },
+  'melancholia': {
+    image: require('../assets/images/moods/melancholia.jpg'),
+    video: require('../assets/images/moods_videos/melancholia.mp4'),
+  },
+  'low-key': {
+    image: require('../assets/images/moods/low-key.jpg'),
+    video: require('../assets/images/moods_videos/low-key.mp4'),
+  },
+  'memory-lane': {
+    image: require('../assets/images/moods/memory-lane.jpg'),
+    video: require('../assets/images/moods_videos/memory-lane.mp4'),
+  },
+  'sonic-drift': {
+    image: require('../assets/images/moods/sonic-drift.jpg'),
+    video: require('../assets/images/moods_videos/sonic-drift.mp4'),
+  },
+};
+
+// Common data structure to avoid duplication
+const commonStreamData = [
   {
     id: 'slow-focus',
     title: 'FOCUS',
     emoji: '🧘',
-    description: 'Meditation, relax and focus',
-    imageUrl: require('../assets/images/moods/slow-focus.jpg'),
-    videoUrl: require('../assets/images/moods_videos/slow-focus.mp4'),
+    description: 'Relax and focus',
     stationSlug: 'the_big_calm',
   },
   {
     id: 'poolside',
     title: 'HIGH ENERGY',
     emoji: '☀️',
-    description: 'Uplifting, energetic and fun',
-    imageUrl: require('../assets/images/moods/poolside.jpg'),
-    videoUrl: require('../assets/images/moods_videos/poolside.mp4'),
+    description: 'Uplifting and energetic',
     stationSlug: 'high_energy', 
   },
   {
     id: 'melancholia',
     title: 'MELANCHOLIC',
     emoji: '🌙',
-    description: 'Dark, moody and melancholic',
-    imageUrl: require('../assets/images/moods/melancholia.jpg'),
-    videoUrl: require('../assets/images/moods_videos/melancholia.mp4'),
+    description: 'Moody and melancholic',
     stationSlug: 'melancholia',
   },
   {
     id: 'low-key',
     title: 'RAVE',
     emoji: '💥',
-    description: 'Angry, aggressive and intense',
-    imageUrl: require('../assets/images/moods/low-key.jpg'),
-    videoUrl: require('../assets/images/moods_videos/low-key.mp4'),
+    description: 'Fast and intense',
     stationSlug: 'rage',
   },
   {
     id: 'memory-lane',
     title: 'EXPLORE',
     emoji: '🔮',
-    description: 'Futuristic, experimental and cosmic',
-    imageUrl: require('../assets/images/moods/memory-lane.jpg'),
-    videoUrl: require('../assets/images/moods_videos/memory-lane.mp4'),
+    description: 'Futuristic and experimental',
     stationSlug: 'cosmics_trip',
   },
   {
     id: 'sonic-drift',
-    title: 'MOOD RADIO MAIN MIX',
+    title: 'MOODS MAIN MIX',
     emoji: '♾️',
-    description: 'The main station feed, a bit of everything, right in the middle',
-    imageUrl: require('../assets/images/moods/sonic-drift.jpg'),
-    videoUrl: require('../assets/images/moods_videos/sonic-drift.mp4'),
+    description: 'The main feed, a bit of everything, right in the middle',
     stationSlug: 'tangerine_radio',
   },
 ];
 
-const webRawStreamData = [
-  {
-    id: 'slow-focus',
-    title: 'FOCUS',
-    emoji: '🧘',
-    description: 'Meditation, relax and focus',
-    imageUrl: '/images/moods/slow-focus.jpg',
-    videoUrl: '/images/moods_videos/slow-focus.mp4',
-    stationSlug: 'the_big_calm',
-  },
-  {
-    id: 'poolside',
-    title: 'HIGH ENERGY',
-    emoji: '☀️',
-    description: 'Uplifting, energetic and fun',
-    imageUrl: '/images/moods/poolside.jpg',
-    videoUrl: '/images/moods_videos/poolside.mp4',
-    stationSlug: 'high_energy', 
-  },
-  {
-    id: 'melancholia',
-    title: 'MELANCHOLIC',
-    emoji: '🌙',
-    description: 'Dark, moody and melancholic',
-    imageUrl: '/images/moods/melancholia.jpg',
-    videoUrl: '/images/moods_videos/melancholia.mp4',
-    stationSlug: 'melancholia',
-  },
-  {
-    id: 'low-key',
-    title: 'RAVE',
-    emoji: '💥',
-    description: 'Angry, aggressive and intense',
-    imageUrl: '/images/moods/low-key.jpg',
-    videoUrl: '/images/moods_videos/low-key.mp4',
-    stationSlug: 'rage',
-  },
-  {
-    id: 'memory-lane',
-    title: 'EXPLORE',
-    emoji: '🔮',
-    description: 'Futuristic, experimental and cosmic',
-    imageUrl: '/images/moods/memory-lane.jpg',
-    videoUrl: '/images/moods_videos/memory-lane.mp4',
-    stationSlug: 'cosmics_trip',
-  },
-  {
-    id: 'sonic-drift',
-    title: 'MOOD RADIO MAIN MIX',
-    emoji: '♾️',
-    description: 'The main station feed, a bit of everything, right in the middle',
-    imageUrl: '/images/moods/sonic-drift.jpg',
-    videoUrl: '/images/moods_videos/sonic-drift.mp4',
-    stationSlug: 'tangerine_radio',
-  },
-];
+// Generate platform-specific data
+const generateStreamData = (isWeb: boolean) => {
+  return commonStreamData.map(item => ({
+    ...item,
+    imageUrl: isWeb 
+      ? `/images/moods/${item.id}.jpg`
+      : nativeAssets[item.id as keyof typeof nativeAssets].image,
+    videoUrl: isWeb 
+      ? `/images/moods_videos/${item.id}.mp4`
+      : nativeAssets[item.id as keyof typeof nativeAssets].video,
+  }));
+};
 
-const rawStreamData = Platform.OS === 'web' ? webRawStreamData : nativeRawStreamData;
+const rawStreamData = generateStreamData(Platform.OS === 'web');
 
 const STREAM_DATA: StreamData[] = rawStreamData.map(item => ({
   ...item,

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.23.0] - 2025-06-29
+
+### Changed
+- **Wording Improvements**: Refined mood descriptions for better clarity and conciseness.
+- Updated "FOCUS" description from "Meditation, relax and focus" to "Relax and focus".
+- Updated "HIGH ENERGY" description from "Uplifting, energetic and fun" to "Uplifting and energetic".
+- Updated "MELANCHOLIC" description from "Dark, moody and melancholic" to "Moody and melancholic".
+- Updated "RAVE" description from "Angry, aggressive and intense" to "Fast and intense".
+- Updated "EXPLORE" description from "Futuristic, experimental and cosmic" to "Futuristic and experimental".
+- Updated main mix title from "MOOD RADIO MAIN MIX" to "MOODS MAIN MIX".
+- Updated main mix description for better readability.
+
+### Refactoring
+- **Code Deduplication**: Eliminated duplicate stream data definitions between native and web platforms.
+- Introduced centralized `commonStreamData` structure to maintain single source of truth for mood information.
+- Refactored asset loading with platform-specific mapping to avoid require() dynamic path issues.
+- Improved code maintainability by reducing redundancy from ~120 lines to ~80 lines of data definitions.
+
 ## [3.22.0] - 2025-06-28
 
 ### Changed
