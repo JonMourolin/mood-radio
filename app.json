@@ -48,7 +48,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png",
+      "favicon": "./public/favicon.ico",
       "backgroundColor": "#000000"
     },
     "plugins": [

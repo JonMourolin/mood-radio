@@ -69,6 +69,28 @@ export default function SEOHead({
     updateMetaTag('twitter:description', description);
     updateMetaTag('twitter:image', 'https://moodradio.fr/images/logo/mood_logo_test.svg');
 
+    // Favicon links
+    const createOrUpdateLinkTag = (rel: string, href: string, type?: string, sizes?: string) => {
+      let link = document.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement;
+      
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = rel;
+        document.head.appendChild(link);
+      }
+      
+      link.href = href;
+      if (type) link.setAttribute('type', type);
+      if (sizes) link.setAttribute('sizes', sizes);
+    };
+
+    // Add all favicon links
+    createOrUpdateLinkTag('icon', '/favicon.ico');
+    createOrUpdateLinkTag('icon', '/favicon-16x16.png', 'image/png', '16x16');
+    createOrUpdateLinkTag('icon', '/favicon-32x32.png', 'image/png', '32x32');
+    createOrUpdateLinkTag('apple-touch-icon', '/apple-touch-icon.png');
+    createOrUpdateLinkTag('manifest', '/site.webmanifest');
+
     // Cleanup function
     return () => {
       // No cleanup needed for meta tags as they should persist
