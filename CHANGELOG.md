@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.24.1] - 2025-07-05
+
+### Fixed
+- **Safari Mobile Status Bar**: Fixed red status bar background on Safari mobile iOS by updating theme-color meta tag from #D22F49 to #000000 for consistent black theme
+- **Footer Layout**: Optimized footer spacing for better visual balance
+  - Reduced paddingTop from 60px to 20px (67% reduction)
+  - Reduced paddingBottom from 40px to 10px (75% reduction)  
+  - Decreased logo size from 32px to 26px for more compact design
+  - Reduced copyright text size from 12px to 10px for better hierarchy
+- **Loading State Messages**: Improved audio loading feedback in player components
+  - Replaced confusing "Paused" text with informative "Connecting..." during stream initialization
+  - Enhanced loading state logic with proper text progression: "Connecting..." → "Streaming..." → "Ready"
+  - Updated MiniPlayer, FullScreenPlayer, and navigation params for consistent messaging
+
+### Changed
+- **Visual Consistency**: Enhanced overall interface cohesion by addressing mobile Safari theming issues and optimizing spacing throughout the application
+
 ## [3.24.0] - 2025-07-05
 
 ### Added
