@@ -12,6 +12,7 @@ import {
   ScrollView,
   Image,
   ViewStyle,
+  ActivityIndicator,
 } from 'react-native';
 import { Audio, Video, ResizeMode } from 'expo-av';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -32,6 +33,7 @@ interface StreamItemProps {
   onPlayPress: (item: StreamData) => void;
   isActive: boolean;
   isPlaying: boolean;
+  isLoading: boolean;
 }
 
 interface MiniPlayerProps {
@@ -139,7 +141,7 @@ const STREAM_DATA: StreamData[] = rawStreamData.map(item => ({
 }));
 
 // --- Stream Item Component ---
-const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, isPlaying }) => {
+const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, isPlaying, isLoading }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [videoKey, setVideoKey] = useState(Date.now());
   const styles = getStyles(useColorScheme() === 'dark', Platform.OS === 'web' && useWindowDimensions().width >= 480 ? 2 : 1);
@@ -177,9 +179,10 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
   } : {};
 
   // Determine icon visibility
-  const showPauseIcon = isActive && isPlaying;
-  const showPlayIcon = !showPauseIcon && (!canHover || isHovered);
-  const shouldShowIcon = showPauseIcon || showPlayIcon;
+  const showSpinner = isLoading && isActive;
+  const showPauseIcon = !showSpinner && isActive && isPlaying;
+  const showPlayIcon = !showSpinner && !showPauseIcon && (!canHover || isHovered);
+  const shouldShowIcon = showSpinner || showPauseIcon || showPlayIcon;
 
   return (
     <TouchableOpacity 
@@ -208,12 +211,19 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
       <View style={StyleSheet.absoluteFill}>
         {shouldShowIcon && (
           <TouchableOpacity style={styles.playButton} onPress={handlePress}> 
-            <Ionicons 
-              name={showPauseIcon ? "stop-sharp" : "play-sharp"} 
-              size={48}
-              color="#FFFFFF"
-              style={styles.playIcon}
-            />
+            {showSpinner ? (
+              <ActivityIndicator 
+                size="large" 
+                color="#FFFFFF"
+              />
+            ) : (
+              <Ionicons 
+                name={showPauseIcon ? "stop-sharp" : "play-sharp"} 
+                size={48}
+                color="#FFFFFF"
+                style={styles.playIcon}
+              />
+            )}
           </TouchableOpacity>
         )}
 
@@ -343,6 +353,7 @@ export default function LiveScreen() {
     activeStream,
     currentMetadata,
     isPlaying,
+    isLoading,
     playStream,       // Use this to start a new stream
     togglePlayPause,  // Use this for the mini player's button
     cleanupAudio      // Use this for closing
@@ -399,6 +410,7 @@ export default function LiveScreen() {
               onPlayPress={handlePlayPress}
               isActive={activeStream?.id === item.id}
               isPlaying={isPlaying && activeStream?.id === item.id}
+              isLoading={isLoading && activeStream?.id === item.id}
             />
           ))}
         </View>

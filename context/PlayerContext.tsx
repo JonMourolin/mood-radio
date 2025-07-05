@@ -8,6 +8,7 @@ interface PlayerContextProps {
   activeStream: StreamData | null;
   currentMetadata: StreamMetadata | null;
   isPlaying: boolean;
+  isLoading: boolean;
   soundRef: React.MutableRefObject<Audio.Sound | null>;
   playStream: (stream: StreamData) => Promise<void>;
   togglePlayPause: () => Promise<void>;
@@ -24,9 +25,11 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
   console.log('[PlayerContext] PlayerProvider component rendering');
   const [activeStream, setActiveStream] = useState<StreamData | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [currentMetadata, setCurrentMetadata] = useState<StreamMetadata | null>(null);
   const soundRef = useRef<Audio.Sound | null>(null);
   const metadataIntervalRef = useRef<NodeJS.Timeout | number | null>(null);
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | number | null>(null);
 
   useEffect(() => {
     console.log('[PlayerContext] PlayerProvider useEffect running for setAudioModeAsync');
@@ -45,10 +48,20 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
 
   const cleanupAudio = async () => {
     console.log("Context: Cleaning up audio...");
+    
+    // Clear loading timeout
+    if (loadingTimeoutRef.current) {
+      clearTimeout(loadingTimeoutRef.current);
+      loadingTimeoutRef.current = null;
+    }
+    
+    // Clear metadata interval
     if (metadataIntervalRef.current) {
       clearInterval(metadataIntervalRef.current);
       metadataIntervalRef.current = null;
     }
+    
+    // Clean up sound
     if (soundRef.current) {
       try {
         await soundRef.current.stopAsync();
@@ -58,10 +71,10 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
       }
       soundRef.current = null;
     }
+    
+    // Reset states
     setIsPlaying(false);
-    // Don't clear metadata here, keep it until a new stream starts
-    // setCurrentMetadata(null); 
-    // Don't clear active stream here? Or maybe we should?
+    setIsLoading(false);
     setActiveStream(null);
   };
 
@@ -106,15 +119,28 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
       return;
     }
 
+    // Edge case 1: Ignore if already loading (except for same stream toggle)
+    if (isLoading && activeStream?.id !== stream.id) {
+      console.log("Context: Already loading another stream, ignoring request.");
+      return;
+    }
+
+    // Edge case 3: Ignore toggle during loading
     if (soundRef.current && activeStream?.id === stream.id) {
+        if (isLoading) {
+          console.log("Context: Stream is loading, ignoring toggle.");
+          return;
+        }
         console.log("Context: Stream already loaded. Toggling play/pause instead.");
         await togglePlayPause();
         return;
     }
     
+    // Edge case 2: Last request priority - cleanup previous attempt
     await cleanupAudio(); // Clean previous stream first
     setActiveStream(stream); // Set active stream immediately
     setCurrentMetadata(null); // Clear old metadata
+    setIsLoading(true); // Start loading state
 
     // // Placeholder for testing UI without actual streaming
     // if (stream.streamUrl === 'placeholder') {
@@ -124,6 +150,12 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     //   return;
     // }
 
+    // Edge case 4: Set loading timeout (10 seconds)
+    loadingTimeoutRef.current = setTimeout(() => {
+      console.warn("Context: Stream loading timeout after 10 seconds");
+      setIsLoading(false);
+    }, 10000);
+
     try {
       console.log(`Context: Loading sound: ${stream.streamUrl}`);
       const { sound } = await Audio.Sound.createAsync(
@@ -132,11 +164,20 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
         (status) => { // onPlaybackStatusUpdate
           if (status.isLoaded) {
               setIsPlaying(status.isPlaying);
+              // Clear loading state only when actually playing
+              if (status.isPlaying) {
+                setIsLoading(false);
+                if (loadingTimeoutRef.current) {
+                  clearTimeout(loadingTimeoutRef.current);
+                  loadingTimeoutRef.current = null;
+                }
+              }
           } else {
               if (status.error) {
                   console.error(`Context Playback Error: ${status.error}`);
+                  setIsLoading(false);
                   cleanupAudio(); 
-                  setActiveStream(null); // Clear stream if playback fails
+                  setActiveStream(null);
                   setCurrentMetadata(null);
               }
           }
@@ -144,6 +185,8 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
       );
       soundRef.current = sound;
       console.log("Context: Sound loaded and playing.");
+      
+      // Don't clear loading state here - wait for status callback to confirm playing
       // isPlaying state is set by the status listener above
 
       // Initial metadata fetch + interval
@@ -156,6 +199,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
 
     } catch (error) {
       console.error('Context: Error playing stream:', error);
+      setIsLoading(false);
       cleanupAudio();
       setActiveStream(null); 
       setCurrentMetadata(null);
@@ -163,6 +207,12 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
   };
 
   const togglePlayPause = async () => {
+    // Edge case 3: Ignore toggle during loading
+    if (isLoading) {
+      console.log("Context: Cannot toggle while loading.");
+      return;
+    }
+    
     if (!soundRef.current) {
         console.log("Context: No sound loaded to toggle.");
         // Optionally, try to replay the active stream if it exists? 
@@ -191,6 +241,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     activeStream,
     currentMetadata,
     isPlaying,
+    isLoading,
     soundRef,
     playStream,
     togglePlayPause,
