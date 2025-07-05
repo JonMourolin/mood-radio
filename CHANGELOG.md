@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.24.0] - 2025-07-05
+
+### Added
+- **Audio Loading Feedback System**: Implemented comprehensive loading indicators during audio stream initialization.
+  - Added ActivityIndicator spinner that replaces play button during loading
+  - Real-time visual feedback on user interaction for better perceived performance
+  - Smart loading state management prevents UI flickering between states
+- **Complete Favicon Support**: Added comprehensive favicon implementation for all browsers and devices.
+  - ICO, PNG favicons in multiple sizes (16x16, 32x32)
+  - Apple Touch Icon for iOS devices
+  - Android Chrome icons (192x192, 512x512) for PWA support
+  - Web App Manifest for proper PWA integration
+
+### Changed
+- **Enhanced Audio UX**: Improved audio streaming user experience with immediate visual feedback.
+  - Smooth state transitions: Play → Loading Spinner → Pause/Stop
+  - Eliminated confusing delays and loading uncertainty
+- **SEO and Branding**: Enhanced web application branding with proper favicon ecosystem.
+  - Updated site.webmanifest with "Mood Radio" branding
+  - Dynamic favicon injection via SEOHead component
+
+### Fixed
+- **Edge Case Handling**: Implemented robust edge case management for audio loading.
+  - Prevents double-click issues during loading (ignores subsequent clicks)
+  - Smart stream switching (last request priority for rapid station changes)
+  - Disabled toggle functionality during loading to prevent race conditions
+  - 10-second timeout with automatic fallback to normal state
+- **Loading State Synchronization**: Fixed timing issues between loading indicators and actual audio playback.
+  - Loading spinner only disappears when audio actually starts playing
+  - Eliminated brief flash of play button before pause button appears
+
+### Technical Improvements
+- **PlayerContext Enhancement**: Extended player context with isLoading state for centralized loading management
+- **Component Architecture**: Improved StreamItem component with loading state props and conditional rendering
+- **State Management**: Better synchronization between audio status callbacks and UI state updates
+
 ## [3.23.0] - 2025-06-29
 
 ### Changed
