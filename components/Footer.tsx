@@ -20,16 +20,16 @@ export const Footer = () => {
 
 const styles = StyleSheet.create({
   footerContainer: {
-    paddingTop: 60,
-    paddingBottom: 40,
+    paddingTop: 20,
+    paddingBottom: 10,
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
   },
   logo: {
-    fontSize: 32,
+    fontSize: 26,
     color: '#b30000',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   linksContainer: {
     flexDirection: 'row',
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     color: '#a0a0a0',
   },
   copyrightText: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#6c757d',
   },
 }); 
