@@ -49,7 +49,7 @@ export default function SEOHead({
     updateMetaTag('keywords', keywords);
     updateMetaTag('author', 'Mood Radio');
     updateMetaTag('robots', 'index, follow');
-    updateMetaTag('theme-color', '#D22F49');
+    updateMetaTag('theme-color', '#000000');
     updateMetaTag('language', 'en');
     updateMetaTag('geo.region', 'FR');
     updateMetaTag('geo.placename', 'France');
