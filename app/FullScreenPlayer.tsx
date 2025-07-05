@@ -14,11 +14,12 @@ export default function FullScreenPlayer() {
     activeStream,
     currentMetadata,
     isPlaying,
+    isLoading,
     togglePlayPause
   } = usePlayerContext();
 
   // Use data from context instead of params
-  const trackInfo = String(currentMetadata?.song || (isPlaying ? "Playing..." : "Paused"));
+  const trackInfo = String(currentMetadata?.song || (isLoading ? "Connecting..." : (isPlaying ? "Streaming..." : "Ready")));
   const streamTitle = activeStream?.title || 'Unknown Station';
   const artUrl = currentMetadata?.artUrl;
   const imageUrl = typeof activeStream?.imageUrl === 'object' && 
@@ -39,7 +40,7 @@ export default function FullScreenPlayer() {
           router.back();
       } else {
           // Fallback if cannot go back (e.g., deep link)
-          router.replace('/moods'); // Or your main tab screen
+          router.replace('/live'); // Or your main tab screen
       }
   };
 

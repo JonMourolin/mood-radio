@@ -40,6 +40,7 @@ interface MiniPlayerProps {
   activeStream: StreamData | null;
   metadata: StreamMetadata | null;
   isPlaying: boolean;
+  isLoading: boolean;
   onPlayPausePress: () => void; 
   onClosePress?: () => void;
 }
@@ -249,7 +250,7 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
 };
 
 // --- Mini Player Component ---
-const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlaying, onPlayPausePress, onClosePress }) => {
+const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlaying, isLoading, onPlayPausePress, onClosePress }) => {
   if (!activeStream) return null;
 
   const styles = getStyles(useColorScheme() === 'dark', Platform.OS === 'web' ? 2 : 1);
@@ -259,7 +260,7 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({ activeStream, metadata, isPlayi
   } else {
     imageSource = activeStream.imageUrl; 
   }
-  const trackInfo = metadata?.song || (isPlaying ? "Playing..." : "Paused");
+  const trackInfo = metadata?.song || (isLoading ? "Connecting..." : (isPlaying ? "Streaming..." : "Ready"));
   const isWeb = Platform.OS === 'web'; // Check if web
 
   return (
@@ -426,6 +427,7 @@ export default function LiveScreen() {
                 activeStream={activeStream}
                 metadata={currentMetadata}
                 isPlaying={isPlaying}
+                isLoading={isLoading}
                 onPlayPausePress={handleMiniPlayerPlayPause} 
                 onClosePress={handleCloseMiniPlayer} // Web close button still works
             />
@@ -442,7 +444,7 @@ export default function LiveScreen() {
                           activeStream.imageUrl.uri 
                           ? activeStream.imageUrl.uri 
                           : undefined,
-                trackInfo: currentMetadata?.song || (isPlaying ? 'Playing...' : 'Paused'),
+                trackInfo: currentMetadata?.song || (isLoading ? 'Connecting...' : (isPlaying ? 'Streaming...' : 'Ready')),
                 streamTitle: activeStream.title,
                 isPlaying: isPlaying.toString(),
               }
@@ -453,8 +455,9 @@ export default function LiveScreen() {
               <MiniPlayer 
                   activeStream={activeStream}
                   metadata={currentMetadata}
-                  isPlaying={isPlaying}
-                  onPlayPausePress={handleMiniPlayerPlayPause} // Play/pause still works
+                                  isPlaying={isPlaying}
+                isLoading={isLoading}
+                onPlayPausePress={handleMiniPlayerPlayPause} // Play/pause still works
                   onClosePress={undefined} // No close button on native MiniPlayer
               />
             </TouchableOpacity>
