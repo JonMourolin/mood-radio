@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.26.0] - 2025-07-06
+
+### Added
+- **Professional App Icons Ecosystem**: Implemented comprehensive icon set across all platforms
+  - Complete iOS AppIcon.appiconset with all required sizes (60pt, 40pt, 29pt at @1x, @2x, @3x)
+  - Android launcher icons for all densities (mdpi, hdpi, xhdpi, xxhdpi, xxxhdpi)
+  - Professional web favicon ecosystem with multiple sizes (16x16, 32x32)
+  - PWA manifest icons (192x192, 512x512) for standalone app experience
+  - Future-ready macOS and watchOS icon sets for platform expansion
+- **Enhanced Splash Screen**: Updated app startup experience
+  - New horizontal splash screen design (404x147) optimized for mobile displays
+  - RGBA format with transparency support for refined visual presentation
+  - Improved aspect ratio eliminates excessive padding on mobile devices
+
+### Changed
+- **App Icon Configuration**: Updated platform-specific icon configurations
+  - iOS now uses complete AppIcon.appiconset for optimal native experience
+  - Android configured with high-resolution launcher icons
+  - Web PWA icons properly referenced in site.webmanifest
+  - Consistent branding across all platforms and app stores
+- **Asset Organization**: Streamlined icon asset structure
+  - Organized icons by platform (iOS, Android, web, macOS, watchOS)
+  - Eliminated redundancy between assets/ and public/ directories
+  - Professional icon hierarchy ensures consistent visual identity
+
+### Removed
+- **Legacy Icon Assets**: Cleaned up outdated icon files
+  - Removed old mood_radio_ios_icon.png and mood_radio_android_icon.png
+  - Eliminated redundant favicon.png from assets/images/
+  - Removed obsolete android-chrome-*.png files (replaced with icon-*.png)
+  - Cleaned up unused React logo assets and outdated global images
+
+### Technical Improvements
+- **Build Optimization**: Enhanced app build configuration for better icon handling
+  - Updated app.json to use AppIcon.appiconset for iOS builds
+  - Configured Android with platform-specific launcher icons
+  - Optimized file sizes while maintaining quality across all icon variants
+  - Future-proofed icon structure supports additional platforms (macOS, watchOS)
+
 ## [3.25.0] - 2025-07-06
 
 ### Changed
