@@ -4,7 +4,7 @@
     "slug": "web-radio-mobile",
     "version": "3.25.0",
     "orientation": "portrait",
-    "icon": "./assets/app-icons/mood_radio_ios_icon.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
@@ -15,7 +15,7 @@
     "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
-      "icon": "./assets/app-icons/mood_radio_ios_icon.png",
+      "icon": "./assets/app-icons/iOS/AppIcon.appiconset",
       "infoPlist": {
         "UIBackgroundModes": [
           "audio"
@@ -33,10 +33,7 @@
       "bundleIdentifier": "com.jonmourolin.web-radio-mobile"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/app-icons/mood_radio_android_icon.png",
-        "backgroundColor": "#ffffff"
-      },
+      "icon": "./assets/app-icons/android/mipmap-xxxhdpi/ic_launcher.png",
       "permissions": [
         "FOREGROUND_SERVICE",
         "android.permission.FOREGROUND_SERVICE",
