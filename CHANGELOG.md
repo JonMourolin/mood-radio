@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.25.0] - 2025-07-06
+
+### Changed
+- **Mobile Navigation Simplification**: Completely removed tab bar navigation for a cleaner single-screen mobile experience
+  - Eliminated bottom tab bar with multiple tabs (Live, Mixes, Settings)
+  - Simplified mobile navigation to focus solely on the Live radio screen
+  - Reduced navigation complexity and improved user focus on core functionality
+- **Architecture Optimization**: Streamlined mobile app structure for better performance
+  - Removed unused tab-related components and configurations
+  - Simplified `(tabs)/_layout.tsx` from 53 lines to 12 lines of code
+  - Cleaned up navigation logic across all platforms
+
+### Removed
+- **Tab Bar Components**: Removed all tab bar related UI components
+  - Deleted `TabBarBackground.tsx` and `TabBarBackground.ios.tsx` components
+  - Removed tab navigation imports and configurations
+  - Eliminated tab-specific styling and background blur effects
+- **Multi-tab Navigation**: Removed Settings and Mixes tabs from mobile navigation
+  - Disabled `href` for settings and mixcloud tabs
+  - Focused mobile experience on Live radio streaming only
+
+### Technical Improvements
+- **Code Cleanup**: Significant reduction in mobile navigation complexity
+  - Removed unused imports (Tabs, Ionicons, Platform from tab layout)
+  - Eliminated redundant tab bar styling and configuration
+  - Streamlined mobile layout rendering with universal `<Slot />` approach
+
 ## [3.24.1] - 2025-07-05
 
 ### Fixed
