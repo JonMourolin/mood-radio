@@ -2,14 +2,14 @@
   "expo": {
     "name": "web-radio-mobile",
     "slug": "web-radio-mobile",
-    "version": "3.26.0",
+    "version": "3.27.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
+      "resizeMode": "native",
       "backgroundColor": "#000000"
     },
     "newArchEnabled": false,

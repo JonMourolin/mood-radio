@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.27.0] - 2025-07-07
+
+### Added
+- **Mobile Header Logo**: Replaced text header with branded logo on mobile app
+  - Added logo display in mobile header using logo1.png
+  - Implemented sticky header that remains visible during scrolling
+  - Centered logo positioning for professional appearance
+
+### Changed
+- **Splash Screen Optimization**: Improved splash screen display and timing
+  - Extended splash screen duration from 1 second to 2 seconds for better loading experience
+  - Changed splash screen resizeMode from "contain" to "native" for proper logo sizing
+  - Eliminated oversized logo display on splash screen
+- **Navigation Transitions**: Enhanced app navigation with smooth fade transitions
+  - Replaced default slide transition with elegant fade animation
+  - Applied fade transition to all screen navigation for consistent UX
+  - Improved visual continuity between screens
+
+### Technical Improvements
+- **App Launch Optimization**: Enhanced app startup experience and performance
+  - Optimized splash screen timing and visual presentation
+  - Improved header rendering with sticky positioning
+  - Better mobile layout consistency across different screen sizes
+
 ## [3.26.0] - 2025-07-06
 
 ### Added

@@ -394,12 +394,16 @@ export default function LiveScreen() {
         style={styles.scrollView} 
         contentContainerStyle={styles.scrollContentContainer}
         showsVerticalScrollIndicator={false}
+        stickyHeaderIndices={!isWeb ? [0] : undefined}
       >
         {/* Header Content Inside ScrollView (Mobile Only) */}
         {!isWeb && (
             <View style={styles.scrollHeaderContainer}>
-              <Text style={styles.scrollHeaderText}>Listen to your mood</Text>
-              <Ionicons name="infinite-outline" size={26} color="#D22F49" />
+              <Image 
+                source={require('../assets/images/logo/logo1.png')}
+                style={styles.headerLogo} 
+                resizeMode="contain"
+              />
             </View>
         )}
 
@@ -696,8 +700,15 @@ const getStyles = (
         paddingTop: 25,      // Slightly more top padding
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'flex-start', // Align items to the left
+        justifyContent: 'center', // Center the logo
         backgroundColor: '#000000', // Change background back to black
+        width: '100%', // Ensure full width
+        alignSelf: 'center', // Center the container itself
+    },
+    headerLogo: {
+        width: 120,
+        height: 40,
+        alignSelf: 'center', // Center the logo itself
     },
     scrollHeaderText: {
         color: '#FFFFFF',

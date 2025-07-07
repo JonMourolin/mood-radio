@@ -28,7 +28,7 @@ export default function RootLayout() {
       try {
         // In a real app, you'd await things like Font.loadAsync here
         console.log("Simulating app preparation...");
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Example delay
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Example delay
       } catch (e) {
         console.warn(e);
       } finally {
