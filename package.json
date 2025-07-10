@@ -1,5 +1,5 @@
 {
-  "name": "web-radio-mobile",
+  "name": "mood-radio",
   "main": "expo-router/entry",
   "version": "3.27.0",
   "scripts": {
