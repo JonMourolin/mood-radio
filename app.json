@@ -15,7 +15,7 @@
     "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
-      "icon": "./assets/app-icons/iOS/AppIcon.appiconset",
+      "icon": "./assets/app-icons/iOS/AppIcon.appiconset/Icon-60@3x.png",
       "infoPlist": {
         "UIBackgroundModes": [
           "audio"
