@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.28.0] - 2025-07-11
+
+### Added
+- **HD Splash Screen**: Upgraded splash screen to high-definition resolution
+  - Replaced 404x147 low-quality splash icon with HD 1080x1920 version
+  - Improved aspect ratio from 2.75:1 to 9:16 for better mobile display
+  - Eliminated stretching and pixelation issues on high-resolution screens
+  - Enhanced visual quality with proper RGBA transparency support
+
+### Changed
+- **Project Rebranding**: Renamed project from "web-radio-mobile" to "mood-radio"
+  - Updated package.json name to "mood-radio" for consistent branding
+  - Updated package-lock.json to maintain dependency consistency
+  - Changed app.json display name to "Mood Radio" for better user recognition
+  - Maintained backward compatibility with existing configurations
+
+### Fixed
+- **iOS Splash Screen**: Fixed splash screen display issues on iOS builds
+  - Corrected splash screen resizeMode configuration for proper iOS rendering
+  - Improved splash screen behavior across different iOS device sizes
+
+### Technical Improvements
+- **Asset Quality**: Enhanced visual assets with professional-grade specifications
+  - Splash screen now meets modern mobile app standards (Full HD resolution)
+  - Improved loading experience with crisp, high-quality imagery
+  - Better performance on high-DPI displays and retina screens
+
 ## [3.27.0] - 2025-07-07
 
 ### Added
