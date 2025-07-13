@@ -137,7 +137,9 @@ const rawStreamData = generateStreamData(Platform.OS === 'web');
 
 const STREAM_DATA: StreamData[] = rawStreamData.map(item => ({
   ...item,
-  streamUrl: `${AZURACAST_BASE_URL}/hls/${item.stationSlug}/live.m3u8`,
+  streamUrl: Platform.OS === 'web'
+    ? `${AZURACAST_BASE_URL}/listen/${item.stationSlug}/radio.mp3`
+    : `${AZURACAST_BASE_URL}/hls/${item.stationSlug}/live.m3u8`,
   metadataUrl: `${AZURACAST_BASE_URL}/api/nowplaying/${item.stationSlug}`,
 }));
 
