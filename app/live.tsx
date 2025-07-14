@@ -363,18 +363,21 @@ export default function LiveScreen() {
 
   // Animation for card slide-up
   const [cardAnimations] = useState(() => 
-    STREAM_DATA.map(() => new Animated.Value(50))
+    STREAM_DATA.map(() => new Animated.Value(100))
   );
 
   // Trigger animations on mount
   useEffect(() => {
+    console.log('[Animation] Starting card slide-up animations');
     cardAnimations.forEach((anim, index) => {
       Animated.timing(anim, {
         toValue: 0,
-        duration: 300,
-        delay: index * 100,
+        duration: 600,
+        delay: index * 150,
         useNativeDriver: true,
-      }).start();
+      }).start(() => {
+        console.log(`[Animation] Card ${index} slide-up completed`);
+      });
     });
   }, []);
 
@@ -432,8 +435,9 @@ export default function LiveScreen() {
               style={{
                 transform: [{ translateY: cardAnimations[index] }],
                 opacity: cardAnimations[index].interpolate({
-                  inputRange: [0, 50],
-                  outputRange: [1, 0]
+                  inputRange: [0, 100],
+                  outputRange: [1, 0],
+                  extrapolate: 'clamp'
                 })
               }}
             >

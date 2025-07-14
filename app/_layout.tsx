@@ -48,11 +48,14 @@ export default function RootLayout() {
       console.log("Hiding splash screen (onLayout). App was already ready.");
       await SplashScreen.hideAsync();
       // Start fade-in animation after splash is hidden
+      console.log('[Animation] Starting fade-in animation (onLayout)');
       Animated.timing(contentOpacity, {
         toValue: 1,
         duration: 500,
         useNativeDriver: true,
-      }).start();
+      }).start(() => {
+        console.log('[Animation] Fade-in animation completed (onLayout)');
+      });
     }
   }, [appIsReady]); // Depend on appIsReady
 
@@ -62,11 +65,14 @@ export default function RootLayout() {
       console.log("Hiding splash screen (useEffect). Layout was already ready.");
       SplashScreen.hideAsync().then(() => {
         // Start fade-in animation after splash is hidden
+        console.log('[Animation] Starting fade-in animation');
         Animated.timing(contentOpacity, {
           toValue: 1,
           duration: 500,
           useNativeDriver: true,
-        }).start();
+        }).start(() => {
+          console.log('[Animation] Fade-in animation completed');
+        });
       });
     }
   }, [appIsReady, rootViewRendered]);
