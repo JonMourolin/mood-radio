@@ -363,22 +363,33 @@ export default function LiveScreen() {
 
   // Animation for card slide-up
   const [cardAnimations] = useState(() => 
-    STREAM_DATA.map(() => new Animated.Value(100))
+    STREAM_DATA.map(() => new Animated.Value(50))
   );
 
   // Trigger animations on mount
   useEffect(() => {
-    console.log('[Animation] Starting card slide-up animations');
-    cardAnimations.forEach((anim, index) => {
-      Animated.timing(anim, {
+    // First batch: indices 0, 1, 2 (focus, high energy, melancholic)
+    [0, 1, 2].forEach((index, batchIndex) => {
+      Animated.timing(cardAnimations[index], {
         toValue: 0,
-        duration: 600,
-        delay: index * 150,
+        duration: 300,
+        delay: batchIndex * 100,
         useNativeDriver: true,
-      }).start(() => {
-        console.log(`[Animation] Card ${index} slide-up completed`);
-      });
+      }).start();
     });
+
+    // Second batch: indices 3, 4, 5 (rage, cosmics_trip, tangerine_radio)
+    // Start after first batch completes (300ms duration + 200ms delay)
+    setTimeout(() => {
+      [3, 4, 5].forEach((index, batchIndex) => {
+        Animated.timing(cardAnimations[index], {
+          toValue: 0,
+          duration: 300,
+          delay: batchIndex * 100,
+          useNativeDriver: true,
+        }).start();
+      });
+    }, 500);
   }, []);
 
   // --- Event Handlers --- 
@@ -435,9 +446,8 @@ export default function LiveScreen() {
               style={{
                 transform: [{ translateY: cardAnimations[index] }],
                 opacity: cardAnimations[index].interpolate({
-                  inputRange: [0, 100],
-                  outputRange: [1, 0],
-                  extrapolate: 'clamp'
+                  inputRange: [0, 50],
+                  outputRange: [1, 0]
                 })
               }}
             >
