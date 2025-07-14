@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
-import { View, Platform } from 'react-native';
+import { View, Platform, Animated } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import Navigation from './components/Navigation';
 import { PlayerProvider } from '@/context/PlayerContext';
@@ -20,6 +20,7 @@ export default function RootLayout() {
   // We'll use simple readiness flags for now
   const [appIsReady, setAppIsReady] = useState(false);
   const [rootViewRendered, setRootViewRendered] = useState(false);
+  const [contentOpacity] = useState(new Animated.Value(0));
 
   useEffect(() => {
     console.log('[RootLayout] useEffect running');
@@ -46,6 +47,12 @@ export default function RootLayout() {
     if (appIsReady) {
       console.log("Hiding splash screen (onLayout). App was already ready.");
       await SplashScreen.hideAsync();
+      // Start fade-in animation after splash is hidden
+      Animated.timing(contentOpacity, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
     }
   }, [appIsReady]); // Depend on appIsReady
 
@@ -53,7 +60,14 @@ export default function RootLayout() {
   useEffect(() => {
     if (appIsReady && rootViewRendered) {
       console.log("Hiding splash screen (useEffect). Layout was already ready.");
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync().then(() => {
+        // Start fade-in animation after splash is hidden
+        Animated.timing(contentOpacity, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }).start();
+      });
     }
   }, [appIsReady, rootViewRendered]);
 
@@ -77,7 +91,7 @@ export default function RootLayout() {
         keywords="electronic music moods, focus music, meditation music, high energy music, melancholic music, rave music, ambient radio, electronic radio stations"
       />
       {/* Attach onLayout here to the final root view */}
-      <View style={{ flex: 1, backgroundColor: '#121418' }} onLayout={onLayoutRootView}>
+      <Animated.View style={{ flex: 1, backgroundColor: '#121418', opacity: contentOpacity }} onLayout={onLayoutRootView}>
         {Platform.OS === 'web' && <Navigation />}
         <Stack 
           screenOptions={{
@@ -85,7 +99,7 @@ export default function RootLayout() {
             contentStyle: { backgroundColor: '#121418' }
           }}
         />
-      </View>
+      </Animated.View>
     </PlayerProvider>
   );
 }

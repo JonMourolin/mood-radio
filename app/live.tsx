@@ -13,6 +13,7 @@ import {
   Image,
   ViewStyle,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
 import { Audio, Video, ResizeMode } from 'expo-av';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -361,6 +362,8 @@ export default function LiveScreen() {
     togglePlayPause,  // Use this for the mini player's button
     cleanupAudio      // Use this for closing
   } = usePlayerContext();
+
+
 
   // --- Event Handlers --- 
   const handlePlayPress = (item: StreamData) => {
