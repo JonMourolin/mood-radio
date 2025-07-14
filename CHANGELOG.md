@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.29.0] - 2025-07-14
+
+### Added
+- **Smooth App Transitions**: Implemented fade-in animation for improved user experience
+  - Added 500ms fade-in transition after splash screen for smoother app launch
+  - Eliminated jarring instant appearance of content after splash screen
+  - Optimized animations using native driver for 60fps performance
+
+### Fixed
+- **Mobile Audio Glitch Resolution**: Resolved 1-second audio stuttering on mobile devices
+  - Implemented hybrid streaming solution: MP3 for web, HLS for mobile
+  - Fixed audio looping issue caused by chunked transfer encoding on mobile players
+  - Web continues using MP3 streams for optimal browser compatibility
+  - Mobile now uses HLS streams for buffer-free playback
+  - Eliminated audio "cafouillage" at stream start on iOS/Android devices
+
+### Technical
+- **Platform-Specific Stream URLs**: Enhanced streaming architecture
+  - Web: `${AZURACAST_BASE_URL}/listen/${station}/radio.mp3`
+  - Mobile: `${AZURACAST_BASE_URL}/hls/${station}/live.m3u8`
+  - Automatic platform detection for optimal stream format selection
+- **Animation System**: Clean implementation of UI transitions
+  - Removed debug logging for production-ready code
+  - GPU-accelerated animations for optimal performance
+
 ## [3.28.0] - 2025-07-11
 
 ### Added
