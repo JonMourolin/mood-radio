@@ -13,6 +13,7 @@ import {
   Image,
   ViewStyle,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
 import { Audio, Video, ResizeMode } from 'expo-av';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -360,6 +361,23 @@ export default function LiveScreen() {
     cleanupAudio      // Use this for closing
   } = usePlayerContext();
 
+  // Animation for card slide-up
+  const [cardAnimations] = useState(() => 
+    STREAM_DATA.map(() => new Animated.Value(50))
+  );
+
+  // Trigger animations on mount
+  useEffect(() => {
+    cardAnimations.forEach((anim, index) => {
+      Animated.timing(anim, {
+        toValue: 0,
+        duration: 300,
+        delay: index * 100,
+        useNativeDriver: true,
+      }).start();
+    });
+  }, []);
+
   // --- Event Handlers --- 
   const handlePlayPress = (item: StreamData) => {
     // Use context functions directly
@@ -408,15 +426,25 @@ export default function LiveScreen() {
         )}
 
         <View style={styles.itemsGridContainer}>
-          {STREAM_DATA.map((item) => (
-            <StreamItem
+          {STREAM_DATA.map((item, index) => (
+            <Animated.View
               key={item.id}
-              item={item}
-              onPlayPress={handlePlayPress}
-              isActive={activeStream?.id === item.id}
-              isPlaying={isPlaying && activeStream?.id === item.id}
-              isLoading={isLoading && activeStream?.id === item.id}
-            />
+              style={{
+                transform: [{ translateY: cardAnimations[index] }],
+                opacity: cardAnimations[index].interpolate({
+                  inputRange: [0, 50],
+                  outputRange: [1, 0]
+                })
+              }}
+            >
+              <StreamItem
+                item={item}
+                onPlayPress={handlePlayPress}
+                isActive={activeStream?.id === item.id}
+                isPlaying={isPlaying && activeStream?.id === item.id}
+                isLoading={isLoading && activeStream?.id === item.id}
+              />
+            </Animated.View>
           ))}
         </View>
 
