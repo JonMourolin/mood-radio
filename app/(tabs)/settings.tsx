@@ -98,8 +98,8 @@ export default function SettingsScreen() {
     await Audio.setAudioModeAsync({
       playsInSilentModeIOS: value,
       staysActiveInBackground: value,
-      interruptionModeIOS: InterruptionModeIOS.DuckOthers,
-      interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
+      interruptionModeIOS: InterruptionModeIOS.DoNotMix,
+      interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
     });
   };
 
