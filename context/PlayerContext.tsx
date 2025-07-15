@@ -1,5 +1,5 @@
 import React, { createContext, useState, useRef, useContext, useEffect, ReactNode } from 'react';
-import { Audio } from 'expo-av';
+import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from 'expo-av';
 import { StreamData, StreamMetadata } from '@/types/player';
 import { METADATA_REFRESH_INTERVAL_MS } from '../config';
 import { AzuraCastApiResponse } from '@/types/api';
@@ -37,7 +37,13 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
       allowsRecordingIOS: false,
       staysActiveInBackground: true,
       playsInSilentModeIOS: true,
+      interruptionModeIOS: InterruptionModeIOS.DuckOthers,
+      interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
+      shouldDuckAndroid: true,
+      playThroughEarpieceAndroid: false,
     });
+
+
 
     // Cleanup on unmount
     return () => {
@@ -45,6 +51,40 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
       cleanupAudio(); 
     };
   }, []);
+
+  // Update Now Playing Info for iOS Media Controls
+  const updateNowPlayingInfo = async (stream: StreamData | null, metadata: StreamMetadata | null, isPlaying: boolean) => {
+    if (!stream) return;
+    
+    try {
+      const nowPlayingInfo: any = {
+        title: metadata?.song || stream.title,
+        artist: 'Mood Radio',
+        albumName: stream.description,
+        isLiveStream: true,
+      };
+      
+      // Add artwork if available
+      if (metadata?.artUrl) {
+        nowPlayingInfo.artwork = metadata.artUrl;
+      }
+      
+      console.log('[PlayerContext] Updating Now Playing Info:', nowPlayingInfo);
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: false,
+        staysActiveInBackground: true,
+        playsInSilentModeIOS: true,
+        interruptionModeIOS: InterruptionModeIOS.DuckOthers,
+        interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
+        shouldDuckAndroid: true,
+        playThroughEarpieceAndroid: false,
+        // @ts-ignore - These properties might not be in TypeScript definitions but exist in runtime
+        nowPlayingInfoCenter: nowPlayingInfo,
+      });
+    } catch (error) {
+      console.error('[PlayerContext] Error updating Now Playing Info:', error);
+    }
+  };
 
   const cleanupAudio = async () => {
     console.log("Context: Cleaning up audio...");
@@ -70,6 +110,13 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
           console.warn("Context: Error during sound cleanup:", error);
       }
       soundRef.current = null;
+    }
+    
+    // Clear Now Playing Info
+    try {
+      await updateNowPlayingInfo(null, null, false);
+    } catch (error) {
+      console.warn("Context: Error clearing Now Playing Info:", error);
     }
     
     // Reset states
@@ -99,6 +146,8 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
         if (newMetadata.song !== currentMetadata?.song) {
             setCurrentMetadata(newMetadata);
             console.log("Context: Metadata updated:", newMetadata);
+            // Update Now Playing Info with new metadata
+            await updateNowPlayingInfo(activeStream, newMetadata, isPlaying);
         }
       } else {
           // If no song data, maybe keep the old metadata for a bit?
@@ -164,6 +213,8 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
         (status) => { // onPlaybackStatusUpdate
           if (status.isLoaded) {
               setIsPlaying(status.isPlaying);
+              // Update Now Playing Info when playback state changes
+              updateNowPlayingInfo(stream, currentMetadata, status.isPlaying);
               // Clear loading state only when actually playing
               if (status.isPlaying) {
                 setIsLoading(false);
@@ -189,12 +240,17 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
       // Don't clear loading state here - wait for status callback to confirm playing
       // isPlaying state is set by the status listener above
 
+      // Initial Now Playing Info setup
+      await updateNowPlayingInfo(stream, null, true);
+      
       // Initial metadata fetch + interval
       if (stream.metadataUrl) {
         fetchMetadata(stream.metadataUrl); // Fetch immediately
         metadataIntervalRef.current = setInterval(() => fetchMetadata(stream.metadataUrl), METADATA_REFRESH_INTERVAL_MS); // Fetch every 7s
       } else {
         setCurrentMetadata(null); // No metadata URL
+        // Update Now Playing Info even without metadata
+        await updateNowPlayingInfo(stream, null, true);
       }
 
     } catch (error) {
@@ -236,6 +292,53 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
         console.error("Context: Error toggling play/pause:", error);
     }
   };
+
+  // Setup remote control events after functions are defined
+  useEffect(() => {
+    const setupRemoteControls = async () => {
+      try {
+        console.log('[PlayerContext] Setting up remote controls...');
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: false,
+          staysActiveInBackground: true,
+          playsInSilentModeIOS: true,
+          interruptionModeIOS: InterruptionModeIOS.DuckOthers,
+          interruptionModeAndroid: InterruptionModeAndroid.DuckOthers,
+          shouldDuckAndroid: true,
+          playThroughEarpieceAndroid: false,
+          // @ts-ignore - Remote control commands might not be in TypeScript definitions
+          remoteControlCommandsEnabled: true,
+          remoteControlCommands: [
+            {
+              command: 'play',
+              handler: () => {
+                console.log('[PlayerContext] Remote control: Play pressed');
+                togglePlayPause();
+              },
+            },
+            {
+              command: 'pause',
+              handler: () => {
+                console.log('[PlayerContext] Remote control: Pause pressed');
+                togglePlayPause();
+              },
+            },
+            {
+              command: 'togglePlayPause',
+              handler: () => {
+                console.log('[PlayerContext] Remote control: Toggle play/pause pressed');
+                togglePlayPause();
+              },
+            },
+          ],
+        });
+      } catch (error) {
+        console.error('[PlayerContext] Error setting up remote controls:', error);
+      }
+    };
+
+    setupRemoteControls();
+  }, []);
 
   const value = {
     activeStream,
