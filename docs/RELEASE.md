@@ -1,6 +1,6 @@
 # Release Process
 
-Ce document décrit le processus complet de développement et de déploiement pour le projet web-radio-mobile.
+Ce document décrit le processus complet de développement et de déploiement pour le projet mood-radio.
 
 ## Table des matières
 
@@ -331,7 +331,7 @@ vercel --prod
 
 - **Production** : https://moodradio.fr
 - **Serveur audio** : https://radio.moodradio.fr
-- **Vercel par défaut** : https://web-radio-mobile.vercel.app
+- **Vercel par défaut** : https://mood-radio.vercel.app
 
 ### Services externes
 

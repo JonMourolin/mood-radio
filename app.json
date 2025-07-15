@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Mood Radio",
-    "slug": "web-radio-mobile",
+    "slug": "mood-radio",
     "version": "3.29.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -30,7 +30,7 @@
         },
         "ITSAppUsesNonExemptEncryption": false
       },
-      "bundleIdentifier": "com.jonmourolin.web-radio-mobile"
+      "bundleIdentifier": "com.jonmourolin.mood-radio"
     },
     "android": {
       "icon": "./assets/app-icons/android/mipmap-xxxhdpi/ic_launcher.png",

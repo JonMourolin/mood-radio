@@ -20,15 +20,15 @@ Une application mobile et web pour écouter des mixs musicaux de longue durée.
 ## Déploiement
 
 L'application est déployée sur:
-- **Web**: [https://web-radio-mobile.expo.app](https://web-radio-mobile.expo.app)
+- **Web**: [https://mood-radio.expo.app](https://mood-radio.expo.app)
 - **Mobile**: Bientôt disponible sur iOS et Android
 
 ## Installation pour développement
 
 ```bash
 # Cloner le dépôt
-git clone https://github.com/JonMourolin/web-radio-mobile.git
-cd web-radio-mobile
+git clone https://github.com/JonMourolin/mood-radio.git
+cd mood-radio
 
 # Installer les dépendances
 npm install
@@ -41,7 +41,7 @@ npm run android  # Pour Android
 
 ## Versioning
 
-Ce projet utilise [SemVer](http://semver.org/) pour le versioning. Pour connaître les versions disponibles, consultez les [tags sur ce dépôt](https://github.com/JonMourolin/web-radio-mobile/tags).
+Ce projet utilise [SemVer](http://semver.org/) pour le versioning. Pour connaître les versions disponibles, consultez les [tags sur ce dépôt](https://github.com/JonMourolin/mood-radio/tags).
 
 Veuillez consulter le [CHANGELOG.md](CHANGELOG.md) pour voir les modifications détaillées de chaque version.
 
