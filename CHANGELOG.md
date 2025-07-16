@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.30.0] - 2025-07-16
+
+### Added
+- **iOS Background Streaming**: Implemented complete iOS background audio playback
+  - Added Media Controls integration for iOS lock screen and control center
+  - Implemented proper iOS background modes for continuous audio streaming
+  - Added seamless audio session management for iOS platform
+
+### Fixed
+- **iOS Audio Mixing**: Resolved audio coexistence issues on iOS devices
+  - Fixed audio interruption when other apps (Spotify, etc.) are running
+  - Implemented proper audio session categories for iOS
+  - Prevented unwanted audio mixing with other applications
+  - Enhanced audio focus management for better user experience
+
+### Technical
+- **iOS Audio Architecture**: Improved iOS-specific audio handling
+  - Enhanced audio session configuration for background playback
+  - Optimized audio interruption handling and recovery
+
 ## [3.29.0] - 2025-07-14
 
 ### Added
