@@ -20,7 +20,11 @@ export default function RootLayout() {
   // We'll use simple readiness flags for now
   const [appIsReady, setAppIsReady] = useState(false);
   const [rootViewRendered, setRootViewRendered] = useState(false);
-  const [contentOpacity] = useState(new Animated.Value(0));
+  
+  // Conditional animation setup based on platform
+  // Web: No animation to avoid useNativeDriver issues
+  // Native: Keep existing smooth animation
+  const [contentOpacity] = useState(Platform.OS === 'web' ? 1 : new Animated.Value(0));
 
   useEffect(() => {
     console.log('[RootLayout] useEffect running');
@@ -47,12 +51,15 @@ export default function RootLayout() {
     if (appIsReady) {
       console.log("Hiding splash screen (onLayout). App was already ready.");
       await SplashScreen.hideAsync();
-      // Start fade-in animation after splash is hidden
-      Animated.timing(contentOpacity, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }).start();
+      
+      // Start fade-in animation only on native platforms
+      if (Platform.OS !== 'web') {
+        Animated.timing(contentOpacity as Animated.Value, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }).start();
+      }
     }
   }, [appIsReady]); // Depend on appIsReady
 
@@ -61,12 +68,14 @@ export default function RootLayout() {
     if (appIsReady && rootViewRendered) {
       console.log("Hiding splash screen (useEffect). Layout was already ready.");
       SplashScreen.hideAsync().then(() => {
-        // Start fade-in animation after splash is hidden
-        Animated.timing(contentOpacity, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }).start();
+        // Start fade-in animation only on native platforms
+        if (Platform.OS !== 'web') {
+          Animated.timing(contentOpacity as Animated.Value, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+          }).start();
+        }
       });
     }
   }, [appIsReady, rootViewRendered]);
