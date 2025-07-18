@@ -2,7 +2,7 @@
   "expo": {
     "name": "Mood Radio",
     "slug": "mood-radio",
-    "version": "3.29.0",
+    "version": "3.29.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",

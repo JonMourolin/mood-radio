@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.29.1] - 2025-07-18
+
+### Fixed
+- **Web Animation Error Resolution**: Fixed useNativeDriver error on web platforms
+  - Resolved console errors: "useNativeDriver is not supported because the native animated module is missing"
+  - Implemented platform-specific animation handling: native driver for mobile, no animation for web
+  - Eliminated JS-based animation fallback that caused performance issues
+  - Improved web user experience with cleaner console output and better performance
+
+### Technical
+- **Platform-Conditional Animations**: Enhanced animation system architecture
+  - Web: Direct opacity setting to avoid native driver requirements
+  - Mobile: Preserved existing GPU-accelerated animations with native driver
+  - Maintained backward compatibility with no impact on mobile app experience
+
 ## [3.29.0] - 2025-07-14
 
 ### Added
