@@ -82,11 +82,42 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
         };
         if (newMetadata.song !== currentMetadata?.song) {
           setCurrentMetadata(newMetadata);
+          updateMediaSession(newMetadata, activeStream?.title);
         }
       }
     } catch (error) {
       console.error(`Error fetching metadata from ${url}:`, error);
     }
+  };
+
+  const updateMediaSession = (metadata: StreamMetadata | null, streamTitle?: string) => {
+    if (!('mediaSession' in navigator)) {
+      return;
+    }
+
+    const { song, artUrl } = metadata || {};
+    
+    // Default values
+    let title = 'Unknown Title';
+    let artist = streamTitle || 'Mood Radio';
+
+    if (song) {
+        // Simple parsing, assuming "Artist - Title" format
+        const parts = song.split(' - ');
+        if (parts.length > 1) {
+            artist = parts[0].trim();
+            title = parts[1].trim();
+        } else {
+            title = song;
+        }
+    }
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: title,
+      artist: artist,
+      album: streamTitle || 'Live Stream',
+      artwork: artUrl ? [{ src: artUrl, sizes: '512x512', type: 'image/jpeg' }] : [],
+    });
   };
 
   const playStream = async (stream: StreamData) => {
@@ -125,6 +156,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     // Now, set the new stream state
     setActiveStream(stream);
     setCurrentMetadata(null);
+    updateMediaSession(null, stream.title); // Update with default info immediately
     setIsLoading(true);
 
     loadingTimeoutRef.current = setTimeout(() => {

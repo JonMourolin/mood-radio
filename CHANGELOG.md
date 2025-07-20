@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.30.1] - 2025-07-20
+
+### Added
+- **Lock Screen Metadata (Web)**: Implemented the Media Session API to display the current track's artwork, title, and artist on the device's lock screen and system media controls.
+
 ## [3.30.0] - 2025-07-20
 
 ### Added
