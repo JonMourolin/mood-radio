@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.30.0] - 2025-07-20
+
+### Added
+- **Robust Web Audio Player**: Implemented `hls.js` for native HLS streaming on web platforms, replacing the deprecated `expo-av` web implementation.
+- **Platform-Specific Architecture**: Created dedicated web and native versions of `PlayerContext` and `MiniPlayer` to ensure zero conflicts between audio libraries.
+
+### Fixed
+- **Background Audio Distortion**: Resolved the audio distortion and stuttering bug that occurred when controlling playback from the lock screen on mobile web.
+- **Stream Loading Timeout**: Fixed the persistent 10-second timeout error on the web by removing library conflicts and ensuring a clean audio state.
+- **Stream Switching Bug**: Corrected the race condition that caused playback to fail when switching between streams without manually stopping the current one.
+
+### Removed
+- **`expo-av` from Web Bundle**: Completely removed the `expo-av` library from the web build, resolving console warnings and critical runtime conflicts.
+- **Unused Settings Screen**: Deleted the `settings.tsx` screen to clean up the codebase.
+
+### Technical
+- **Code Separation**: Refactored components using platform-specific file extensions (`.web.tsx`, `.native.tsx`) for cleaner, more maintainable, and conflict-free code.
+- **Dependency Optimization**: The web bundle is now lighter as it no longer includes the native `expo-av` library.
+
 ## [3.29.1] - 2025-07-18
 
 ### Fixed

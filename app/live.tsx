@@ -1,21 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  ImageBackground,
+  Image,
+  ImageBackground, // Re-add ImageBackground
   Platform,
   useWindowDimensions,
   ImageSourcePropType,
   SafeAreaView,
   ScrollView,
-  Image,
-  ViewStyle,
   ActivityIndicator,
-  Animated,
 } from 'react-native';
-import { Audio, Video, ResizeMode } from 'expo-av';
+// REMOVED: import { Audio, Video, ResizeMode } from 'expo-av';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText'; 
@@ -138,51 +136,28 @@ const rawStreamData = generateStreamData(Platform.OS === 'web');
 
 const STREAM_DATA: StreamData[] = rawStreamData.map(item => ({
   ...item,
-  streamUrl: Platform.OS === 'web'
-    ? `${AZURACAST_BASE_URL}/listen/${item.stationSlug}/radio.mp3`
-    : `${AZURACAST_BASE_URL}/hls/${item.stationSlug}/live.m3u8`,
+  // Use HLS for all platforms now
+  streamUrl: `${AZURACAST_BASE_URL}/hls/${item.stationSlug}/live.m3u8`,
   metadataUrl: `${AZURACAST_BASE_URL}/api/nowplaying/${item.stationSlug}`,
 }));
 
 // --- Stream Item Component ---
 const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, isPlaying, isLoading }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [videoKey, setVideoKey] = useState(Date.now());
   const styles = getStyles(useColorScheme() === 'dark', Platform.OS === 'web' && useWindowDimensions().width >= 480 ? 2 : 1);
 
   const handlePress = () => {
     onPlayPress(item);
   };
+  
+  const isWeb = Platform.OS === 'web';
+  const canHover = isWeb && (typeof navigator !== 'undefined' && !navigator.userAgent.includes('Mobile'));
 
-  // Detect if it's mobile web
-  const isMobileWeb = Platform.OS === 'web' && (
-    typeof navigator !== 'undefined' && 
-    (navigator.userAgent.includes('Mobile') || navigator.userAgent.includes('Android') || navigator.userAgent.includes('iPhone'))
-  );
+  const handleMouseEnter = () => canHover && setIsHovered(true);
+  const handleMouseLeave = () => canHover && setIsHovered(false);
 
-  const canHover = Platform.OS === 'web' && !isMobileWeb;
+  const webHoverProps = canHover ? { onMouseEnter: handleMouseEnter, onMouseLeave: handleMouseLeave } : {};
 
-  const handleMouseEnter = () => {
-    if (canHover) {
-      setIsHovered(true);
-      setVideoKey(Date.now()); // Change key to force remount and restart video
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (canHover) {
-      setIsHovered(false);
-      // By changing the key on leave as well, we force a remount to a paused state
-      setVideoKey(Date.now()); 
-    }
-  };
-
-  const webHoverProps = canHover ? {
-    onMouseEnter: handleMouseEnter,
-    onMouseLeave: handleMouseLeave,
-  } : {};
-
-  // Determine icon visibility
   const showSpinner = isLoading && isActive;
   const showPauseIcon = !showSpinner && isActive && isPlaying;
   const showPlayIcon = !showSpinner && !showPauseIcon && (!canHover || isHovered);
@@ -195,31 +170,17 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
       onPress={handlePress}
       activeOpacity={0.8}
     >
-      {isMobileWeb ? (
-        <Image
-          source={item.imageUrl}
-          style={styles.itemImageBackground}
-          resizeMode="cover"
-        />
-      ) : (
-        <Video
-          key={videoKey}
-          source={item.videoUrl}
-          style={styles.itemImageBackground}
-          resizeMode={ResizeMode.COVER}
-          isLooping
-          isMuted
-          shouldPlay={isHovered}
-        />
-      )}
+      {/* Video component is now completely removed in favor of Image */}
+      <Image
+        source={item.imageUrl as ImageSourcePropType}
+        style={styles.itemImageBackground}
+        resizeMode="cover"
+      />
       <View style={StyleSheet.absoluteFill}>
         {shouldShowIcon && (
           <TouchableOpacity style={styles.playButton} onPress={handlePress}> 
             {showSpinner ? (
-              <ActivityIndicator 
-                size="large" 
-                color="#FFFFFF"
-              />
+              <ActivityIndicator size="large" color="#FFFFFF" />
             ) : (
               <Ionicons 
                 name={showPauseIcon ? "stop-sharp" : "play-sharp"} 

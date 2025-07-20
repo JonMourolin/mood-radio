@@ -55,10 +55,10 @@ export default function RootLayout() {
       // Start fade-in animation only on native platforms
       if (Platform.OS !== 'web') {
         Animated.timing(contentOpacity as Animated.Value, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }).start();
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
       }
     }
   }, [appIsReady]); // Depend on appIsReady
@@ -71,10 +71,10 @@ export default function RootLayout() {
         // Start fade-in animation only on native platforms
         if (Platform.OS !== 'web') {
           Animated.timing(contentOpacity as Animated.Value, {
-            toValue: 1,
-            duration: 500,
-            useNativeDriver: true,
-          }).start();
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }).start();
         }
       });
     }
