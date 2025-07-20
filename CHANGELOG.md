@@ -10,36 +10,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [3.30.0] - 2025-07-20
 
 ### Added
-- **Robust Web Audio Player**: Implemented `hls.js` for native HLS streaming on web platforms, replacing the deprecated `expo-av` web implementation.
-- **Platform-Specific Architecture**: Created dedicated web and native versions of `PlayerContext` and `MiniPlayer` to ensure zero conflicts between audio libraries.
+- **Web Audio Player**: Replaced Expo AV's web implementation with `hls.js` for robust HLS streaming.
+- **Platform-Specific Code**: Separated `PlayerContext` and `MiniPlayer` into `.web.tsx` and `.native.tsx` files to remove `expo-av` warnings on the web build.
 
 ### Fixed
-- **Background Audio Distortion**: Resolved the audio distortion and stuttering bug that occurred when controlling playback from the lock screen on mobile web.
-- **Stream Loading Timeout**: Fixed the persistent 10-second timeout error on the web by removing library conflicts and ensuring a clean audio state.
-- **Stream Switching Bug**: Corrected the race condition that caused playback to fail when switching between streams without manually stopping the current one.
+- **Audio Distortion on Web**: Resolved audio distortion and glitches when controlling playback from the lock screen on mobile web.
+- **Stream Switching Timeout**: Fixed a bug where switching between streams could cause a timeout if the previous stream wasn't stopped manually.
+- **Video Playback on Web**: Removed background video playback on the web to prevent potential conflicts with the new audio implementation, keeping only the mood images.
 
 ### Removed
-- **`expo-av` from Web Bundle**: Completely removed the `expo-av` library from the web build, resolving console warnings and critical runtime conflicts.
-- **Unused Settings Screen**: Deleted the `settings.tsx` screen to clean up the codebase.
-
-### Technical
-- **Code Separation**: Refactored components using platform-specific file extensions (`.web.tsx`, `.native.tsx`) for cleaner, more maintainable, and conflict-free code.
-- **Dependency Optimization**: The web bundle is now lighter as it no longer includes the native `expo-av` library.
+- **Settings Screen**: Deleted the unused `settings.tsx` screen and its corresponding tab from the layout.
 
 ## [3.29.1] - 2025-07-18
 
 ### Fixed
-- **Web Animation Error Resolution**: Fixed useNativeDriver error on web platforms
-  - Resolved console errors: "useNativeDriver is not supported because the native animated module is missing"
-  - Implemented platform-specific animation handling: native driver for mobile, no animation for web
-  - Eliminated JS-based animation fallback that caused performance issues
-  - Improved web user experience with cleaner console output and better performance
-
-### Technical
-- **Platform-Conditional Animations**: Enhanced animation system architecture
-  - Web: Direct opacity setting to avoid native driver requirements
-  - Mobile: Preserved existing GPU-accelerated animations with native driver
-  - Maintained backward compatibility with no impact on mobile app experience
+- **Animation Warning on Web**: Resolved the `useNativeDriver` warning on the web by applying animations conditionally.
 
 ## [3.29.0] - 2025-07-14
 
