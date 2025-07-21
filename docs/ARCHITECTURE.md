@@ -59,9 +59,12 @@ La distinction avec `config.ts` est importante : une **constante** est gravée d
 
 ---
 
-### `services/mixcloudService.ts`
-**Rôle :** Ambassadeur auprès de l'API Mixcloud.
-Ce fichier isole toute la logique de communication avec le service externe Mixcloud. Il est responsable de récupérer les données, de les nettoyer et de les formater pour le reste de l'application. Cela rend le code plus modulaire et facile à maintenir si l'API externe change.
+### `services/`
+**Rôle :** Ambassadeurs auprès des APIs externes.
+Ce dossier isole toute la logique de communication avec les services externes.
+
+- **`mixcloudService.ts`**: Récupère, nettoie et formate les données depuis l'API Mixcloud.
+- **`WebPlayer.ts`**: Encapsule et contrôle la librairie `hls.js` pour le streaming audio sur le web. Il gère la lecture, la pause, et les événements du lecteur, offrant une interface simple au reste de l'application web.
 
 ---
 
@@ -95,13 +98,13 @@ Ce dossier contient des "hooks" personnalisés qui encapsulent et partagent de l
 
 ### `context/`
 **Rôle :** Panneau de contrôle global et état partagé.
-Ce dossier contient les "Contextes" React. Un Contexte est un mécanisme pour rendre des données et fonctions disponibles dans toute l'application sans avoir à les passer manuellement de composant en composant. C'est ici que réside l'état partagé. Par exemple, `PlayerContext.tsx` est le "cerveau" du lecteur audio : il gère l'état (quelle radio joue, si elle est en pause) et expose les commandes (`playStream`).
+Ce dossier contient les "Contextes" React. Un Contexte est un mécanisme pour rendre des données et fonctions disponibles dans toute l'application sans avoir à les passer manuellement de composant en composant.
 
-**Relation avec les Hooks :**
-La distinction est clé : le **Hook** est l'**outil**, le **Context** est le **tuyau**.
-- On utilise des **Hooks** (comme `useState`, `useEffect`) pour construire la logique et mémoriser l'état.
-- On place cet état dans un **Provider** de Context (le **tuyau**) pour le rendre accessible partout.
-- On utilise le hook **`useContext`** (un autre **outil**) pour se brancher au tuyau depuis n'importe quel composant et y lire les données.
+Au cœur de cette architecture se trouve une **séparation de la logique par plateforme** :
+- **`PlayerContext.native.tsx` :** Le "cerveau" du lecteur audio pour iOS et Android. Il utilise la librairie `expo-av` pour gérer le son, la lecture en arrière-plan et les interruptions natives.
+- **`PlayerContext.web.tsx` :** La version web du cerveau. Il utilise `hls.js` pour le streaming adaptatif et la `MediaSession API` du navigateur pour afficher les informations du morceau sur l'écran de verrouillage du système.
+
+Grâce aux extensions `.native.tsx` et `.web.tsx`, Expo choisit automatiquement le bon fichier lors de la compilation, ce qui permet de garder le reste du code agnostique à la plateforme.
 
 ---
 
@@ -117,7 +120,7 @@ Ce dossier est la "boîte de Lego" du projet. Il contient des composants React i
 
 - **Composants fondamentaux :**
   - `ThemedText.tsx` et `ThemedView.tsx` : La base du système de design, ils appliquent automatiquement les bonnes couleurs de texte et de fond en fonction du thème (clair/sombre).
-  - `MiniPlayer.tsx` : Le lecteur audio qui apparaît en bas de l'écran.
+  - `MiniPlayer.native.tsx` et `MiniPlayer.web.tsx` : Versions spécifiques par plateforme du lecteur audio qui apparaît en bas de l'écran.
 
 - **Sous-dossiers :**
   - `ui/` : Contient des composants d'interface de bas niveau, souvent avec des implémentations spécifiques à une plateforme (ex: `IconSymbol.ios.tsx` pour les icônes natives d'Apple).
@@ -129,14 +132,14 @@ Ce dossier est la "boîte de Lego" du projet. Il contient des composants React i
 **Rôle :** Ressources statiques **intégrées** à l'application native (iOS/Android).
 Ce dossier contient les images, polices, et vidéos qui sont packagées directement dans l'application mobile. Pour les plateformes natives, les assets de ce dossier sont chargés via `require()`, ce qui garantit leur disponibilité immédiate et hors ligne.
 
-**Important :** Pour la version Web, afin d'optimiser les temps de chargement, les assets lourds (images des tuiles, vidéos) ne sont pas chargés depuis ce dossier mais depuis le dossier `public/`.
+**Important :** Pour la version Web, afin d'optimiser les temps de chargement, les assets lourds (images des tuiles) ne sont pas chargés depuis ce dossier mais depuis le dossier `public/`.
 
 ---
 
 ### `public/`
 **Rôle :** Ressources statiques **servies** à l'application Web.
-Ce dossier a été ajouté pour optimiser radicalement les performances de la version Web. Tout fichier placé ici (images, vidéos, etc.) est rendu accessible via une URL simple, comme sur un site web traditionnel.
-Le navigateur peut ainsi télécharger ces ressources de manière asynchrone, sans qu'elles soient intégrées dans le fichier JavaScript principal de l'application. Cela réduit drastiquement la taille du bundle initial et élimine l'écran blanc au premier chargement.
+Ce dossier a été ajouté pour optimiser radicalement les performances de la version Web. Tout fichier placé ici (images, etc.) est rendu accessible via une URL simple, comme sur un site web traditionnel.
+Le navigateur peut ainsi télécharger ces ressources de manière asynchrone, sans qu'elles soient intégrées dans le fichier JavaScript principal de l'application. Cela réduit drastiquement la taille du bundle initial.
 
 ---
 
@@ -146,19 +149,17 @@ Ce dossier est géré par **Expo Router** et sa structure de fichiers définit l
 
 - **Stratégie de chargement des assets :**
   Pour optimiser les performances sur chaque plateforme, l'application utilise une stratégie de chargement conditionnelle.
-  - **Natif (iOS/Android) :** Utilise `require()` pour charger les médias depuis `assets/`, les intégrant directement pour un accès rapide.
+  - **Natif (iOS/Android) :** Utilise `require()` pour charger les médias depuis `assets/`.
   - **Web :** Utilise des chemins d'URL simples (ex: `/images/moods/poolside.jpg`) qui pointent vers les fichiers du dossier `public/`.
-  Cette logique est isolée dans la définition des données (ex: `app/moods.tsx`) pour garder le code des composants propre et agnostique à la plateforme.
 
 - **Fichiers de layout (les "poupées russes") :**
-  - `_layout.tsx` : La **coquille principale** (la plus grande poupée). Il gère le splash screen, enveloppe toute l'application dans le `PlayerProvider` pour rendre le lecteur audio global, et définit la structure de navigation de base (`<Stack>`).
-  - `(tabs)/_layout.tsx` : La **coquille des onglets** (la poupée du milieu). Ce layout est un enfant du layout racine et ne s'applique qu'aux applications natives (iOS/Android). Il construit la barre de navigation inférieure et configure les icônes et titres pour chaque onglet (`moods`, `mixcloud`, `settings`). Sur le web, il s'efface pour laisser la navigation du header prendre le relais.
+  - `_layout.tsx` : La **coquille principale**. Il gère le splash screen et enveloppe toute l'application dans le `PlayerProvider` pour rendre le lecteur audio global.
+  - `(tabs)/_layout.tsx` : La **coquille des onglets**. Ce layout ne s'applique qu'aux applications natives (iOS/Android). Il construit la barre de navigation inférieure pour les onglets (`Live` et `Mixcloud`).
 
 - **Les écrans et les routes :**
   - `index.tsx` : Le "portier" de l'application. Il redirige l'utilisateur de la racine (`/`) vers le premier écran pertinent.
-  - `moods.tsx`, `mixcloud.tsx`, `settings.tsx` : Les fichiers de contenu des écrans principaux.
-  - `(tabs)/moods.tsx` : Un simple **"pointeur"** qui importe le vrai contenu depuis `app/moods.tsx` pour l'afficher dans l'onglet correspondant.
-  - `(tabs)/mixcloud.tsx` : La version de l'écran Mixcloud **spécifique au natif**, qui utilise une `WebView` dans un modal.
+  - `live.tsx`, `mixcloud.tsx` : Les fichiers de contenu des écrans principaux.
+  - `(tabs)/live.tsx` et `(tabs)/mixcloud.tsx` : Simples **"pointeurs"** qui importent le vrai contenu depuis les fichiers racines correspondants pour les afficher dans les onglets natifs.
   - `FullScreenPlayer.tsx` : L'écran du lecteur en plein écran, utilisé **uniquement sur natif**.
 
 - **Le sous-dossier `app/components/` :**
