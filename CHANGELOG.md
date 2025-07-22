@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.32.0] - 2025-07-22
+
+### Added
+- **Ken Burns Effect**: Implemented a subtle, looping zoom animation (Ken Burns effect) on mood tiles to add dynamic visual interest to the interface.
+
+### Changed
+- **Grid Layout**: Refined the spacing between mood tiles to 2px for a tighter, more cohesive grid appearance.
+
 ## [3.31.0] - 2025-07-22
 
 ### Added

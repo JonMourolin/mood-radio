@@ -13,6 +13,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withRepeat, Easing } from 'react-native-reanimated';
 // REMOVED: import { Audio, Video, ResizeMode } from 'expo-av';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ThemedView } from '@/components/ThemedView';
@@ -146,6 +147,25 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
   const [isHovered, setIsHovered] = useState(false);
   const styles = getStyles(useColorScheme() === 'dark', Platform.OS === 'web' && useWindowDimensions().width >= 480 ? 2 : 1);
 
+  const scale = useSharedValue(1);
+
+  useEffect(() => {
+    scale.value = withRepeat(
+      withTiming(1.05, {
+        duration: 15000,
+        easing: Easing.inOut(Easing.ease),
+      }),
+      -1,
+      true
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: scale.value }],
+    };
+  });
+
   const handlePress = () => {
     onPlayPress(item);
   };
@@ -164,52 +184,54 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
   const shouldShowIcon = showSpinner || showPauseIcon || showPlayIcon;
 
   return (
-    <TouchableOpacity 
-      style={styles.itemOuterContainer}
-      {...webHoverProps} 
-      onPress={handlePress}
-      activeOpacity={0.8}
-    >
-      {/* Video component is now completely removed in favor of Image */}
-      <Image
-        source={item.imageUrl as ImageSourcePropType}
-        style={styles.itemImageBackground}
-        resizeMode="cover"
-      />
-      <View style={StyleSheet.absoluteFill}>
-        {shouldShowIcon && (
-          <TouchableOpacity style={styles.playButton} onPress={handlePress}> 
-            {showSpinner ? (
-              <ActivityIndicator size="large" color="#FFFFFF" />
-            ) : (
-              <Ionicons 
-                name={showPauseIcon ? "stop-sharp" : "play-sharp"} 
-                size={48}
-                color="#FFFFFF"
-                style={styles.playIcon}
-              />
-            )}
-          </TouchableOpacity>
-        )}
+    <View style={styles.itemSizer}>
+      <TouchableOpacity 
+        style={styles.itemContainer}
+        {...webHoverProps} 
+        onPress={handlePress}
+        activeOpacity={0.8}
+      >
+        {/* Video component is now completely removed in favor of Image */}
+        <Animated.Image
+          source={item.imageUrl as ImageSourcePropType}
+          style={[styles.itemImageBackground, animatedStyle]}
+          resizeMode="cover"
+        />
+        <View style={StyleSheet.absoluteFill}>
+          {shouldShowIcon && (
+            <TouchableOpacity style={styles.playButton} onPress={handlePress}> 
+              {showSpinner ? (
+                <ActivityIndicator size="large" color="#FFFFFF" />
+              ) : (
+                <Ionicons 
+                  name={showPauseIcon ? "stop-sharp" : "play-sharp"} 
+                  size={48}
+                  color="#FFFFFF"
+                  style={styles.playIcon}
+                />
+              )}
+            </TouchableOpacity>
+          )}
 
-        {canHover && isHovered ? (
-          <View style={styles.hoverOverlay}>
-            <View style={styles.hoverTitleContainer}> 
-              <Text style={styles.itemEmoji}>{item.emoji}</Text> 
-              <Text style={styles.hoverTitle}>{item.title}</Text>
+          {canHover && isHovered ? (
+            <View style={styles.hoverOverlay}>
+              <View style={styles.hoverTitleContainer}> 
+                <Text style={styles.itemEmoji}>{item.emoji}</Text> 
+                <Text style={styles.hoverTitle}>{item.title}</Text>
+              </View>
+              <Text style={styles.hoverDescription}>{item.description}</Text>
             </View>
-            <Text style={styles.hoverDescription}>{item.description}</Text>
-          </View>
-        ) : (
-          <View style={styles.itemOverlay}> 
-            <View style={styles.itemTitleContainer}>
-                <Text style={styles.itemEmoji}>{item.emoji}</Text>
-                <Text style={styles.itemTitle} numberOfLines={1}>{item.title}</Text> 
+          ) : (
+            <View style={styles.itemOverlay}> 
+              <View style={styles.itemTitleContainer}>
+                  <Text style={styles.itemEmoji}>{item.emoji}</Text>
+                  <Text style={styles.itemTitle} numberOfLines={1}>{item.title}</Text> 
+              </View>
             </View>
-          </View>
-        )}
-      </View>
-    </TouchableOpacity>
+          )}
+        </View>
+      </TouchableOpacity>
+    </View>
   );
 };
 
@@ -468,13 +490,16 @@ const getStyles = (
       // Add padding here ONLY for web 2-col to space from edges
       paddingHorizontal: numColumns === 1 ? 0 : 7, // 10 - 3 item padding = 7
     },
-    itemOuterContainer: { // Renamed from itemBase
-      // Explicit conditional styles based EXACTLY on numColumns
-      width: numColumns === 1 ? '100%' : '50%', 
-      height: numColumns === 1 ? 200 : 230,
-      padding: numColumns === 1 ? 0 : 3, // Padding only for 2-col items
-      marginBottom: numColumns === 1 ? 6 : 0, // Margin only for 1-col items
+    itemSizer: {
+      width: numColumns === 1 ? '100%' : '50%',
+      padding: numColumns === 1 ? 0 : 1,
+      marginBottom: numColumns === 1 ? 2 : 0,
+    },
+    itemContainer: {
+      height: numColumns === 1 ? 200 : 224,
+      width: '100%',
       overflow: 'hidden',
+      position: 'relative',
     },
     itemImageBackground: {
       height: '100%', 
