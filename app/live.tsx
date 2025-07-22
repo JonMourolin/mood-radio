@@ -13,7 +13,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withRepeat, Easing } from 'react-native-reanimated';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withRepeat, Easing, cancelAnimation } from 'react-native-reanimated';
 // REMOVED: import { Audio, Video, ResizeMode } from 'expo-av';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { ThemedView } from '@/components/ThemedView';
@@ -150,15 +150,20 @@ const StreamItem: React.FC<StreamItemProps> = ({ item, onPlayPress, isActive, is
   const scale = useSharedValue(1);
 
   useEffect(() => {
-    scale.value = withRepeat(
-      withTiming(1.05, {
-        duration: 15000,
-        easing: Easing.inOut(Easing.ease),
-      }),
-      -1,
-      true
-    );
-  }, []);
+    if (isHovered) {
+      scale.value = withRepeat(
+        withTiming(1.05, {
+          duration: 2000,
+          easing: Easing.inOut(Easing.ease),
+        }),
+        -1,
+        true
+      );
+    } else {
+      cancelAnimation(scale);
+      scale.value = withTiming(1, { duration: 300 });
+    }
+  }, [isHovered]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
