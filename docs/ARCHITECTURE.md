@@ -6,7 +6,16 @@ Ce document explique le rôle des principaux fichiers et dossiers de configurati
 
 ### `package.json`
 **Rôle :** Carte d'identité du projet.
-Il liste toutes les librairies externes (dépendances) nécessaires pour que le projet fonctionne et pour le développer. Il contient aussi des scripts pour lancer des commandes courantes (comme `npm start`). C'est le premier fichier lu quand on installe le projet.
+Il liste toutes les librairies externes (dépendances) nécessaires pour que le projet fonctionne et pour le développer. Il contient aussi des scripts pour lancer des commandes courantes (comme `npm start`).
+La clé `"main"` est particulièrement importante : elle définit le tout premier fichier JavaScript à exécuter au lancement de l'application. Pour intégrer le lecteur audio en arrière-plan, nous l'avons pointée vers `index.js`.
+
+---
+
+### `index.js`
+**Rôle :** Point d'entrée principal de l'application.
+Ce fichier est le premier code exécuté. Il a deux responsabilités critiques :
+1.  **Enregistrer le service de lecture :** Il appelle `TrackPlayer.registerPlaybackService()` pour initialiser le service d'écoute en arrière-plan, ce qui permet à l'application de répondre aux contrôles de l'écran de verrouillage même quand elle est fermée.
+2.  **Lancer l'interface utilisateur :** Il importe `'expo-router/entry'` pour ensuite passer la main à Expo Router, qui gère le reste de l'application et l'affichage des écrans.
 
 ---
 
@@ -60,11 +69,12 @@ La distinction avec `config.ts` est importante : une **constante** est gravée d
 ---
 
 ### `services/`
-**Rôle :** Ambassadeurs auprès des APIs externes.
+**Rôle :** Ambassadeurs auprès des APIs externes et gestion des services d'arrière-plan.
 Ce dossier isole toute la logique de communication avec les services externes.
 
 - **`mixcloudService.ts`**: Récupère, nettoie et formate les données depuis l'API Mixcloud.
 - **`WebPlayer.ts`**: Encapsule et contrôle la librairie `hls.js` pour le streaming audio sur le web. Il gère la lecture, la pause, et les événements du lecteur, offrant une interface simple au reste de l'application web.
+- **`trackPlayerService.ts`**: Ce service est un **processus d'arrière-plan ("headless")** pour les plateformes natives (iOS/Android). Il s'enregistre au démarrage de l'application et écoute les événements "distants" envoyés par le système (écran de verrouillage, écouteurs, etc.). Lorsque l'utilisateur appuie sur "Play", ce service reçoit l'événement et le transmet au lecteur principal via `react-native-track-player`.
 
 ---
 
@@ -101,7 +111,7 @@ Ce dossier contient des "hooks" personnalisés qui encapsulent et partagent de l
 Ce dossier contient les "Contextes" React. Un Contexte est un mécanisme pour rendre des données et fonctions disponibles dans toute l'application sans avoir à les passer manuellement de composant en composant.
 
 Au cœur de cette architecture se trouve une **séparation de la logique par plateforme** :
-- **`PlayerContext.native.tsx` :** Le "cerveau" du lecteur audio pour iOS et Android. Il utilise la librairie `expo-av` pour gérer le son, la lecture en arrière-plan et les interruptions natives.
+- **`PlayerContext.native.tsx` :** Le "cerveau" du lecteur audio pour iOS et Android. Initialement basé sur `expo-av`, il a été refactorisé pour utiliser **`react-native-track-player`**. Cette librairie est spécialisée dans la gestion audio avancée : elle gère non seulement la lecture, mais aussi les contrôles sur l'écran de verrouillage, les notifications de lecture, et les événements d'arrière-plan.
 - **`PlayerContext.web.tsx` :** La version web du cerveau. Il utilise `hls.js` pour le streaming adaptatif et la `MediaSession API` du navigateur pour afficher les informations du morceau sur l'écran de verrouillage du système.
 
 Grâce aux extensions `.native.tsx` et `.web.tsx`, Expo choisit automatiquement le bon fichier lors de la compilation, ce qui permet de garder le reste du code agnostique à la plateforme.

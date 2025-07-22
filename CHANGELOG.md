@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.31.0] - 2025-07-22
+
+### Added
+- **Native Lock Screen Controls**: Implemented `react-native-track-player` to manage background audio and display playback controls on the lock screen for iOS and Android. This includes track title, artwork, and play/pause functionality.
+
+### Changed
+- **Native Audio Engine**: Replaced the `expo-av` library with `react-native-track-player` for the native mobile player context (`PlayerContext.native.tsx`) to support advanced background features.
+
+### Fixed
+- Corrected native build issues by updating all Expo dependencies to their compatible versions.
+
 ## [3.30.1] - 2025-07-20
 
 ### Added
