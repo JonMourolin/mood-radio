@@ -127,6 +127,7 @@ const generateStreamData = (isWeb: boolean) => {
     imageUrl: isWeb 
       ? `/images/moods/${item.id}.jpg`
       : nativeAssets[item.id as keyof typeof nativeAssets].image,
+    moodImageUrl: `/images/moods/${item.id}.jpg`, // Always use the web path
     videoUrl: isWeb 
       ? `/images/moods_videos/${item.id}.mp4`
       : nativeAssets[item.id as keyof typeof nativeAssets].video,

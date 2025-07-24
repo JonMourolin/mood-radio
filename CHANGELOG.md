@@ -5,7 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [3.34.0] - 2025-07-24
+
+### Added
+- **AI-Powered Discovery Modal**: Implemented a new modal that provides users with AI-generated descriptions for the currently playing track.
+- **Serverless Backend API**: Created a Vercel serverless function (`/api/getTrackInfo`) to handle requests to the OpenAI API securely.
+- **Vercel KV Caching**: Integrated Vercel KV to cache track descriptions for 30 days, reducing API costs and improving performance.
+- **Responsive Modal UI**: Designed the modal to be fully responsive, with a custom layout for both desktop and mobile screens.
+- **Dynamic Typewriter Effect**: Added a "typewriter" animation for displaying the track description.
+
+### Changed
+- **Navigation Flow**: Replaced the dedicated discovery page with a global modal, accessible directly from the main player UI.
+- **AI Prompt Engineering**: Refined the OpenAI prompt multiple times to improve description quality, enforce length constraints, and ensure correct formatting.
+
+### Fixed
+- **UI Loading State**: Improved the user experience by showing existing track data instantly while the AI description loads.
+- Corrected various styling issues based on user feedback, including colors, fonts, and layout spacing.
 
 ## [3.33.0] - 2025-07-23
 

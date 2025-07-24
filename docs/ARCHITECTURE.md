@@ -4,6 +4,13 @@ Ce document explique le rôle des principaux fichiers et dossiers de configurati
 
 ---
 
+### `api/`
+**Rôle :** Backend de l'application (fonctions Serverless).
+Ce dossier, qui n'existe que pour Vercel, contient notre logique backend sous forme de fonctions "serverless". Chaque fichier TypeScript dans ce dossier devient un point d'API interrogeable.
+- **`getTrackInfo.ts`**: C'est le cœur de notre fonctionnalité "Discovery". Cette fonction reçoit un nom d'artiste et de morceau, interroge l'API d'OpenAI pour générer une description, et utilise **Vercel KV** (une base de données clé-valeur) comme cache pour stocker les descriptions pendant 30 jours, évitant ainsi des appels répétés et coûteux.
+
+---
+
 ### `package.json`
 **Rôle :** Carte d'identité du projet.
 Il liste toutes les librairies externes (dépendances) nécessaires pour que le projet fonctionne et pour le développer. Il contient aussi des scripts pour lancer des commandes courantes (comme `npm start`).
@@ -110,11 +117,16 @@ Ce dossier contient des "hooks" personnalisés qui encapsulent et partagent de l
 **Rôle :** Panneau de contrôle global et état partagé.
 Ce dossier contient les "Contextes" React. Un Contexte est un mécanisme pour rendre des données et fonctions disponibles dans toute l'application sans avoir à les passer manuellement de composant en composant.
 
-Au cœur de cette architecture se trouve une **séparation de la logique par plateforme** :
-- **`PlayerContext.native.tsx` :** Le "cerveau" du lecteur audio pour iOS et Android. Initialement basé sur `expo-av`, il a été refactorisé pour utiliser **`react-native-track-player`**. Cette librairie est spécialisée dans la gestion audio avancée : elle gère non seulement la lecture, mais aussi les contrôles sur l'écran de verrouillage, les notifications de lecture, et les événements d'arrière-plan.
-- **`PlayerContext.web.tsx` :** La version web du cerveau. Il utilise `hls.js` pour le streaming adaptatif et la `MediaSession API` du navigateur pour afficher les informations du morceau sur l'écran de verrouillage du système.
+- **`PlayerContext`**: Le "cerveau" de l'application. Au-delà de la gestion du lecteur audio, il a été enrichi pour piloter la **modale de découverte** :
+    - Il maintient l'état de la modale (visible/cachée, chargement, erreurs).
+    - Il contient la fonction `openDiscoveryModal` qui interroge notre propre API (`/api/getTrackInfo`) pour récupérer les informations du morceau.
+    - Il stocke les données reçues (`discoveryData`) pour les afficher dans la modale.
 
-Grâce aux extensions `.native.tsx` et `.web.tsx`, Expo choisit automatiquement le bon fichier lors de la compilation, ce qui permet de garder le reste du code agnostique à la plateforme.
+- **Séparation par plateforme** :
+    - **`PlayerContext.native.tsx` :** Version pour iOS et Android, basée sur **`react-native-track-player`**.
+    - **`PlayerContext.web.tsx` :** Version web, basée sur `hls.js` et la `MediaSession API`.
+
+Grâce aux extensions `.native.tsx` et `.web.tsx`, Expo choisit automatiquement le bon fichier lors de la compilation.
 
 ---
 
@@ -129,8 +141,9 @@ Ces dossiers contiennent les projets natifs (Xcode pour iOS, Android Studio pour
 Ce dossier est la "boîte de Lego" du projet. Il contient des composants React indépendants qui sont assemblés pour construire les écrans.
 
 - **Composants fondamentaux :**
-  - `ThemedText.tsx` et `ThemedView.tsx` : La base du système de design, ils appliquent automatiquement les bonnes couleurs de texte et de fond en fonction du thème (clair/sombre).
-  - `MiniPlayer.native.tsx` et `MiniPlayer.web.tsx` : Versions spécifiques par plateforme du lecteur audio qui apparaît en bas de l'écran.
+  - `ThemedText.tsx` et `ThemedView.tsx` : La base du système de design.
+  - `MiniPlayer.native.tsx` et `MiniPlayer.web.tsx` : Le lecteur audio réduit.
+  - **`DiscoveryModal.tsx`**: Un composant **global et réutilisable** qui affiche les informations détaillées d'un morceau. Il est conçu pour s'afficher par-dessus n'importe quel écran et est entièrement piloté par le `PlayerContext`.
 
 - **Sous-dossiers :**
   - `ui/` : Contient des composants d'interface de bas niveau, souvent avec des implémentations spécifiques à une plateforme (ex: `IconSymbol.ios.tsx` pour les icônes natives d'Apple).
@@ -162,6 +175,9 @@ Ce dossier est géré par **Expo Router** et sa structure de fichiers définit l
   - **Natif (iOS/Android) :** Utilise `require()` pour charger les médias depuis `assets/`.
   - **Web :** Utilise des chemins d'URL simples (ex: `/images/moods/poolside.jpg`) qui pointent vers les fichiers du dossier `public/`.
 
+- **Logique de la modale "Discovery" :**
+  Contrairement à une navigation vers une nouvelle page, les boutons "Discovery" (dans `FullScreenPlayer.tsx` et `Footer.tsx`) appellent désormais la fonction `openDiscoveryModal` du `PlayerContext`. C'est le contexte qui se charge d'afficher le composant `DiscoveryModal.tsx` (rendu globalement dans `_layout.tsx`) par-dessus l'écran actuel.
+
 - **Fichiers de layout (les "poupées russes") :**
   - `_layout.tsx` : La **coquille principale**. Il gère le splash screen et enveloppe toute l'application dans le `PlayerProvider` pour rendre le lecteur audio global.
   - `(tabs)/_layout.tsx` : La **coquille des onglets**. Ce layout ne s'applique qu'aux applications natives (iOS/Android). Il construit la barre de navigation inférieure pour les onglets (`Live` et `Mixcloud`).
@@ -170,8 +186,4 @@ Ce dossier est géré par **Expo Router** et sa structure de fichiers définit l
   - `index.tsx` : Le "portier" de l'application. Il redirige l'utilisateur de la racine (`/`) vers le premier écran pertinent.
   - `live.tsx`, `mixcloud.tsx` : Les fichiers de contenu des écrans principaux.
   - `(tabs)/live.tsx` et `(tabs)/mixcloud.tsx` : Simples **"pointeurs"** qui importent le vrai contenu depuis les fichiers racines correspondants pour les afficher dans les onglets natifs.
-  - `FullScreenPlayer.tsx` : L'écran du lecteur en plein écran, utilisé **uniquement sur natif**.
-
-- **Le sous-dossier `app/components/` :**
-  - **Rôle :** Contient des composants spécifiques au **layout**, par opposition aux composants génériques du dossier `components/` racine.
-  - **Exemple (`Navigation.tsx`) :** C'est l'en-tête de navigation du **site web**, "colocalisé" ici car il est fortement couplé à la structure de routage de `/app`. 
+  - `FullScreenPlayer.tsx` : L'écran du lecteur en plein écran, utilisé **uniquement sur natif**. 

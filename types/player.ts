@@ -7,6 +7,7 @@ export interface StreamData {
   emoji: string;
   description: string;
   imageUrl: ImageSourcePropType; 
+  moodImageUrl?: string; // New field for the consistent URL
   videoUrl?: any; // or specific video type if you have one
   streamUrl?: string; 
   metadataUrl?: string; 

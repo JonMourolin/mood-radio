@@ -4,17 +4,32 @@ import { METADATA_REFRESH_INTERVAL_MS } from '../config';
 import { AzuraCastApiResponse } from '@/types/api';
 import WebPlayer, { WebPlayerCallbacks } from '../services/WebPlayer';
 
-// NOTE: This interface must stay in sync with the native version
+// Data structure for the discovery modal content
+interface DiscoveryData {
+  track: string | null;
+  artist: string | null;
+  artUrl: string | null;
+  moodImageUrl: string | null;
+  description: string | null;
+}
+
+// PlayerContext: Manages the state of the audio player for the web application.
 interface PlayerContextProps {
   activeStream: StreamData | null;
   currentMetadata: StreamMetadata | null;
   isPlaying: boolean;
   isLoading: boolean;
-  // soundRef is a no-op on web, but kept for interface compatibility
   soundRef: React.MutableRefObject<null>; 
   playStream: (stream: StreamData) => Promise<void>;
   togglePlayPause: () => Promise<void>;
-  cleanupAudio: () => void; // Changed from Promise<void> to void
+  cleanupAudio: () => void;
+  
+  isDiscoveryModalVisible: boolean;
+  discoveryData: DiscoveryData | null;
+  isDiscoveryLoading: boolean;
+  discoveryError: string | null;
+  openDiscoveryModal: () => void;
+  closeDiscoveryModal: () => void;
 }
 
 const PlayerContext = createContext<PlayerContextProps | undefined>(undefined);
@@ -29,6 +44,12 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentMetadata, setCurrentMetadata] = useState<StreamMetadata | null>(null);
   
+  // State for Discovery Modal
+  const [isDiscoveryModalVisible, setDiscoveryModalVisible] = useState(false);
+  const [discoveryData, setDiscoveryData] = useState<DiscoveryData | null>(null);
+  const [isDiscoveryLoading, setDiscoveryLoading] = useState(false);
+  const [discoveryError, setDiscoveryError] = useState<string | null>(null);
+
   const webPlayerRef = useRef<WebPlayer | null>(null);
   const metadataIntervalRef = useRef<NodeJS.Timeout | number | null>(null);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | number | null>(null);
@@ -45,7 +66,6 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
       onLoading: () => setIsLoading(true),
       onError: (error) => {
         console.error('WebPlayer error in context:', error);
-        // On error, we should clean up to allow a fresh start.
         cleanupAudio();
       },
     };
@@ -56,8 +76,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     };
   }, []);
 
-  // Simplified and more robust cleanup
-  const cleanupAudio = () => { // No longer async
+  const cleanupAudio = () => { 
     if (loadingTimeoutRef.current) clearTimeout(loadingTimeoutRef.current);
     if (metadataIntervalRef.current) clearInterval(metadataIntervalRef.current);
     
@@ -66,7 +85,59 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     setIsPlaying(false);
     setIsLoading(false);
     setActiveStream(null);
-    setCurrentMetadata(null); // Also clear metadata on cleanup
+    setCurrentMetadata(null);
+  };
+  
+  const openDiscoveryModal = async () => {
+    if (!currentMetadata || !currentMetadata.song || !activeStream) return;
+
+    // Immediately parse and set the data we already have
+    const songParts = currentMetadata.song.split(' - ');
+    const artist = songParts[0]?.trim() || activeStream.title;
+    const track = songParts.length > 1 ? songParts.slice(1).join(' - ').trim() : 'Unknown Title';
+
+    setDiscoveryData({
+        track,
+        artist,
+        artUrl: currentMetadata.artUrl || null,
+        moodImageUrl: activeStream.moodImageUrl || null,
+        description: null, // The description is what we're fetching
+    });
+
+    setDiscoveryModalVisible(true);
+    setDiscoveryLoading(true);
+    setDiscoveryError(null);
+
+    try {
+      const response = await fetch(`/api/getTrackInfo?artist=${encodeURIComponent(artist)}&track=${encodeURIComponent(track)}`);
+
+      if (!response.ok) {
+        if (response.status === 504) {
+          setDiscoveryError("No data found. This track might be too recent or underground. Dig it !");
+        } else {
+          const errorData = await response.json();
+          setDiscoveryError(errorData.error || 'Failed to fetch description');
+        }
+      } else {
+        const data = await response.json();
+        // Update existing data with the fetched description
+        setDiscoveryData(prevData => ({
+          ...prevData!,
+          description: data.description,
+        }));
+      }
+    } catch (err) {
+      setDiscoveryError(err instanceof Error ? err.message : 'An unknown error occurred');
+    } finally {
+      setDiscoveryLoading(false);
+    }
+  };
+
+  const closeDiscoveryModal = () => {
+    setDiscoveryModalVisible(false);
+    setDiscoveryData(null);
+    setDiscoveryError(null);
+    setDiscoveryLoading(false);
   };
 
   const fetchMetadata = async (url: string | undefined) => {
@@ -185,10 +256,17 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     currentMetadata,
     isPlaying,
     isLoading,
-    soundRef: useRef(null), // Provide a dummy ref for compatibility
+    soundRef: useRef(null),
     playStream,
     togglePlayPause,
     cleanupAudio,
+    // Add discovery modal state and functions to the context value
+    isDiscoveryModalVisible,
+    discoveryData,
+    isDiscoveryLoading,
+    discoveryError,
+    openDiscoveryModal,
+    closeDiscoveryModal,
   };
 
   return (

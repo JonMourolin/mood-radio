@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, SafeAreaView, Platform } from 'react-native';
-import { Stack, useRouter } from 'expo-router'; // Import useRouter
+import { Stack, useRouter, Link } from 'expo-router'; // Import Link
 import { Ionicons } from '@expo/vector-icons';
 // import { BlurView } from 'expo-blur'; // BlurView might not be needed if Image blurRadius works well
 import { usePlayerContext } from '@/context/PlayerContext'; // Import player context
@@ -15,7 +15,8 @@ export default function FullScreenPlayer() {
     currentMetadata,
     isPlaying,
     isLoading,
-    togglePlayPause
+    togglePlayPause,
+    openDiscoveryModal,
   } = usePlayerContext();
 
   // Use data from context instead of params
@@ -73,11 +74,17 @@ export default function FullScreenPlayer() {
 
         {/* Header with Back Button */}
         <View style={styles.header}>
-            <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
+            <TouchableOpacity onPress={handleGoBack} style={styles.headerButton}>
                 <Ionicons name="chevron-down" size={32} color="#FFFFFF" />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>{streamTitle}</Text>
-            <View style={{ width: 40 }} />
+            {currentMetadata?.song ? (
+              <TouchableOpacity onPress={openDiscoveryModal} style={styles.headerButton}>
+                <Ionicons name="infinite" size={28} color="#FFFFFF" />
+              </TouchableOpacity>
+            ) : (
+              <View style={{ width: 40 }} />
+            )}
         </View>
 
       <View style={styles.container}>
@@ -127,8 +134,10 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     width: '100%',
   },
-  backButton: {
-    padding: 5, // Increase touchable area
+  headerButton: {
+    padding: 5,
+    width: 40,
+    alignItems: 'center',
   },
   headerTitle: {
       color: '#FFFFFF',

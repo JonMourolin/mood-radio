@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import Navigation from './components/Navigation';
 import { PlayerProvider } from '@/context/PlayerContext';
 import SEOHead from '@/components/SEOHead';
+import DiscoveryModal from './components/DiscoveryModal';
 
 
 // Explicitly import the tabs layout to see if it affects bundling in preview
@@ -107,7 +108,9 @@ export default function RootLayout() {
             headerShown: false,
             contentStyle: { backgroundColor: '#121418' }
           }}
-        />
+        >
+        </Stack>
+        <DiscoveryModal />
       </Animated.View>
     </PlayerProvider>
   );
