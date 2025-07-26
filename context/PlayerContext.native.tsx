@@ -16,6 +16,7 @@ import { AzuraCastApiResponse } from '@/types/api';
 interface DiscoveryData {
   track: string | null;
   artist: string | null;
+  album: string | null; // Add album to discovery data
   artUrl: string | null;
   moodImageUrl: string | null;
   description: string | null;
@@ -92,6 +93,7 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
         const newMetadata: StreamMetadata = {
           song: track.text || `${track.artist || 'Unknown Artist'} - ${track.title || 'Unknown Title'}`,
           artUrl: track.art || undefined,
+          album: track.album || undefined, // Capture the album here
         };
         if (newMetadata.song !== currentMetadata?.song) {
           setCurrentMetadata(newMetadata);
@@ -117,10 +119,12 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     const songParts = currentMetadata.song.split(' - ');
     const artist = songParts[0]?.trim() || activeStream.title;
     const track = songParts.length > 1 ? songParts.slice(1).join(' - ').trim() : 'Unknown Title';
+    const album = currentMetadata.album || null;
 
     setDiscoveryData({
         track,
         artist,
+        album,
         artUrl: currentMetadata.artUrl || null,
         moodImageUrl: activeStream.moodImageUrl || null,
         description: null, // The description is what we're fetching
@@ -131,7 +135,8 @@ export const PlayerProvider: React.FC<PlayerProviderProps> = ({ children }) => {
     setDiscoveryError(null);
 
     try {
-      const response = await fetch(`/api/getTrackInfo?artist=${encodeURIComponent(artist)}&track=${encodeURIComponent(track)}`);
+      const apiUrl = `/api/getTrackInfo?artist=${encodeURIComponent(artist)}&track=${encodeURIComponent(track)}&album=${album ? encodeURIComponent(album) : ''}`;
+      const response = await fetch(apiUrl);
 
       if (!response.ok) {
         if (response.status === 504) {

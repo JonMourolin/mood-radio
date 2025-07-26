@@ -10,6 +10,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const artist = searchParams.get('artist');
   const track = searchParams.get('track');
+  const album = searchParams.get('album'); // Get the album from the query
 
   if (!artist || !track) {
     return new Response(JSON.stringify({ error: 'Artist and track parameters are required' }), {
@@ -34,10 +35,28 @@ export async function GET(request: Request) {
     }
 
     // 2. Cache miss: call OpenAI API
-    const prompt = `
-Here is the track: "${track}" by "${artist}".
+    const prompt = `You are a music curator for a beloved independent radio station, like Worldwide FM or NTS. Your goal is to write a short, insightful description for the track about to be played.
 
-Write a precise and engaging 50-word maximum description of a music track. Use available metadata to highlight the track, the album (if applicable), the release year, the genre, and the country of origin of the artist. If relevant, include an anecdote or trivia about the track, artist, or recording. The tone should mix technical insight with a warm, curious radio host vibe — like something you’d hear on Worldwide FM. Avoid vague or generic phrases; aim for accuracy, depth, and musical context.
+The track is: "${track}"
+The artist is: "${artist}"
+${album ? `From the album: "${album}"` : ''}
+
+Your instructions:
+1.  **Write a captivating description** of 50-60 words.
+2.  **VARY YOUR SENTENCE STRUCTURE AND OPENING.** Do not always start with the same phrase. You could start with the release year, a piece of trivia, the artist's origin, or a description of the sound itself.
+3.  **Weave in key details** like genre, release year, and artist's country of origin when possible.
+4.  **Maintain a tone** that is both knowledgeable and passionate—technical yet accessible.
+
+Here are a few examples of the style we love to demonstrate the variety we're looking for:
+
+Example 1 (starting with the year):
+"1992's 'Equinox (Heavenly Club Mix)' is the work of New York's Code 718, an alias of legendary DJ Danny Tenaglia. This classic house track pulses with hypnotic rhythms, embodying the era's club scene magic."
+
+Example 2 (starting with the artist):
+"Sweden's Carbon Based Lifeforms are known for pioneering the psybient genre. Their 2003 track 'Tensor,' from the album 'Hydroponic Garden,' blends lush textures and intricate rhythms into something both cosmic and grounding."
+
+Example 3 (starting with a fact):
+"A cult favorite from the '90s shoegaze scene, Bowery Electric's 'Long Way Down' (1996) envelops you in lush, textured soundscapes. Taken from their sophomore album 'Beat,' it showcases their innovative fusion of ambient and rock."
 `;
 
     const response = await openai.chat.completions.create({

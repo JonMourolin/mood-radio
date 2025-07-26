@@ -3,28 +3,17 @@ import { View, Text, StyleSheet, Image, ActivityIndicator, ScrollView, useWindow
 import { usePlayerContext } from '@/context/PlayerContext';
 import { Ionicons } from '@expo/vector-icons';
 
-// Custom hook for typewriter effect
-const useTypewriter = (text: string, speed: number = 20) => {
-  const [displayedText, setDisplayedText] = React.useState('');
+// The typewriter hook is removed as it causes layout shifts.
 
-  React.useEffect(() => {
-    setDisplayedText('');
-    if (text) {
-      let i = 0;
-      const intervalId = setInterval(() => {
-        if (i < text.length) {
-          setDisplayedText(prev => prev + text.charAt(i));
-          i++;
-        } else {
-          clearInterval(intervalId);
-        }
-      }, speed);
-      return () => clearInterval(intervalId);
-    }
-  }, [text, speed]);
-
-  return displayedText;
-};
+// Skeleton Loader Component
+const SkeletonPlaceholder = () => (
+  <View style={styles.skeletonContainer}>
+    <View style={styles.skeletonBar} />
+    <View style={styles.skeletonBar} />
+    <View style={styles.skeletonBar} />
+    <View style={[styles.skeletonBar, { width: '75%' }]} />
+  </View>
+);
 
 export default function DiscoveryModal() {
   const {
@@ -37,7 +26,6 @@ export default function DiscoveryModal() {
   
   const { track, artist, artUrl, moodImageUrl, description } = discoveryData || {};
   
-  const displayedDescription = useTypewriter(isDiscoveryLoading ? '' : description || '');
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
   const isMobileLayout = width < 768;
@@ -65,20 +53,28 @@ export default function DiscoveryModal() {
         <View style={[styles.card, isWeb && !isMobileLayout && styles.cardDesktop]}>
           <View style={[styles.mainContent, isMobileLayout && styles.mainContentMobile]}>
             {typeof artUrl === 'string' && (
-              <Image source={{ uri: artUrl }} style={[styles.coverImage, isMobileLayout && styles.coverImageMobile]} />
+              <Image 
+                source={{ uri: artUrl }} 
+                style={[
+                  styles.coverImage, 
+                  isWeb && isMobileLayout && { 
+                    width: width * 0.35, 
+                    height: width * 0.35, 
+                    marginRight: 0, 
+                    marginBottom: 20 
+                  }
+                ]} 
+              />
             )}
             <View style={[styles.textContainer, isMobileLayout && styles.textContainerMobile]}>
               <Text style={[styles.artistName, isMobileLayout && styles.artistNameMobile]}>{artist || 'Unknown Artist'}</Text>
               <Text style={[styles.trackTitle, isMobileLayout && styles.trackTitleMobile]}>{track || 'Unknown Track'}</Text>
               
               <View style={styles.descriptionContainer}>
-                {isDiscoveryLoading ? (
-                  <ActivityIndicator size="large" color="#FFFFFF" />
-                ) : discoveryError ? (
-                  <Text style={styles.errorText}>{discoveryError}</Text>
-                ) : (
-                  <Text style={[styles.descriptionText, isMobileLayout && styles.descriptionTextMobile]}>{displayedDescription}</Text>
-                )}
+                {isDiscoveryLoading && <SkeletonPlaceholder />}
+                <Text style={[styles.descriptionText, { color: isDiscoveryLoading ? 'transparent' : '#FFFFFF' }]}>
+                  {isDiscoveryLoading ? 'Loading description, please wait... This text ensures the container has the correct height from the start.' : (discoveryError || description)}
+                </Text>
               </View>
               
               <TouchableOpacity onPress={handleClose} style={styles.backButton}>
@@ -168,48 +164,42 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginRight: 25,
   },
-  coverImageMobile: {
-    width: '80%',
-    height: undefined,
-    aspectRatio: 1,
-    marginRight: 0,
-    marginBottom: 20,
-  },
   textContainer: {
     flex: 1,
     justifyContent: 'center',
   },
   textContainerMobile: {
-    alignItems: 'center',
+    alignItems: 'flex-start', // Align text content to the left
     width: '100%',
   },
   artistName: {
-    fontSize: 22, // Reduced size
+    fontSize: 18, // Final font size adjustment
     color: '#FFFFFF',
     fontWeight: '400',
   },
   artistNameMobile: {
-    textAlign: 'center',
+    // No longer centered
   },
   trackTitle: {
-    fontSize: 18, // Reduced size
+    fontSize: 16, // Further reduced size
     color: '#FFFFFF',
-    marginBottom: 15, // Reduced space
+    marginBottom: 15,
   },
   trackTitleMobile: {
-    textAlign: 'center',
+    // No longer centered
   },
   descriptionContainer: {
     marginTop: 10,
-    minHeight: 120, // Adjusted min-height for the new button
+    position: 'relative', // Needed for absolute positioning of skeleton
+    width: '100%',
   },
   descriptionText: {
-    fontSize: 15,
+    fontSize: 14, // Further reduced size
     color: '#FFFFFF',
-    lineHeight: 22,
+    lineHeight: 20, // Adjusted line height
   },
   descriptionTextMobile: {
-    textAlign: 'center',
+    // No longer centered
   },
   errorText: {
     fontSize: 15,
@@ -229,4 +219,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
+  skeletonBar: {
+    height: 14,
+    width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  skeletonContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  }
 }); 

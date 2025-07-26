@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.35.0] - 2025-07-26
+
+### Added
+- **Album Data Integration**: The app now fetches and utilizes album titles from the AzuraCast API.
+- **Enhanced AI Prompts**: The prompt sent to OpenAI has been significantly improved with a persona, clear instructions, and few-shot examples to encourage more varied and engaging track descriptions.
+- **Skeleton Loader**: Implemented a skeleton loader in the Discovery Modal. This reserves space for the description, preventing layout shifts and providing a smoother loading experience.
+
+### Changed
+- **Discovery Modal UI (Mobile)**: Reworked the Discovery Modal on mobile web for a better user experience.
+  - The album art is now displayed as a smaller, perfect square.
+  - All text (artist, title, description) is now left-aligned for better readability.
+  - Font sizes have been adjusted for a more balanced and refined look.
+
+### Fixed
+- **Discovery Modal Layout Shift**: Fixed a major UI bug where the modal would resize as the description text loaded, creating a jarring visual effect.
+- **Discovery Modal Text Truncation**: Corrected an issue where the description text could be cut off.
+- **Typewriter Effect Bug**: Removed the "typewriter" effect, which was causing layout instability and occasionally skipping the first letter of the description.
+
+### Security
+- **Resolved Dependencies Vulnerabilities**: Ran `npm audit fix` to patch 1 low and 1 critical vulnerability in project dependencies, improving the overall security of the application.
+
 ## [3.34.0] - 2025-07-24
 
 ### Added

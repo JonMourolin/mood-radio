@@ -19,4 +19,5 @@ export interface StreamMetadata {
   // Removed title, artist, album as they are combined into song
   song: string; // e.g., "Artist Name - Track Title"
   artUrl?: string;
+  album?: string;
 } 

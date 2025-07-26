@@ -6,6 +6,7 @@ export interface AzuraCastSong {
   art?: string;
   artist?: string;
   title?: string;
+  album?: string;
 }
 
 /**
